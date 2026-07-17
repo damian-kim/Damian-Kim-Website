@@ -20,25 +20,47 @@ const TARGETS = [
 
 function LowPolyTree({ position }: { position: [number, number, number] }) {
   const seed = position[0] + position[2];
-  const heightScale = 0.85 + (Math.sin(seed * 100) * 0.15 + 0.15);
-  const widthScale = 0.9 + (Math.cos(seed * 50) * 0.1 + 0.1);
+  // Natural variation in height and width
+  const heightScale = 0.85 + (Math.sin(seed * 110) * 0.15 + 0.15);
+  const widthScale = 0.9 + (Math.cos(seed * 60) * 0.1 + 0.1);
 
   return (
     <group position={position} scale={[widthScale, heightScale, widthScale]}>
-      {/* Trunk: solid charcoal */}
-      <mesh position={[0, 1.0, 0]} castShadow>
-        <cylinderGeometry args={[0.15, 0.25, 2.0, 8]} />
+      {/* Detailed Trunk: dark charcoal cylinder */}
+      <mesh position={[0, 0.9, 0]} castShadow>
+        <cylinderGeometry args={[0.1, 0.2, 1.8, 8]} />
         <meshStandardMaterial color="#222222" roughness={0.9} />
       </mesh>
-      {/* Bottom foliage: off-white */}
-      <mesh position={[0, 2.7, 0]} castShadow receiveShadow>
-        <coneGeometry args={[1.1, 2.4, 8]} />
-        <meshStandardMaterial color="#f0f0f0" roughness={0.8} />
+      
+      {/* Realistic Layered Pine Needle Branches (Tapering cone segments) */}
+      {/* Layer 1 (Bottom branches) */}
+      <mesh position={[0, 1.6, 0]} castShadow receiveShadow>
+        <coneGeometry args={[1.3, 1.0, 10]} />
+        <meshStandardMaterial color="#eeeeee" roughness={0.8} />
       </mesh>
-      {/* Top foliage: medium-light gray */}
-      <mesh position={[0, 3.8, 0]} castShadow>
-        <coneGeometry args={[0.8, 1.8, 8]} />
-        <meshStandardMaterial color="#e0e0e0" roughness={0.8} />
+
+      {/* Layer 2 */}
+      <mesh position={[0, 2.2, 0]} castShadow receiveShadow>
+        <coneGeometry args={[1.05, 0.9, 10]} />
+        <meshStandardMaterial color="#e2e2e2" roughness={0.8} />
+      </mesh>
+
+      {/* Layer 3 */}
+      <mesh position={[0, 2.7, 0]} castShadow>
+        <coneGeometry args={[0.85, 0.8, 10]} />
+        <meshStandardMaterial color="#d4d4d4" roughness={0.8} />
+      </mesh>
+
+      {/* Layer 4 */}
+      <mesh position={[0, 3.2, 0]} castShadow>
+        <coneGeometry args={[0.6, 0.7, 8]} />
+        <meshStandardMaterial color="#c6c6c6" roughness={0.8} />
+      </mesh>
+
+      {/* Layer 5 (Top needles cap) */}
+      <mesh position={[0, 3.62, 0]} castShadow>
+        <coneGeometry args={[0.35, 0.55, 8]} />
+        <meshStandardMaterial color="#b8b8b8" roughness={0.8} />
       </mesh>
     </group>
   );
@@ -96,7 +118,7 @@ function TargetGreen({ yards, x, z, color }: TargetGreenProps) {
 
 export default function RangeEnvironment({ bounds }: RangeEnvironmentProps) {
   const lengthM = Math.max(bounds.maxDownrangeM * 1.25, 30);
-  const widthM = Math.max(bounds.maxLateralAbsM * 3, 24);
+  const widthM = Math.max(bounds.maxLateralAbsM * 2.5 + 90, 100);
 
   const fairwayWidth = widthM * 0.7;
   const roughWidth = (widthM - fairwayWidth) / 2;

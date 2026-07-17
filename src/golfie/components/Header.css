@@ -1,0 +1,85 @@
+.app-header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: rgba(8, 12, 16, 0.85);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(152, 175, 199, 0.15);
+}
+
+.app-header__row {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 16px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.app-header__wordmark {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 17px;
+  letter-spacing: 0.08em;
+  color: var(--color-ink);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: color 0.15s ease;
+}
+
+.app-header__wordmark::before {
+  content: "";
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--color-turf-bright);
+  box-shadow: 0 0 6px var(--color-turf-bright);
+}
+
+.app-header__wordmark:hover {
+  text-decoration: none;
+  color: var(--color-turf-bright);
+}
+
+.app-header__nav {
+  display: flex;
+  gap: 24px;
+}
+
+.app-header__link {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 13px;
+  color: var(--color-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  transition: color 0.15s ease;
+  position: relative;
+  padding: 4px 0;
+}
+
+.app-header__link:hover {
+  color: var(--color-ink);
+  text-decoration: none;
+}
+
+.app-header__link--active {
+  color: var(--color-turf-bright);
+}
+
+.app-header__link--active::after {
+  content: "";
+  position: absolute;
+  bottom: -16px;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--color-turf-bright);
+  box-shadow: 0 0 8px var(--color-turf-bright);
+}
+
+.app-header__tracer {
+  display: none; /* Removed the messy visual SVG tracer in favor of a clean underline on active links */
+}

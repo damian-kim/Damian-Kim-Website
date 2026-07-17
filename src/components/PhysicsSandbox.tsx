@@ -6,6 +6,7 @@ export default function PhysicsSandbox() {
     // Parameter States
     const [velocity, setVelocity] = useState(45);
     const [angle, setAngle] = useState(15);
+    const [direction, setDirection] = useState(0); // -20 to 20 degrees (left/right)
     const [backspin, setBackspin] = useState(3000);
     const [sidespin, setSidespin] = useState(0); // -2000 to 2000 RPM
     const [drag, setDrag] = useState(0.24);
@@ -16,8 +17,8 @@ export default function PhysicsSandbox() {
 
     // Compute 3D trajectory path when parameters change
     const path = useMemo(() => {
-        return calculateTrajectory3D(velocity, angle, backspin, sidespin, drag, gravity);
-    }, [velocity, angle, backspin, sidespin, drag, gravity]);
+        return calculateTrajectory3D(velocity, angle, direction, backspin, sidespin, drag, gravity);
+    }, [velocity, angle, direction, backspin, sidespin, drag, gravity]);
 
     // Compute metrics
     const metrics = useMemo(() => {
@@ -38,6 +39,7 @@ export default function PhysicsSandbox() {
     const handleReset = () => {
         setVelocity(45);
         setAngle(15);
+        setDirection(0);
         setBackspin(3000);
         setSidespin(0);
         setDrag(0.24);
@@ -49,6 +51,12 @@ export default function PhysicsSandbox() {
         if (val === 0) return '0 RPM (Straight)';
         if (val < 0) return `${Math.abs(val)} RPM (Draw / Hook)`;
         return `${val} RPM (Fade / Slice)`;
+    };
+
+    const getDirectionLabel = (val: number) => {
+        if (val === 0) return '0° (Straight)';
+        if (val < 0) return `${Math.abs(val)}° Left`;
+        return `${val}° Right`;
     };
 
     return (
@@ -138,6 +146,24 @@ export default function PhysicsSandbox() {
                                 step="1" 
                                 value={angle}
                                 onChange={(e) => setAngle(parseInt(e.target.value))}
+                            />
+                        </div>
+
+                        <div className="control-group">
+                            <div className="control-label">
+                                <label htmlFor="param-direction">Launch Direction</label>
+                                <span className="val-display" id="val-direction" style={{ color: direction === 0 ? 'var(--text-primary)' : direction < 0 ? '#ef4444' : '#3b82f6' }}>
+                                    {getDirectionLabel(direction)}
+                                </span>
+                            </div>
+                            <input 
+                                type="range" 
+                                id="param-direction" 
+                                min="-20" 
+                                max="20" 
+                                step="1" 
+                                value={direction}
+                                onChange={(e) => setDirection(parseInt(e.target.value))}
                             />
                         </div>
 

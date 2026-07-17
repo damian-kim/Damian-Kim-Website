@@ -1,4 +1,4 @@
-// 3D Runge-Kutta 4th Order (RK4) integration for projectile mechanics
+// 3D Runge-Kutta 4th Order (RK4) integration for projectile mechanics with bouncing and rolling friction
 import type { ScenePoint } from '../lib/types';
 
 // Advances state using RK4 solver in 3D: [x, y, z, vx, vy, vz]
@@ -33,15 +33,10 @@ export function getDerivatives3D(
     const adz = -(Fd / m) * (vz / v);
 
     // 3. Magnus Lift Force (cross product of angular velocity and velocity)
-    // spin vector: [omega_x, omega_y, omega_z]
-    // backspin is rotation about Z, sidespin is rotation about Y
     const omegaY = sidespin * Math.PI / 30.0;
     const omegaZ = backspin * Math.PI / 30.0;
     
     // Cross product: w = omega x v
-    // wx = omegaY * vz - omegaZ * vy
-    // wy = omegaZ * vx
-    // wz = -omegaY * vx
     const wx = omegaY * vz - omegaZ * vy;
     const wy = omegaZ * vx;
     const wz = -omegaY * vx;
@@ -123,51 +118,88 @@ export function rk4Step3D(
 export function calculateTrajectory3D(
     v0: number,
     angleDeg: number,
+    yawDeg: number, // horizontal launch direction (degrees left/right)
     backspin: number,
     sidespin: number,
     Cd: number,
     gravity: number
 ): ScenePoint[] {
     const angleRad = angleDeg * Math.PI / 180.0;
+    const yawRad = yawDeg * Math.PI / 180.0;
     
     // Initial state: [x, y, z, vx, vy, vz]
-    // Launching down the +X fairway
+    // Launching down the +X fairway, with yaw angle deviating left/right
+    const vx = v0 * Math.cos(angleRad) * Math.cos(yawRad);
+    const vy = v0 * Math.sin(angleRad);
+    const vz = v0 * Math.cos(angleRad) * Math.sin(yawRad);
+
     let state: [number, number, number, number, number, number] = [
         0.0, 
         0.0, 
         0.0, 
-        v0 * Math.cos(angleRad), 
-        v0 * Math.sin(angleRad),
-        0.0 // initial lateral velocity is 0
+        vx, 
+        vy,
+        vz
     ];
 
     const path: ScenePoint[] = [{ x: state[0], y: state[1], z: state[2], t: 0.0 }];
     const dt = 0.015;
     let t = 0.0;
-    const maxDuration = 30.0;
+    const maxDuration = 35.0; // Slightly increased to allow complete bounce + roll duration
 
-    while (state[1] >= 0.0 && t < maxDuration) {
-        state = rk4Step3D(state, dt, Cd, backspin, sidespin, gravity);
+    let currentBackspin = backspin;
+    let currentSidespin = sidespin;
+    let bounceCount = 0;
+    const maxBounces = 6;
+
+    while (t < maxDuration) {
+        state = rk4Step3D(state, dt, Cd, currentBackspin, currentSidespin, gravity);
         t += dt;
+
+        // Ground collision check
+        if (state[1] < 0.0) {
+            state[1] = 0.0; // lock ball vertically to turf surface
+            
+            const vy = state[4];
+
+            // If vertical velocity is small or max bounces reached, transition to roll
+            if (Math.abs(vy) < 0.8 || bounceCount >= maxBounces) {
+                state[4] = 0.0; // kill vertical velocity
+
+                // Calculate rolling speed
+                const rollingSpeed = Math.sqrt(state[3] * state[3] + state[5] * state[5]);
+                
+                if (rollingSpeed < 0.2) {
+                    // Ball comes to rest
+                    state[3] = 0.0;
+                    state[5] = 0.0;
+                    path.push({ x: state[0], y: state[1], z: state[2], t });
+                    break;
+                } else {
+                    // Apply rolling friction coefficient (friction decelerates the rolling ball)
+                    const frictionCoeff = 0.08; // grass roll resistance
+                    const frictionDecel = frictionCoeff * gravity * dt;
+                    const ratio = Math.max(0, (rollingSpeed - frictionDecel) / rollingSpeed);
+                    state[3] *= ratio;
+                    state[5] *= ratio;
+                }
+            } else {
+                // Bounce reflection: reverse vertical speed and apply coefficient of restitution (e.g. 0.42 for turf)
+                state[4] = -vy * 0.42;
+
+                // Apply impact friction: deduct horizontal speed components
+                state[3] *= 0.72;
+                state[5] *= 0.72;
+                
+                bounceCount++;
+            }
+
+            // Spin decays on impact
+            currentBackspin *= 0.45;
+            currentSidespin *= 0.45;
+        }
+
         path.push({ x: state[0], y: state[1], z: state[2], t });
-    }
-
-    // exact landing correction
-    if (state[1] < 0.0 && path.length > 1) {
-        const before = path[path.length - 2];
-        const after = path[path.length - 1];
-        
-        const ratio = (0.0 - before.y) / (after.y - before.y);
-        const finalX = before.x + ratio * (after.x - before.x);
-        const finalZ = before.z + ratio * (after.z - before.z);
-        const finalT = before.t + ratio * (after.t - before.t);
-
-        path[path.length - 1] = {
-            x: finalX,
-            y: 0.0,
-            z: finalZ,
-            t: finalT
-        };
     }
 
     return path;
