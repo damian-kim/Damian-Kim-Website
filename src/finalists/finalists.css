@@ -16,6 +16,9 @@
 .golfie-product-demo--compact .portfolio-shot-modes,
 .golfie-product-demo--compact .portfolio-parameter-dock,
 .golfie-product-demo--compact .portfolio-real-shot-actions { display: none; }
+.portfolio-home .monolith-page { padding-top: 0; }
+.portfolio-home .monolith-nav { top: 0; }
+.portfolio-home .monolith-hero { min-height: calc(100svh - 70px); }
 
 @layer shell {
   .finalists-app { min-height: 100svh; }
