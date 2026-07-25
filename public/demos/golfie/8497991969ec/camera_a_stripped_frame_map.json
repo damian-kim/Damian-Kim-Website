@@ -1,0 +1,396 @@
+{
+  "fps_used": 29.95556066298838,
+  "start_frame": 0,
+  "mappings": [
+    {
+      "original_frame_idx": 0,
+      "cropped_frame_idx": 0,
+      "original_timestamp_sec": 0.0,
+      "cropped_timestamp_sec": 0.0
+    },
+    {
+      "original_frame_idx": 1,
+      "cropped_frame_idx": 1,
+      "original_timestamp_sec": 0.03338,
+      "cropped_timestamp_sec": 0.03338
+    },
+    {
+      "original_frame_idx": 2,
+      "cropped_frame_idx": 2,
+      "original_timestamp_sec": 0.06677,
+      "cropped_timestamp_sec": 0.06677
+    },
+    {
+      "original_frame_idx": 3,
+      "cropped_frame_idx": 3,
+      "original_timestamp_sec": 0.10015,
+      "cropped_timestamp_sec": 0.10015
+    },
+    {
+      "original_frame_idx": 4,
+      "cropped_frame_idx": 4,
+      "original_timestamp_sec": 0.13353,
+      "cropped_timestamp_sec": 0.13353
+    },
+    {
+      "original_frame_idx": 5,
+      "cropped_frame_idx": 5,
+      "original_timestamp_sec": 0.16691,
+      "cropped_timestamp_sec": 0.16691
+    },
+    {
+      "original_frame_idx": 6,
+      "cropped_frame_idx": 6,
+      "original_timestamp_sec": 0.2003,
+      "cropped_timestamp_sec": 0.2003
+    },
+    {
+      "original_frame_idx": 7,
+      "cropped_frame_idx": 7,
+      "original_timestamp_sec": 0.23368,
+      "cropped_timestamp_sec": 0.23368
+    },
+    {
+      "original_frame_idx": 8,
+      "cropped_frame_idx": 8,
+      "original_timestamp_sec": 0.26706,
+      "cropped_timestamp_sec": 0.26706
+    },
+    {
+      "original_frame_idx": 9,
+      "cropped_frame_idx": 9,
+      "original_timestamp_sec": 0.30045,
+      "cropped_timestamp_sec": 0.30045
+    },
+    {
+      "original_frame_idx": 10,
+      "cropped_frame_idx": 10,
+      "original_timestamp_sec": 0.33383,
+      "cropped_timestamp_sec": 0.33383
+    },
+    {
+      "original_frame_idx": 11,
+      "cropped_frame_idx": 11,
+      "original_timestamp_sec": 0.36721,
+      "cropped_timestamp_sec": 0.36721
+    },
+    {
+      "original_frame_idx": 12,
+      "cropped_frame_idx": 12,
+      "original_timestamp_sec": 0.40059,
+      "cropped_timestamp_sec": 0.40059
+    },
+    {
+      "original_frame_idx": 13,
+      "cropped_frame_idx": 13,
+      "original_timestamp_sec": 0.43398,
+      "cropped_timestamp_sec": 0.43398
+    },
+    {
+      "original_frame_idx": 14,
+      "cropped_frame_idx": 14,
+      "original_timestamp_sec": 0.46736,
+      "cropped_timestamp_sec": 0.46736
+    },
+    {
+      "original_frame_idx": 15,
+      "cropped_frame_idx": 15,
+      "original_timestamp_sec": 0.50074,
+      "cropped_timestamp_sec": 0.50074
+    },
+    {
+      "original_frame_idx": 16,
+      "cropped_frame_idx": 16,
+      "original_timestamp_sec": 0.53412,
+      "cropped_timestamp_sec": 0.53412
+    },
+    {
+      "original_frame_idx": 17,
+      "cropped_frame_idx": 17,
+      "original_timestamp_sec": 0.56751,
+      "cropped_timestamp_sec": 0.56751
+    },
+    {
+      "original_frame_idx": 18,
+      "cropped_frame_idx": 18,
+      "original_timestamp_sec": 0.60089,
+      "cropped_timestamp_sec": 0.60089
+    },
+    {
+      "original_frame_idx": 19,
+      "cropped_frame_idx": 19,
+      "original_timestamp_sec": 0.63427,
+      "cropped_timestamp_sec": 0.63427
+    },
+    {
+      "original_frame_idx": 20,
+      "cropped_frame_idx": 20,
+      "original_timestamp_sec": 0.66766,
+      "cropped_timestamp_sec": 0.66766
+    },
+    {
+      "original_frame_idx": 21,
+      "cropped_frame_idx": 21,
+      "original_timestamp_sec": 0.70104,
+      "cropped_timestamp_sec": 0.70104
+    },
+    {
+      "original_frame_idx": 22,
+      "cropped_frame_idx": 22,
+      "original_timestamp_sec": 0.73442,
+      "cropped_timestamp_sec": 0.73442
+    },
+    {
+      "original_frame_idx": 23,
+      "cropped_frame_idx": 23,
+      "original_timestamp_sec": 0.7678,
+      "cropped_timestamp_sec": 0.7678
+    },
+    {
+      "original_frame_idx": 24,
+      "cropped_frame_idx": 24,
+      "original_timestamp_sec": 0.80119,
+      "cropped_timestamp_sec": 0.80119
+    },
+    {
+      "original_frame_idx": 25,
+      "cropped_frame_idx": 25,
+      "original_timestamp_sec": 0.83457,
+      "cropped_timestamp_sec": 0.83457
+    },
+    {
+      "original_frame_idx": 26,
+      "cropped_frame_idx": 26,
+      "original_timestamp_sec": 0.86795,
+      "cropped_timestamp_sec": 0.86795
+    },
+    {
+      "original_frame_idx": 27,
+      "cropped_frame_idx": 27,
+      "original_timestamp_sec": 0.90134,
+      "cropped_timestamp_sec": 0.90134
+    },
+    {
+      "original_frame_idx": 28,
+      "cropped_frame_idx": 28,
+      "original_timestamp_sec": 0.93472,
+      "cropped_timestamp_sec": 0.93472
+    },
+    {
+      "original_frame_idx": 29,
+      "cropped_frame_idx": 29,
+      "original_timestamp_sec": 0.9681,
+      "cropped_timestamp_sec": 0.9681
+    },
+    {
+      "original_frame_idx": 30,
+      "cropped_frame_idx": 30,
+      "original_timestamp_sec": 1.00148,
+      "cropped_timestamp_sec": 1.00148
+    },
+    {
+      "original_frame_idx": 31,
+      "cropped_frame_idx": 31,
+      "original_timestamp_sec": 1.03487,
+      "cropped_timestamp_sec": 1.03487
+    },
+    {
+      "original_frame_idx": 32,
+      "cropped_frame_idx": 32,
+      "original_timestamp_sec": 1.06825,
+      "cropped_timestamp_sec": 1.06825
+    },
+    {
+      "original_frame_idx": 33,
+      "cropped_frame_idx": 33,
+      "original_timestamp_sec": 1.10163,
+      "cropped_timestamp_sec": 1.10163
+    },
+    {
+      "original_frame_idx": 34,
+      "cropped_frame_idx": 34,
+      "original_timestamp_sec": 1.13501,
+      "cropped_timestamp_sec": 1.13501
+    },
+    {
+      "original_frame_idx": 35,
+      "cropped_frame_idx": 35,
+      "original_timestamp_sec": 1.1684,
+      "cropped_timestamp_sec": 1.1684
+    },
+    {
+      "original_frame_idx": 36,
+      "cropped_frame_idx": 36,
+      "original_timestamp_sec": 1.20178,
+      "cropped_timestamp_sec": 1.20178
+    },
+    {
+      "original_frame_idx": 37,
+      "cropped_frame_idx": 37,
+      "original_timestamp_sec": 1.23516,
+      "cropped_timestamp_sec": 1.23516
+    },
+    {
+      "original_frame_idx": 38,
+      "cropped_frame_idx": 38,
+      "original_timestamp_sec": 1.26855,
+      "cropped_timestamp_sec": 1.26855
+    },
+    {
+      "original_frame_idx": 39,
+      "cropped_frame_idx": 39,
+      "original_timestamp_sec": 1.30193,
+      "cropped_timestamp_sec": 1.30193
+    },
+    {
+      "original_frame_idx": 40,
+      "cropped_frame_idx": 40,
+      "original_timestamp_sec": 1.33531,
+      "cropped_timestamp_sec": 1.33531
+    },
+    {
+      "original_frame_idx": 41,
+      "cropped_frame_idx": 41,
+      "original_timestamp_sec": 1.36869,
+      "cropped_timestamp_sec": 1.36869
+    },
+    {
+      "original_frame_idx": 42,
+      "cropped_frame_idx": 42,
+      "original_timestamp_sec": 1.40208,
+      "cropped_timestamp_sec": 1.40208
+    },
+    {
+      "original_frame_idx": 43,
+      "cropped_frame_idx": 43,
+      "original_timestamp_sec": 1.43546,
+      "cropped_timestamp_sec": 1.43546
+    },
+    {
+      "original_frame_idx": 44,
+      "cropped_frame_idx": 44,
+      "original_timestamp_sec": 1.46884,
+      "cropped_timestamp_sec": 1.46884
+    },
+    {
+      "original_frame_idx": 45,
+      "cropped_frame_idx": 45,
+      "original_timestamp_sec": 1.50223,
+      "cropped_timestamp_sec": 1.50223
+    },
+    {
+      "original_frame_idx": 46,
+      "cropped_frame_idx": 46,
+      "original_timestamp_sec": 1.53561,
+      "cropped_timestamp_sec": 1.53561
+    },
+    {
+      "original_frame_idx": 47,
+      "cropped_frame_idx": 47,
+      "original_timestamp_sec": 1.56899,
+      "cropped_timestamp_sec": 1.56899
+    },
+    {
+      "original_frame_idx": 48,
+      "cropped_frame_idx": 48,
+      "original_timestamp_sec": 1.60237,
+      "cropped_timestamp_sec": 1.60237
+    },
+    {
+      "original_frame_idx": 49,
+      "cropped_frame_idx": 49,
+      "original_timestamp_sec": 1.63576,
+      "cropped_timestamp_sec": 1.63576
+    },
+    {
+      "original_frame_idx": 50,
+      "cropped_frame_idx": 50,
+      "original_timestamp_sec": 1.66914,
+      "cropped_timestamp_sec": 1.66914
+    },
+    {
+      "original_frame_idx": 51,
+      "cropped_frame_idx": 51,
+      "original_timestamp_sec": 1.70252,
+      "cropped_timestamp_sec": 1.70252
+    },
+    {
+      "original_frame_idx": 52,
+      "cropped_frame_idx": 52,
+      "original_timestamp_sec": 1.7359,
+      "cropped_timestamp_sec": 1.7359
+    },
+    {
+      "original_frame_idx": 53,
+      "cropped_frame_idx": 53,
+      "original_timestamp_sec": 1.76929,
+      "cropped_timestamp_sec": 1.76929
+    },
+    {
+      "original_frame_idx": 54,
+      "cropped_frame_idx": 54,
+      "original_timestamp_sec": 1.80267,
+      "cropped_timestamp_sec": 1.80267
+    },
+    {
+      "original_frame_idx": 55,
+      "cropped_frame_idx": 55,
+      "original_timestamp_sec": 1.83605,
+      "cropped_timestamp_sec": 1.83605
+    },
+    {
+      "original_frame_idx": 56,
+      "cropped_frame_idx": 56,
+      "original_timestamp_sec": 1.86944,
+      "cropped_timestamp_sec": 1.86944
+    },
+    {
+      "original_frame_idx": 57,
+      "cropped_frame_idx": 57,
+      "original_timestamp_sec": 1.90282,
+      "cropped_timestamp_sec": 1.90282
+    },
+    {
+      "original_frame_idx": 58,
+      "cropped_frame_idx": 58,
+      "original_timestamp_sec": 1.9362,
+      "cropped_timestamp_sec": 1.9362
+    },
+    {
+      "original_frame_idx": 59,
+      "cropped_frame_idx": 59,
+      "original_timestamp_sec": 1.96958,
+      "cropped_timestamp_sec": 1.96958
+    },
+    {
+      "original_frame_idx": 60,
+      "cropped_frame_idx": 60,
+      "original_timestamp_sec": 2.00297,
+      "cropped_timestamp_sec": 2.00297
+    },
+    {
+      "original_frame_idx": 61,
+      "cropped_frame_idx": 61,
+      "original_timestamp_sec": 2.03635,
+      "cropped_timestamp_sec": 2.03635
+    },
+    {
+      "original_frame_idx": 62,
+      "cropped_frame_idx": 62,
+      "original_timestamp_sec": 2.06973,
+      "cropped_timestamp_sec": 2.06973
+    },
+    {
+      "original_frame_idx": 63,
+      "cropped_frame_idx": 63,
+      "original_timestamp_sec": 2.10312,
+      "cropped_timestamp_sec": 2.10312
+    },
+    {
+      "original_frame_idx": 64,
+      "cropped_frame_idx": 64,
+      "original_timestamp_sec": 2.1365,
+      "cropped_timestamp_sec": 2.1365
+    }
+  ]
+}

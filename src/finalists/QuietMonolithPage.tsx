@@ -1,5 +1,6 @@
 import { experienceProof, principles, supportingProjects } from './content';
-import { GolfieDemo, JunoDemo, SateDemo } from './ProjectDemos';
+import { GolfieDemo, SateDemo } from './ProjectDemos';
+import { MonolithProductExpansion } from './RealProductDemos';
 
 function MonolithMark() {
   return <a className="monolith-mark" href="#monolith-top" aria-label="Damian Kim, back to top">DK<span>Damian Kim</span></a>;
@@ -55,6 +56,7 @@ export default function QuietMonolithPage() {
             <p>A dual-iPhone launch monitor built across computer vision, numerical physics, and interactive 3D.</p>
           </QuietReveal>
           <QuietReveal className="monolith-featured-demo"><GolfieDemo tone="monolith" /></QuietReveal>
+          <MonolithProductExpansion />
           <div className="monolith-golfie-story">
             <QuietReveal className="monolith-story-chapter">
               <span>01 · SEE</span>
@@ -83,10 +85,6 @@ export default function QuietMonolithPage() {
 
         <section className="monolith-projects">
           <QuietReveal className="monolith-section-heading"><span>SELECTED SYSTEMS</span><h2>Operate the work.</h2></QuietReveal>
-          <QuietReveal className="monolith-demo-project">
-            <div className="monolith-demo-frame"><JunoDemo tone="monolith" /></div>
-            <aside><span>02 · {supportingProjects[0].type}</span><h3>{supportingProjects[0].name}</h3><p>{supportingProjects[0].detail}</p><strong>{supportingProjects[0].result}<small>{supportingProjects[0].resultLabel}</small></strong></aside>
-          </QuietReveal>
           <QuietReveal className="monolith-demo-project monolith-demo-project--reverse">
             <div className="monolith-demo-frame"><SateDemo tone="monolith" /></div>
             <aside><span>03 · {supportingProjects[1].type}</span><h3>{supportingProjects[1].name}</h3><p>{supportingProjects[1].detail}</p><strong>{supportingProjects[1].result}<small>{supportingProjects[1].resultLabel}</small></strong></aside>

@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { JunoDemo, SateDemo } from '../finalists/ProjectDemos';
 
 interface ProjectProps {
     index: string;
@@ -11,6 +12,7 @@ interface ProjectProps {
 
 export default function Projects() {
     const [activeSlide, setActiveSlide] = useState(0);
+    const [viewMode, setViewMode] = useState<'demo' | 'code'>('demo');
 
     const projects: ProjectProps[] = [
         {
@@ -110,12 +112,36 @@ def calculate_consensus(votes, weights):
                                         </div>
                                     </div>
 
-                                    {/* Right Visual Panel (Code blueprint) */}
+                                    {/* Right Visual Panel (Live Interactive Demo & Code Switcher) */}
                                     <div className="slide-visual-panel">
-                                        <div className="slide-visual-overlay"></div>
-                                        <pre className="slide-code-visual">
-                                            <code>{proj.codeSnippet}</code>
-                                        </pre>
+                                        <div className="slide-mode-toggle" style={{ padding: '8px 12px', display: 'flex', gap: '8px', borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
+                                            <button 
+                                                type="button" 
+                                                className={`badge ${viewMode === 'demo' ? 'active' : ''}`}
+                                                style={{ cursor: 'pointer', background: viewMode === 'demo' ? 'var(--color-primary)' : 'transparent', color: viewMode === 'demo' ? '#000' : 'inherit' }}
+                                                onClick={() => setViewMode('demo')}
+                                            >
+                                                ⚡ Live Demo
+                                            </button>
+                                            <button 
+                                                type="button" 
+                                                className={`badge ${viewMode === 'code' ? 'active' : ''}`}
+                                                style={{ cursor: 'pointer', background: viewMode === 'code' ? 'var(--color-primary)' : 'transparent', color: viewMode === 'code' ? '#000' : 'inherit' }}
+                                                onClick={() => setViewMode('code')}
+                                            >
+                                                📄 Code Blueprint
+                                            </button>
+                                        </div>
+
+                                        {viewMode === 'demo' ? (
+                                            <div className="slide-demo-wrapper" style={{ height: '100%', minHeight: '480px' }}>
+                                                {idx === 0 ? <JunoDemo tone="flight" /> : <SateDemo tone="flight" />}
+                                            </div>
+                                        ) : (
+                                            <pre className="slide-code-visual">
+                                                <code>{proj.codeSnippet}</code>
+                                            </pre>
+                                        )}
                                     </div>
                                 </div>
                             );
