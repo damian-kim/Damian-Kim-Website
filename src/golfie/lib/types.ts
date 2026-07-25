@@ -2,7 +2,7 @@
 // and backend never silently drift. If you change a field there, change
 // it here too.
 
-export type MetricSource = "measured" | "estimated" | "experimental" | "not_available";
+export type MetricSource = "measured" | "estimated" | "experimental" | "synthetic" | "not_available";
 
 export interface MetricValue {
   value: number | null;

@@ -6,9 +6,9 @@ import QuietMonolithPage from './QuietMonolithPage';
 type Finalist = 'flight' | 'monolith';
 
 function initialFinalist(): Finalist {
-  return new URLSearchParams(window.location.search).get('direction') === 'monolith'
-    ? 'monolith'
-    : 'flight';
+  return new URLSearchParams(window.location.search).get('direction') === 'flight'
+    ? 'flight'
+    : 'monolith';
 }
 
 export default function FinalistsApp() {

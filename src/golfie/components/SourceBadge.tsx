@@ -5,6 +5,7 @@ const LABELS: Record<MetricSource, string> = {
   measured: "Measured",
   estimated: "Estimated",
   experimental: "Experimental",
+  synthetic: "Synthetic",
   not_available: "Unavailable",
 };
 
