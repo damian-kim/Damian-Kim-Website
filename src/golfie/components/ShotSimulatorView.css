@@ -53,6 +53,7 @@
 
 .shot-simulator-hud__panel--right {
   right: 20px;
+  font-family: var(--font-display);
 }
 
 .hud-header {
@@ -160,6 +161,75 @@
   color: #ffffff;
 }
 
+.camera-input-widget {
+  padding-top: 12px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.camera-input-widget__layout {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 14px;
+  align-items: end;
+  padding: 11px 12px;
+  background: rgba(255, 255, 255, 0.025);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: var(--radius-sm);
+}
+
+.camera-input-widget__wasd {
+  display: grid;
+  gap: 4px;
+}
+
+.camera-input-widget__wasd > div {
+  display: flex;
+  justify-content: center;
+  gap: 4px;
+}
+
+.camera-input-widget__vertical {
+  display: grid;
+  grid-template-columns: minmax(64px, 1fr) auto;
+  gap: 5px 8px;
+  align-items: center;
+}
+
+.camera-input-widget__vertical span {
+  color: var(--color-muted);
+  font: 8px var(--font-mono);
+  letter-spacing: 0.08em;
+}
+
+.camera-key {
+  width: 30px;
+  height: 30px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(255, 255, 255, 0.48);
+  background: rgba(255, 255, 255, 0.055);
+  border: 1px solid rgba(255, 255, 255, 0.13);
+  border-radius: 5px;
+  box-shadow: inset 0 -2px 0 rgba(0, 0, 0, 0.28);
+  font: 700 10px var(--font-mono);
+  transition: color 80ms ease, background 80ms ease, border-color 80ms ease, box-shadow 80ms ease, transform 80ms ease;
+}
+
+.camera-key--wide {
+  width: 100%;
+  height: 28px;
+  font-size: 8px;
+}
+
+.camera-key--active {
+  color: #0b1115;
+  background: var(--color-turf-bright);
+  border-color: #dce9f5;
+  box-shadow: 0 0 12px rgba(152, 175, 199, 0.75), inset 0 0 0 1px rgba(255, 255, 255, 0.35);
+  transform: translateY(1px);
+}
+
 .shot-simulator-hud__metrics-scroll {
   display: flex;
   flex-direction: column;
@@ -167,6 +237,14 @@
   overflow-y: auto;
   flex-grow: 1;
   padding-right: 4px;
+}
+
+.shot-simulator-hud__panel--right .metric-card__label {
+  font-family: var(--font-display);
+}
+
+.shot-simulator-hud__panel--right .metric-card__value {
+  font-family: var(--font-mono);
 }
 
 .shot-simulator-hud__metrics-scroll::-webkit-scrollbar {

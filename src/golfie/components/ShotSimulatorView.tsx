@@ -107,16 +107,8 @@ export function ShotSimulatorView({ payload, title, subtitle }: ShotSimulatorVie
       </div>
 
       {/* Top HUD Alert Deck */}
-      {(payload.is_placeholder || payload.warnings.length > 0) && (
+      {payload.warnings.length > 0 && (
         <div className="shot-simulator-hud__alerts">
-          {payload.is_placeholder && (
-            <div className="hud-alert-banner hud-alert-banner--placeholder">
-              <span className="hud-alert-banner__tag">METRIC SOURCE: DEMO</span>
-              <p className="hud-alert-banner__message">
-                {payload.notes ?? "Telemetry calculated utilizing simulation parameters."}
-              </p>
-            </div>
-          )}
           {payload.warnings.map((w, idx) => (
             <div key={idx} className="hud-alert-banner hud-alert-banner--warning">
               <span className="hud-alert-banner__tag">WARN //</span>
@@ -161,6 +153,8 @@ export function ShotSimulatorView({ payload, title, subtitle }: ShotSimulatorVie
             </div>
           </div>
         </div>
+
+        <KeyboardInputWidget />
 
         {payload.session_id !== "sample" && (
           <div className="hud-section" style={{ marginTop: "8px" }}>
@@ -267,6 +261,56 @@ export function ShotSimulatorView({ payload, title, subtitle }: ShotSimulatorVie
           }}
         />
       )}
+    </div>
+  );
+}
+
+const TRACKED_CAMERA_KEYS = ["KeyW", "KeyA", "KeyS", "KeyD", "Space", "ControlLeft", "ControlRight"];
+
+function KeyboardInputWidget() {
+  const [activeKeys, setActiveKeys] = useState<Set<string>>(() => new Set());
+
+  useEffect(() => {
+    const updateKey = (code: string, pressed: boolean) => {
+      if (!TRACKED_CAMERA_KEYS.includes(code)) return;
+      setActiveKeys((current) => {
+        const next = new Set(current);
+        if (pressed) next.add(code);
+        else next.delete(code);
+        return next;
+      });
+    };
+    const handleKeyDown = (event: KeyboardEvent) => updateKey(event.code, true);
+    const handleKeyUp = (event: KeyboardEvent) => updateKey(event.code, false);
+    const clearKeys = () => setActiveKeys(new Set());
+    window.addEventListener("keydown", handleKeyDown);
+    window.addEventListener("keyup", handleKeyUp);
+    window.addEventListener("blur", clearKeys);
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+      window.removeEventListener("keyup", handleKeyUp);
+      window.removeEventListener("blur", clearKeys);
+    };
+  }, []);
+
+  const isActive = (...codes: string[]) => codes.some((code) => activeKeys.has(code));
+  const key = (label: string, active: boolean, className = "") => (
+    <kbd className={`camera-key${active ? " camera-key--active" : ""}${className ? ` ${className}` : ""}`}>{label}</kbd>
+  );
+
+  return (
+    <div className="hud-section camera-input-widget">
+      <div className="hud-section__title">Free Camera Input</div>
+      <div className="camera-input-widget__layout" aria-label="Live free-camera keyboard input">
+        <div className="camera-input-widget__wasd">
+          <div>{key("W", isActive("KeyW"))}</div>
+          <div>{key("A", isActive("KeyA"))}{key("S", isActive("KeyS"))}{key("D", isActive("KeyD"))}</div>
+        </div>
+        <div className="camera-input-widget__vertical">
+          {key("SPACE", isActive("Space"), "camera-key--wide")}<span>UP</span>
+          {key("CTRL", isActive("ControlLeft", "ControlRight"), "camera-key--wide")}<span>DOWN</span>
+        </div>
+      </div>
     </div>
   );
 }

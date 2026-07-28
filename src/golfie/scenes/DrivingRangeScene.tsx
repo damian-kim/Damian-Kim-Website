@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { ComponentRef } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
-import { AdaptiveDpr, ContactShadows, OrbitControls, useTexture } from "@react-three/drei";
+import { AdaptiveDpr, ContactShadows, Html, OrbitControls, useTexture } from "@react-three/drei";
 import * as THREE from "three";
 import type { ScenePoint } from "../lib/types";
 import { RangeEnvironment } from "./RangeEnvironment";
@@ -18,7 +18,7 @@ interface DrivingRangeSceneProps {
   onReplayClick?: () => void;
 }
 
-type LayerKey = "simulated" | "measured" | "fitted";
+type LayerKey = "measured" | "fitted";
 type CameraVector = [number, number, number];
 
 function conformToRange(points: ScenePoint[]): ScenePoint[] {
@@ -55,6 +55,7 @@ function FreeCameraControls({
 }) {
   const { camera } = useThree();
   const controlsRef = useRef<ComponentRef<typeof OrbitControls>>(null);
+  const pressedKeys = useRef(new Set<string>());
 
   const resetCamera = useCallback(() => {
     camera.position.set(...position);
@@ -73,12 +74,63 @@ function FreeCameraControls({
     if (enabled) resetCamera();
   }, [enabled, resetCamera]);
 
-  useFrame(() => {
+  useEffect(() => {
+    if (!enabled) {
+      pressedKeys.current.clear();
+      return;
+    }
+
+    const isEditableTarget = (target: EventTarget | null) => {
+      const element = target as HTMLElement | null;
+      return Boolean(element?.isContentEditable || element?.closest("input, textarea, select, button, a"));
+    };
+    const movementKeys = new Set(["KeyW", "KeyA", "KeyS", "KeyD", "Space", "ControlLeft", "ControlRight"]);
+    const handleKeyDown = (event: KeyboardEvent) => {
+      const isVerticalControl = event.code === "ControlLeft" || event.code === "ControlRight";
+      if (!movementKeys.has(event.code) || isEditableTarget(event.target) || event.metaKey || event.altKey || (event.ctrlKey && !isVerticalControl)) return;
+      pressedKeys.current.add(event.code);
+      event.preventDefault();
+    };
+    const handleKeyUp = (event: KeyboardEvent) => pressedKeys.current.delete(event.code);
+    const clearKeys = () => pressedKeys.current.clear();
+
+    window.addEventListener("keydown", handleKeyDown);
+    window.addEventListener("keyup", handleKeyUp);
+    window.addEventListener("blur", clearKeys);
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+      window.removeEventListener("keyup", handleKeyUp);
+      window.removeEventListener("blur", clearKeys);
+      clearKeys();
+    };
+  }, [enabled]);
+
+  useFrame((_, delta) => {
     if (!enabled) return;
 
     const controls = controlsRef.current;
     if (!controls) return;
     const controlledCamera = controls.object;
+
+    const forwardAmount = Number(pressedKeys.current.has("KeyW")) - Number(pressedKeys.current.has("KeyS"));
+    const rightAmount = Number(pressedKeys.current.has("KeyD")) - Number(pressedKeys.current.has("KeyA"));
+    const verticalAmount = Number(pressedKeys.current.has("Space")) - Number(pressedKeys.current.has("ControlLeft") || pressedKeys.current.has("ControlRight"));
+    if (forwardAmount || rightAmount || verticalAmount) {
+      const forward = new THREE.Vector3();
+      controlledCamera.getWorldDirection(forward);
+      forward.y = 0;
+      if (forward.lengthSq() < 0.0001) forward.set(1, 0, 0);
+      else forward.normalize();
+
+      const right = new THREE.Vector3().crossVectors(forward, controlledCamera.up).normalize();
+      const movement = forward.multiplyScalar(forwardAmount).addScaledVector(right, rightAmount);
+      movement.y = verticalAmount;
+      if (movement.lengthSq() > 1) movement.normalize();
+      movement.multiplyScalar(24 * Math.min(delta, 0.05));
+      controlledCamera.position.add(movement);
+      controls.target.add(movement);
+      controls.update();
+    }
 
     if (
       !Number.isFinite(controlledCamera.position.x) ||
@@ -135,7 +187,6 @@ export function DrivingRangeScene({
   onReplayClick 
 }: DrivingRangeSceneProps) {
   const [visibleLayers, setVisibleLayers] = useState<Record<LayerKey, boolean>>({
-    simulated: true,
     measured: true,
     fitted: true,
   });
@@ -195,34 +246,31 @@ export function DrivingRangeScene({
       <div className="driving-range__toolbar">
         <div className="driving-range__layers">
           <LayerToggle
-            label="Predicted flight + rollout"
-            active={visibleLayers.simulated}
-            onClick={() => toggle("simulated")}
-            count={simulated.length}
-            colorVar="--color-turf-bright"
-            description="Physics prediction from launch through first landing, two estimated bounces, and rollout."
-          />
-          <LayerToggle
             label="Stereo observations"
             active={visibleLayers.measured}
             onClick={() => toggle("measured")}
             count={measured.length}
-            colorVar="--color-amber"
-            description="Raw 3D ball positions reconstructed from frames where both cameras observed the ball."
+            colorVar="--color-stereo"
+            description="Paired two-camera 3D points."
           />
           <LayerToggle
-            label="Physics launch fit"
+            label="Physics prediction"
             active={visibleLayers.fitted}
             onClick={() => toggle("fitted")}
             count={fitted.length}
-            colorVar="--color-violet"
-            description="The smooth physics model evaluated at the observation times before it is extrapolated downrange."
+            colorVar="--color-physics"
+            description="Modeled flight after stereo ends."
           />
         </div>
         <button className="driving-range__replay" onClick={replayShot}>
           ▶ Replay shot
         </button>
-        <button className="driving-range__camera" onClick={() => setCameraMode((mode) => mode === "chase" ? "orbit" : "chase")}>
+        <button
+          className="driving-range__camera"
+          onClick={() => setCameraMode((mode) => mode === "chase" ? "orbit" : "chase")}
+          title={cameraMode === "orbit" ? "WASD move · drag to look · scroll to zoom" : "Switch to free camera"}
+          aria-keyshortcuts="W A S D Space Control"
+        >
           {cameraMode === "chase" ? "Ball cam" : "Free cam"}
         </button>
       </div>
@@ -261,16 +309,16 @@ export function DrivingRangeScene({
           />
           <RangeEnvironment bounds={bounds} />
           <ContactShadows position={[0, 0.055, 0]} opacity={0.32} scale={55} blur={2.8} far={14} color="#172012" />
-          {visibleLayers.simulated && (
-            <TrajectoryTracer points={scenePoints.simulated} color="#4cc273" lineWidth={3} />
-          )}
           {visibleLayers.measured && (
-            <TrajectoryTracer points={scenePoints.measured} color="#e8a23a" dashed lineWidth={2} />
+            <TrajectoryTracer points={scenePoints.measured} color="#d8c49a" lineWidth={4} showPoints />
           )}
           {visibleLayers.fitted && (
-            <TrajectoryTracer points={scenePoints.fitted} color="#8b7ce0" dashed lineWidth={2} />
+            <TrajectoryTracer points={scenePoints.fitted} color="#090909" dashed lineWidth={3.5} />
           )}
-          {visibleLayers.simulated && simulated.length > 0 && (
+          {visibleLayers.measured && visibleLayers.fitted && scenePoints.measured.length > 0 && (
+            <TrajectoryHandoff point={scenePoints.measured[scenePoints.measured.length - 1]} />
+          )}
+          {simulated.length > 0 && (
             <AnimatedBall points={scenePoints.simulated} playToken={playToken} chaseCamera={cameraMode === "chase"} />
           )}
           <FreeCameraControls
@@ -281,6 +329,21 @@ export function DrivingRangeScene({
         </Canvas>
       </div>
     </div>
+  );
+}
+
+function TrajectoryHandoff({ point }: { point: ScenePoint }) {
+  return (
+    <group position={[point.x, point.y, point.z]}>
+      <mesh>
+        <torusGeometry args={[0.72, 0.08, 12, 28]} />
+        <meshBasicMaterial color="#e9e4d8" toneMapped={false} />
+      </mesh>
+      <Html center distanceFactor={16} position={[0, 1.55, 0]} className="trajectory-handoff-label">
+        <span>LAST TWO-CAMERA FRAME</span>
+        <strong>STEREO ENDS · PHYSICS TAKES OVER →</strong>
+      </Html>
+    </group>
   );
 }
 
@@ -302,7 +365,7 @@ function LayerToggle({
   const disabled = count === 0;
   return (
     <button
-      className={`layer-toggle${active && !disabled ? " layer-toggle--active" : ""}`}
+      className={`layer-toggle${active && !disabled ? " layer-toggle--active" : ""}${colorVar === "--color-physics" ? " layer-toggle--dark" : ""}`}
       onClick={onClick}
       disabled={disabled}
       style={{ "--toggle-color": `var(${colorVar})` } as React.CSSProperties}
@@ -310,7 +373,6 @@ function LayerToggle({
     >
       <span className="layer-toggle__dot" />
       {label}
-      {disabled && <span className="layer-toggle__empty">(none)</span>}
     </button>
   );
 }

@@ -35,7 +35,7 @@ export default function QuietMonolithPage() {
             <h1 id="monolith-title">I build what<br />doesn’t <em>exist yet.</em></h1>
             <a href="#monolith-intro">Discover the work <span>↓</span></a>
           </div>
-          <div className="monolith-hero-object monolith-hero-demo"><GolfieDemo tone="monolith" compact /></div>
+          <MonolithBall className="monolith-hero-object quiet-ball--hero" />
           <div className="monolith-hero-caption"><span>GOLFIE · 2026</span><i /><span>Two cameras.<br />One reconstructed flight.</span></div>
         </section>
 
