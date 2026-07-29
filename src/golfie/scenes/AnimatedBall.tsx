@@ -47,11 +47,11 @@ export function AnimatedBall({ points, playToken, chaseCamera = false }: Animate
         if (direction.lengthSq() < 1e-6) direction.set(1, 0, 0);
         direction.normalize();
         const ball = new THREE.Vector3(sample.x, sample.y, sample.z);
-        const desired = ball.clone().addScaledVector(direction, -10).add(new THREE.Vector3(0, 3.8, 0));
+        const desired = ball.clone().addScaledVector(direction, -12.5).add(new THREE.Vector3(0, 4.8, 0));
         state.camera.position.lerp(desired, 1 - Math.exp(-delta * 4.5));
-        state.camera.lookAt(
-          ball.clone().addScaledVector(direction, 7).add(new THREE.Vector3(0, 0.8, 0)),
-        );
+        // Keep the tracked ball at the optical center. Looking several meters
+        // ahead pushed it into the lower-right corner of the viewport.
+        state.camera.lookAt(ball);
       }
     }
   });

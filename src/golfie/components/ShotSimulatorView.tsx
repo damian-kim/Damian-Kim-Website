@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import type { ReactNode } from "react";
 import type { TrajectoryPayload } from "../lib/types";
 import { MetricCard } from "./MetricCard";
 import { formatMetric } from "../lib/units";
@@ -11,9 +12,10 @@ interface ShotSimulatorViewProps {
   payload: TrajectoryPayload;
   title?: string;
   subtitle?: string;
+  sidebarControls?: ReactNode;
 }
 
-export function ShotSimulatorView({ payload, title, subtitle }: ShotSimulatorViewProps) {
+export function ShotSimulatorView({ payload, title, subtitle, sidebarControls }: ShotSimulatorViewProps) {
   const { metrics } = payload;
   const [showPrecursor, setShowPrecursor] = useState(false);
   const [videoError, setVideoError] = useState<string | null>(null);
@@ -22,6 +24,7 @@ export function ShotSimulatorView({ payload, title, subtitle }: ShotSimulatorVie
   const [outlinesRendering, setOutlinesRendering] = useState(false);
   const [outlineRefreshToken, setOutlineRefreshToken] = useState(0);
   const [playToken, setPlayToken] = useState(0);
+  const [showRadar, setShowRadar] = useState(true);
 
   useEffect(() => {
     if (payload.session_id === "sample") return;
@@ -156,6 +159,8 @@ export function ShotSimulatorView({ payload, title, subtitle }: ShotSimulatorVie
 
         <KeyboardInputWidget />
 
+        {sidebarControls}
+
         {payload.session_id !== "sample" && (
           <div className="hud-section" style={{ marginTop: "8px" }}>
             <button 
@@ -204,8 +209,8 @@ export function ShotSimulatorView({ payload, title, subtitle }: ShotSimulatorVie
       </div>
 
       {/* Visual Telemetry Radar Widget */}
-      <div className="hud-radar-widget">
-        <div className="hud-radar-header">LAUNCH RADAR</div>
+      {showRadar ? <div className="hud-radar-widget">
+        <div className="hud-radar-header-row"><div className="hud-radar-header">LAUNCH RADAR</div><button type="button" onClick={() => setShowRadar(false)}>Hide</button></div>
         <svg viewBox="0 0 100 100" className="hud-radar-svg">
           {/* Outer Ring */}
           <circle cx="50" cy="50" r="45" stroke="var(--hud-border)" strokeWidth="1" fill="rgba(10, 16, 13, 0.4)" />
@@ -246,7 +251,7 @@ export function ShotSimulatorView({ payload, title, subtitle }: ShotSimulatorVie
           <div>DIR: {metrics.horizontal_launch_deg?.value !== null ? `${(metrics.horizontal_launch_deg.value || 0).toFixed(1)}°` : "N/A"}</div>
           <div>LA: {metrics.launch_angle_deg?.value !== null ? `${(metrics.launch_angle_deg.value || 0).toFixed(1)}°` : "N/A"}</div>
         </div>
-      </div>
+      </div> : <button type="button" className="hud-radar-show" onClick={() => setShowRadar(true)}>Show launch radar</button>}
 
       {/* Precursor Outlines Replay Overlay */}
       {showPrecursor && (

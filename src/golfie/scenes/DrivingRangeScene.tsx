@@ -56,16 +56,18 @@ function FreeCameraControls({
   const { camera } = useThree();
   const controlsRef = useRef<ComponentRef<typeof OrbitControls>>(null);
   const pressedKeys = useRef(new Set<string>());
+  const lockedTarget = useRef(new THREE.Vector3(...target));
 
   const resetCamera = useCallback(() => {
     camera.position.set(...position);
     camera.up.set(0, 1, 0);
     camera.lookAt(...target);
     camera.updateProjectionMatrix();
+    lockedTarget.current.set(...target);
 
     const controls = controlsRef.current;
     if (controls) {
-      controls.target.set(...target);
+      controls.target.copy(lockedTarget.current);
       controls.update();
     }
   }, [camera, position, target]);
@@ -111,6 +113,10 @@ function FreeCameraControls({
     const controls = controlsRef.current;
     if (!controls) return;
     const controlledCamera = controls.object;
+    if (!controls.target.equals(lockedTarget.current)) {
+      controls.target.copy(lockedTarget.current);
+      controls.update();
+    }
 
     const forwardAmount = Number(pressedKeys.current.has("KeyW")) - Number(pressedKeys.current.has("KeyS"));
     const rightAmount = Number(pressedKeys.current.has("KeyD")) - Number(pressedKeys.current.has("KeyA"));
@@ -128,7 +134,8 @@ function FreeCameraControls({
       if (movement.lengthSq() > 1) movement.normalize();
       movement.multiplyScalar(24 * Math.min(delta, 0.05));
       controlledCamera.position.add(movement);
-      controls.target.add(movement);
+      lockedTarget.current.add(movement);
+      controls.target.copy(lockedTarget.current);
       controls.update();
     }
 
@@ -139,7 +146,8 @@ function FreeCameraControls({
     ) {
       controlledCamera.position.set(...position);
       controlledCamera.up.set(0, 1, 0);
-      controls.target.set(...target);
+      lockedTarget.current.set(...target);
+      controls.target.copy(lockedTarget.current);
       controls.update();
       return;
     }
@@ -155,6 +163,7 @@ function FreeCameraControls({
     const minimumTargetY = rangeGroundHeight(controls.target.x, controls.target.z) + 0.15;
     if (controls.target.y < minimumTargetY) {
       controls.target.y = minimumTargetY;
+      lockedTarget.current.y = minimumTargetY;
       corrected = true;
     }
     if (corrected) controls.update();
@@ -166,6 +175,7 @@ function FreeCameraControls({
       enabled={enabled}
       target={target}
       enableDamping
+      enablePan={false}
       dampingFactor={0.075}
       rotateSpeed={0.42}
       panSpeed={0.34}
@@ -230,10 +240,15 @@ export function DrivingRangeScene({
     () => computeSceneBounds([scenePoints.simulated, scenePoints.measured, scenePoints.fitted]),
     [scenePoints]
   );
-  const { position: cameraPosition, target: cameraTarget } = useMemo(
+  const { position: cameraPosition, target: fittedCameraTarget } = useMemo(
     () => fitCameraToBounds(bounds),
     [bounds]
   );
+  const cameraTarget = useMemo<CameraVector>(() => {
+    const stereoHandoff = scenePoints.measured.at(-1);
+    if (!stereoHandoff) return fittedCameraTarget;
+    return [stereoHandoff.x, fittedCameraTarget[1], stereoHandoff.z];
+  }, [fittedCameraTarget, scenePoints.measured]);
 
   const toggle = (key: LayerKey) => setVisibleLayers((prev) => ({ ...prev, [key]: !prev[key] }));
   const replayShot = () => {

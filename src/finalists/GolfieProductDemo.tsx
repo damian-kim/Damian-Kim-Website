@@ -42,12 +42,20 @@ export default function GolfieProductDemo({ compact = false }: { compact?: boole
     ['velocity', 'Velocity', 20, 75, 1, 'm/s'], ['angle', 'Angle', 5, 35, 1, 'deg'], ['direction', 'Direction', -15, 15, 1, 'deg'], ['backspin', 'Backspin', 0, 6500, 100, 'rpm'], ['sidespin', 'Sidespin', -2500, 2500, 100, 'rpm'], ['drag', 'Drag', .1, .5, .01, 'Cd'],
   ] as const;
 
+  const sampleControls = <div className="portfolio-parameter-sidebar">
+    <div className="portfolio-parameter-sidebar__title">Custom Shot</div>
+    <div className="portfolio-parameter-sidebar__grid">
+      {controls.map(([key, label, min, max, step, unit]) => <label key={key}><span>{label}<b>{parameters[key]} {unit}</b></span><input type="range" min={min} max={max} step={step} value={parameters[key]} onChange={(event) => setParameters((current) => ({ ...current, [key]: Number(event.target.value) }))} /></label>)}
+    </div>
+    <button onClick={() => setPlayKey((value) => value + 1)}>Replay customized shot</button>
+  </div>;
+
   return <div ref={frameRef} className={`golfie-product-demo${compact ? ' golfie-product-demo--compact' : ''}`} aria-label="Interactive Golfie shot simulator">
     <div className="golfie-product-demo__stage" style={{ width: DESIGN_WIDTH, height: DESIGN_HEIGHT, transform: `scale(${scale})` }}>
       <header className="app-header"><div className="app-header__row"><span className="app-header__wordmark">GOLFIE</span><nav className="app-header__nav"><span className="app-header__link">Upload</span><span className="app-header__link">Calibrate</span><span className="app-header__link app-header__link--active">Demo range</span><span className="app-header__link">Course map</span></nav></div></header>
-      <div className="golfie-product-demo__simulator"><ShotSimulatorView key={`${mode}-${playKey}`} payload={payload} title={mode === 'sample' ? 'Sample Shot Lab' : 'Real Shot Replay'} subtitle={mode === 'sample' ? 'Adjustable synthetic trajectory' : 'Measured session 8497991969EC'} />
-        <div className="portfolio-shot-modes"><button className={mode === 'real' ? 'active' : ''} onClick={() => setMode('real')}>01 Real shot<small>Swing-derived + YOLO</small></button><button className={mode === 'sample' ? 'active' : ''} onClick={() => setMode('sample')}>02 Sample shot<small>Adjustable physics</small></button></div>
-        {mode === 'sample' ? <div className="portfolio-parameter-dock">{controls.map(([key, label, min, max, step, unit]) => <label key={key}><span>{label}<b>{parameters[key]} {unit}</b></span><input type="range" min={min} max={max} step={step} value={parameters[key]} onChange={(event) => setParameters((current) => ({ ...current, [key]: Number(event.target.value) }))} /></label>)}<button onClick={() => setPlayKey((value) => value + 1)}>Replay customized shot</button></div> : <div className="portfolio-real-shot-actions"><span>Parameters locked to stereo reconstruction</span><button onClick={() => setShowSwing(true)}>Open YOLO swing comparison</button></div>}
+      <div className="golfie-product-demo__simulator"><ShotSimulatorView key={`${mode}-${playKey}`} payload={payload} title={mode === 'sample' ? 'Custom Shot Lab' : 'Real Shot Replay'} subtitle={mode === 'sample' ? 'Adjustable synthetic trajectory' : 'Measured session 8497991969EC'} sidebarControls={mode === 'sample' ? sampleControls : undefined} />
+        <div className="portfolio-shot-modes"><button className={mode === 'real' ? 'active' : ''} onClick={() => setMode('real')}>01 Real shot<small>Swing-derived + YOLO</small></button><button className={mode === 'sample' ? 'active' : ''} onClick={() => setMode('sample')}>02 Custom shot<small>Adjustable physics</small></button></div>
+        {mode === 'real' && <div className="portfolio-real-shot-actions"><span>Parameters locked to stereo reconstruction</span><button onClick={() => setShowSwing(true)}>Open YOLO swing comparison</button></div>}
       </div>
     </div>
     {showSwing && <div className="portfolio-swing-modal"><button onClick={() => setShowSwing(false)}>Close comparison x</button><GolfieSourceSwingDemo /></div>}
