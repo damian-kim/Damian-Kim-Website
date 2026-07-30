@@ -1,8 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import './realProductDemos.css';
 
-type ProductTab = 'juno' | 'swing';
-
 export function JunoSourceDemo() {
   const [launched, setLaunched] = useState(false);
 
@@ -11,17 +9,15 @@ export function JunoSourceDemo() {
       <header><div><i /> JUNO <small>LIVE APPLICATION BUILD</small></div><span>E:\Juno\juno · Agora RTC</span></header>
       {launched ? (
         <iframe
-          src="/demos/juno/index.html"
+          src="/demos/juno/index.html?embed=portfolio"
           title="Interactive Juno voice and video application"
           allow="microphone; camera; display-capture; autoplay"
         />
       ) : (
         <div className="juno-live-launch">
           <div>
-            <span>LIVE VOICE + VIDEO DEMO</span>
             <h3>Step inside Juno.</h3>
-            <p>The application stays dormant until you launch it. Camera and microphone access may be requested after you continue.</p>
-            <button type="button" onClick={() => setLaunched(true)}>Try it out <span>↗</span></button>
+            <button type="button" onClick={() => setLaunched(true)}>Try it out</button>
           </div>
         </div>
       )}
@@ -91,16 +87,5 @@ export function GolfieSourceSwingDemo() {
       <div className="golfie-source-timeline"><input aria-label="Replay position" type="range" min="0" max={duration} step={1 / frameRate} value={Math.min(time, duration)} onChange={(event) => { setAllPlaying(false); seekAll(Number(event.target.value)); }} /><span>{time.toFixed(2)}s / {duration.toFixed(2)}s</span></div>
       <footer><div><button type="button" onClick={() => { setAllPlaying(false); seekAll(time - 1 / frameRate); }}>│◀</button><button type="button" className="golfie-source-play" onClick={() => setAllPlaying(!playing)}>{playing ? 'Pause' : 'Play'}</button><button type="button" onClick={() => { setAllPlaying(false); seekAll(time + 1 / frameRate); }}>▶│</button></div><label>Speed<select value={speed} onChange={(event) => setSpeed(Number(event.target.value))}>{SPEEDS.map((value) => <option key={value} value={value}>{value}×</option>)}</select></label><span>← → frame step · synchronized dual-camera replay</span></footer>
     </div>
-  );
-}
-
-export function MonolithProductExpansion() {
-  const [tab, setTab] = useState<ProductTab>('juno');
-  return (
-    <section className="monolith-product-expansion" aria-labelledby="product-expansion-title">
-      <div className="monolith-product-expansion__heading"><div><span>02 / PRODUCT SYSTEMS</span><h2 id="product-expansion-title">Operate<br /><em>the work.</em></h2></div><p>These are adapted directly from the working Juno and Golfie applications—including Golfie’s real processed swing footage.</p></div>
-      <div className="monolith-product-tabs" role="tablist" aria-label="Product demos"><button type="button" role="tab" aria-selected={tab === 'juno'} className={tab === 'juno' ? 'active' : ''} onClick={() => setTab('juno')}><span>01</span><strong>Juno voice canvas</strong><small>Agora RTC · shared rooms</small></button><button type="button" role="tab" aria-selected={tab === 'swing'} className={tab === 'swing' ? 'active' : ''} onClick={() => setTab('swing')}><span>02</span><strong>Golfie swing comparison</strong><small>Real dual-camera output</small></button></div>
-      <div className="monolith-product-stage" role="tabpanel">{tab === 'juno' ? <JunoSourceDemo /> : <GolfieSourceSwingDemo />}</div>
-    </section>
   );
 }

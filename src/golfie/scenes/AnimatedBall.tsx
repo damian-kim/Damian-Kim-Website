@@ -13,6 +13,7 @@ interface AnimatedBallProps {
 
 export function AnimatedBall({ points, playToken, chaseCamera = false }: AnimatedBallProps) {
   const ballRef = useRef<THREE.Group>(null);
+  const ballMeshRef = useRef<THREE.Mesh>(null);
   const startTimeRef = useRef<number | null>(null);
   const lastPlayTokenRef = useRef(playToken);
 
@@ -37,6 +38,10 @@ export function AnimatedBall({ points, playToken, chaseCamera = false }: Animate
     const sample = elapsed >= duration ? restPoint : samplePointAtTime(points, firstPointTime + elapsed);
     if (sample) {
       ballRef.current.position.set(sample.x, sample.y, sample.z);
+      if (ballMeshRef.current) {
+        ballMeshRef.current.rotation.x += delta * 8;
+        ballMeshRef.current.rotation.z -= delta * 22;
+      }
       if (chaseCamera && elapsed < duration) {
         const ahead = samplePointAtTime(points, firstPointTime + Math.min(elapsed + 0.18, duration)) || sample;
         const direction = new THREE.Vector3(
@@ -58,8 +63,8 @@ export function AnimatedBall({ points, playToken, chaseCamera = false }: Animate
 
   return (
     <group ref={ballRef}>
-      <mesh castShadow>
-        <sphereGeometry args={[0.02135, 20, 16]} />
+      <mesh ref={ballMeshRef} castShadow>
+        <sphereGeometry args={[0.02135, 40, 32]} />
         <meshStandardMaterial
           color="#f7f7f2"
           emissive="#ffffff"
