@@ -46,22 +46,34 @@ function SkyBackground() {
 
 /** Keep the physical orbit pivot on the stereo handoff and continuously align
  * that exact world point with the HUD's 50% screen centerline. */
-function CenteredHandoffProjection({ target }: { target: CameraVector }) {
+function CenteredHandoffProjection({ target, enabled }: { target: CameraVector; enabled: boolean }) {
   const { camera, size } = useThree();
   const viewOffset = useRef(0);
   const projectedTarget = useRef(new THREE.Vector3());
 
   useEffect(() => {
     viewOffset.current = 0;
+    if (!enabled && camera instanceof THREE.PerspectiveCamera) {
+      camera.clearViewOffset();
+      camera.updateProjectionMatrix();
+    }
     return () => {
       if (!(camera instanceof THREE.PerspectiveCamera)) return;
       camera.clearViewOffset();
       camera.updateProjectionMatrix();
     };
-  }, [camera, size.height, size.width, target]);
+  }, [camera, enabled, size.height, size.width, target]);
 
   useFrame(() => {
-    if (!(camera instanceof THREE.PerspectiveCamera) || size.width <= 0 || size.height <= 0) return;
+    if (!(camera instanceof THREE.PerspectiveCamera)) return;
+    if (!enabled) {
+      if (camera.view?.enabled) {
+        camera.clearViewOffset();
+        camera.updateProjectionMatrix();
+      }
+      return;
+    }
+    if (size.width <= 0 || size.height <= 0) return;
     camera.updateMatrixWorld();
     projectedTarget.current.set(...target).project(camera);
     // The rendered handoff marker sits one stage-grid unit to the right of the
@@ -341,7 +353,7 @@ export function DrivingRangeScene({
             gl.toneMappingExposure = 1.08;
           }}
         >
-          <CenteredHandoffProjection target={cameraTarget} />
+          <CenteredHandoffProjection target={cameraTarget} enabled={cameraMode === "orbit"} />
           <AdaptiveDpr pixelated />
           <fogExp2 attach="fog" args={["#b7d1d9", 0.0019]} />
           <SkyBackground />

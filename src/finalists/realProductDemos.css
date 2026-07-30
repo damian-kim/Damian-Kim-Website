@@ -123,6 +123,71 @@
 .golfie-source-swing > footer .golfie-source-play { min-width: 68px; }
 .golfie-source-swing > footer label { display: flex; align-items: center; gap: 7px; color: var(--g-muted); font: 8px "DM Mono", monospace; text-transform: uppercase; }
 .golfie-source-swing > footer > span { margin-left: auto; color: var(--g-muted); font: 8px "DM Mono", monospace; }
+.golfie-source-header-actions { display: flex; align-items: center; gap: 14px !important; }
+.golfie-source-header-actions button, .golfie-coach-back { padding: 8px 12px; border: 1px solid rgba(152,175,199,.48); border-radius: 4px; color: #eef5fb; background: rgba(152,175,199,.12); font: 700 8px "DM Mono", monospace; letter-spacing: .04em; cursor: pointer; }
+
+/* AI coach analysis uses the same processed dual-camera session. */
+.golfie-product-demo__swing .golfie-source-swing--coach { min-height: 677px; height: 677px; grid-template-rows: 52px minmax(0,1fr); overflow: hidden; }
+.golfie-source-swing--coach > header { position: sticky; top: 0; z-index: 8; }
+.golfie-coach-back { margin-left: auto; }
+.golfie-coach { min-height: 0; padding: 32px clamp(18px,3vw,42px) 28px; overflow-y: auto; }
+.golfie-coach-summary { display: grid; grid-template-columns: 1fr auto; gap: 5vw; align-items: end; padding-bottom: 30px; border-bottom: 1px solid var(--g-border); }
+.golfie-coach-summary > div:first-child > span, .golfie-issue-page section > div > span, .golfie-issue-fix > div > span { color: var(--g-accent); font: 8px "DM Mono", monospace; letter-spacing: .12em; }
+.golfie-coach-summary h2 { margin: 12px 0; font-size: clamp(38px,5vw,70px); line-height: .88; letter-spacing: -.055em; }
+.golfie-coach-summary p { max-width: 650px; margin: 0; color: #a5afaa; font-size: 12px; line-height: 1.65; }
+.golfie-coach-score { min-width: 150px; display: grid; padding: 18px; border: 1px solid var(--g-border); background: rgba(255,255,255,.025); }
+.golfie-coach-score strong { color: var(--g-accent); font: 52px/1 "DM Mono", monospace; }
+.golfie-coach-score span { margin-top: 7px; font: 8px "DM Mono", monospace; letter-spacing: .1em; }
+.golfie-coach-score small { margin-top: 14px; color: var(--g-muted); font-size: 8px; }
+.golfie-coach-workspace { display: grid; grid-template-columns: minmax(0,1.35fr) minmax(300px,.65fr); gap: 18px; margin-top: 24px; }
+.golfie-coach-viewer { min-width: 0; padding: 12px; border: 1px solid var(--g-border); background: #050806; }
+.golfie-coach-viewer > div:first-child { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.golfie-coach-viewer figure, .golfie-issue-frame figure { position: relative; margin: 0; border: 1px solid var(--g-border); background: #000; overflow: hidden; }
+.golfie-coach-viewer figcaption, .golfie-issue-frame figcaption { position: absolute; z-index: 2; left: 8px; top: 8px; padding: 5px 7px; color: #fff; background: rgba(0,0,0,.78); font: 7px "DM Mono", monospace; text-transform: uppercase; }
+.golfie-coach-viewer video { display: block; width: 100%; aspect-ratio: 16 / 11; object-fit: contain; }
+.golfie-coach-transport { display: grid; grid-template-columns: 1fr auto 1fr; gap: 8px; margin-top: 10px; }
+.golfie-coach-transport button { padding: 10px; border: 1px solid var(--g-border); color: #cad2ce; background: transparent; font: 8px "DM Mono", monospace; cursor: pointer; }
+.golfie-coach-transport button:last-child { text-align: right; }.golfie-coach-transport button:first-child { text-align: left; }
+.golfie-coach-transport button:disabled, .golfie-issue-page > footer button:disabled { opacity: .25; cursor: not-allowed; }
+.golfie-coach-transport .golfie-coach-review { min-width: 160px; color: #07100d; border-color: var(--g-accent); background: var(--g-accent); font-weight: 800; text-align: center; }
+.golfie-coach-finding { display: flex; flex-direction: column; padding: 24px; border: 1px solid var(--g-border); background: linear-gradient(145deg,rgba(152,175,199,.07),transparent 50%),var(--g-panel); }
+.golfie-coach-finding-meta { display: flex; flex-wrap: wrap; gap: 7px; }
+.golfie-coach-finding-meta span { padding: 5px 7px; border: 1px solid var(--g-border); color: var(--g-muted); font: 7px "DM Mono", monospace; text-transform: uppercase; }
+.status-priority { color: #f0a58f !important; }.status-refine { color: #d4c586 !important; }.status-strength { color: #83d3a6 !important; }
+.golfie-coach-finding > small { margin-top: 24px; color: var(--g-accent); font: 8px "DM Mono", monospace; }
+.golfie-coach-finding h2 { margin: 10px 0 12px; font-size: clamp(25px,2.5vw,40px); line-height: 1; letter-spacing: -.04em; }
+.golfie-coach-finding p { margin: 0; color: #b5bfba; font-size: 11px; line-height: 1.6; }
+.golfie-coach-finding ul, .golfie-issue-frame ul { margin: 18px 0; padding: 16px 0 16px 18px; border-top: 1px solid var(--g-border); border-bottom: 1px solid var(--g-border); color: #aab4af; font-size: 10px; line-height: 1.8; }
+.golfie-coach-finding a { margin-top: auto; padding-top: 16px; color: #e7edf2; font-size: 10px; font-weight: 700; text-decoration: none; }
+.golfie-coach-checkpoints { display: grid; grid-template-columns: repeat(3,1fr); margin-top: 18px; border: 1px solid var(--g-border); }
+.golfie-coach-checkpoints button { min-width: 0; display: grid; grid-template-columns: 28px 1fr auto; gap: 10px; align-items: center; padding: 14px; border: 0; border-right: 1px solid var(--g-border); border-bottom: 1px solid var(--g-border); color: var(--g-text); background: transparent; text-align: left; cursor: pointer; }
+.golfie-coach-checkpoints button:nth-child(3n) { border-right: 0; }.golfie-coach-checkpoints button:nth-last-child(-n+3) { border-bottom: 0; }
+.golfie-coach-checkpoints button.active { background: rgba(152,175,199,.12); box-shadow: inset 0 0 0 1px var(--g-accent); }
+.golfie-coach-checkpoints button > span { color: var(--g-accent); font: 9px "DM Mono", monospace; }
+.golfie-coach-checkpoints button > div { min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+.golfie-coach-checkpoints small { color: var(--g-muted); font: 7px "DM Mono", monospace; text-transform: uppercase; }
+.golfie-coach-checkpoints strong { overflow: hidden; font-size: 9px; text-overflow: ellipsis; white-space: nowrap; }
+.golfie-coach-checkpoints i { font: 6px "DM Mono", monospace; font-style: normal; text-transform: uppercase; }
+.golfie-coach-disclaimer { margin: 16px 0 0; color: var(--g-muted); font: 7px/1.6 "DM Mono", monospace; }
+
+.golfie-issue-page { min-height: 0; padding: 42px clamp(18px,5vw,74px) 50px; overflow-y: auto; }
+.golfie-issue-page > header { display: grid; grid-template-columns: 1fr auto; align-items: end; gap: 4vw; padding-bottom: 34px; border-bottom: 1px solid var(--g-border); }
+.golfie-issue-page > header span { color: var(--g-accent); font: 8px "DM Mono", monospace; letter-spacing: .12em; }
+.golfie-issue-page > header h1 { max-width: 820px; margin: 14px 0; font-size: clamp(48px,7vw,100px); line-height: .82; letter-spacing: -.065em; }
+.golfie-issue-page > header p { max-width: 720px; margin: 0; color: #abb5b0; font-size: 12px; line-height: 1.7; }
+.golfie-issue-page > header > div:last-child { display: flex; flex-direction: column; }
+.golfie-issue-page > header > div:last-child strong { color: var(--g-accent); font: 46px "DM Mono", monospace; }
+.golfie-issue-page > header > div:last-child span { color: var(--g-muted); font-size: 7px; }
+.golfie-issue-frame { display: grid; grid-template-columns: 1.15fr .85fr; gap: 34px; margin-top: 34px; }
+.golfie-issue-frame video { display: block; width: 100%; max-height: 460px; object-fit: contain; }
+.golfie-issue-frame > div { padding: 18px 0; }
+.golfie-issue-frame > div > p { color: #c2cbc6; font-size: 14px; line-height: 1.7; }
+.golfie-issue-fix { display: grid; grid-template-columns: 1fr 1fr; gap: 6vw; margin-top: 48px; padding-top: 38px; border-top: 1px solid var(--g-border); }
+.golfie-issue-fix ol { margin: 20px 0 0; padding-left: 22px; color: #c2cbc6; font-size: 13px; line-height: 2; }
+.golfie-issue-fix h2 { margin: 18px 0 30px; color: #f0f4f2; font-size: 25px; line-height: 1.3; }
+.golfie-issue-fix p { color: #aeb8b3; font-size: 12px; line-height: 1.7; }
+.golfie-issue-page > footer { display: flex; justify-content: space-between; margin-top: 46px; padding-top: 22px; border-top: 1px solid var(--g-border); }
+.golfie-issue-page > footer button { padding: 10px 14px; border: 1px solid var(--g-border); color: #e7ece9; background: transparent; font: 8px "DM Mono", monospace; cursor: pointer; }
 
 @media (max-width: 900px) {
   .monolith-product-expansion { margin-inline: -20px; padding-inline: 20px; }
@@ -136,6 +201,13 @@
   .golfie-source-cameras { grid-template-columns: 1fr; }
   .golfie-source-cameras video { max-height: 190px; }
   .golfie-source-swing > footer { padding-block: 10px; flex-wrap: wrap; }
+  .golfie-coach-workspace, .golfie-issue-frame { grid-template-columns: 1fr; }
+  .golfie-coach-checkpoints { grid-template-columns: 1fr 1fr; }
+  .golfie-coach-checkpoints button:nth-child(3n) { border-right: 1px solid var(--g-border); }
+  .golfie-coach-checkpoints button:nth-child(2n) { border-right: 0; }
+  .golfie-coach-checkpoints button:nth-last-child(-n+3) { border-bottom: 1px solid var(--g-border); }
+  .golfie-coach-checkpoints button:nth-last-child(-n+2) { border-bottom: 0; }
+  .golfie-issue-fix { grid-template-columns: 1fr; }
 }
 
 @media (max-width: 600px) {
@@ -149,8 +221,17 @@
   .juno-source-controls > span, .juno-source-controls > small { display: none; }
   .juno-source-controls > div { justify-content: center; flex-wrap: wrap; }
   .golfie-source-swing > header span { display: none; }
+  .golfie-source-header-actions span { display: none; }
   .golfie-source-legend { gap: 6px 10px; }
   .golfie-source-swing > footer > span { display: none; }
+  .golfie-coach-summary, .golfie-issue-page > header { grid-template-columns: 1fr; }
+  .golfie-coach-score { min-width: 0; }
+  .golfie-coach-viewer > div:first-child { grid-template-columns: 1fr; }
+  .golfie-coach-checkpoints { grid-template-columns: 1fr; }
+  .golfie-coach-checkpoints button, .golfie-coach-checkpoints button:nth-child(2n), .golfie-coach-checkpoints button:nth-child(3n) { border-right: 0; border-bottom: 1px solid var(--g-border); }
+  .golfie-coach-checkpoints button:last-child { border-bottom: 0; }
+  .golfie-coach-transport { grid-template-columns: 1fr 1fr; }
+  .golfie-coach-transport .golfie-coach-review { grid-row: 1; grid-column: 1 / -1; }
   .juno-live-launch { padding: 28px 20px; }
   .sate-live-embed > header > span { display: none; }
 }
