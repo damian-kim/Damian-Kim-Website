@@ -1,6 +1,6 @@
 {
   "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "ignorePatterns": ["public/demos/juno/assets/**"],
+  "ignorePatterns": ["public/demos/juno/assets/**", "public/demos/sate/assets/**"],
   "plugins": ["react", "typescript", "oxc"],
   "rules": {
     "react/rules-of-hooks": "error",

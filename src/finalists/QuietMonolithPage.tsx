@@ -1,6 +1,6 @@
 import { experienceProof, principles, supportingProjects } from './content';
-import { GolfieDemo, SateDemo } from './ProjectDemos';
-import { MonolithProductExpansion } from './RealProductDemos';
+import { GolfieDemo } from './ProjectDemos';
+import { MonolithProductExpansion, SateSourceDemo } from './RealProductDemos';
 
 function MonolithMark() {
   return <a className="monolith-mark" href="#monolith-top" aria-label="Damian Kim, back to top">DK<span>Damian Kim</span></a>;
@@ -85,9 +85,9 @@ export default function QuietMonolithPage() {
 
         <section className="monolith-projects">
           <QuietReveal className="monolith-section-heading"><span>SELECTED SYSTEMS</span><h2>Operate the work.</h2></QuietReveal>
-          <QuietReveal className="monolith-demo-project monolith-demo-project--reverse">
-            <div className="monolith-demo-frame"><SateDemo tone="monolith" /></div>
-            <aside><span>03 · {supportingProjects[1].type}</span><h3>{supportingProjects[1].name}</h3><p>{supportingProjects[1].detail}</p><strong>{supportingProjects[1].result}<small>{supportingProjects[1].resultLabel}</small></strong></aside>
+          <QuietReveal className="monolith-demo-project monolith-demo-project--sate">
+            <aside><div><span>03 · {supportingProjects[1].type}</span><h3>{supportingProjects[1].name}</h3></div><p>{supportingProjects[1].detail}</p><strong>{supportingProjects[1].result}<small>{supportingProjects[1].resultLabel}</small></strong></aside>
+            <div className="monolith-demo-frame"><SateSourceDemo /></div>
           </QuietReveal>
         </section>
 

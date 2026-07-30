@@ -4,13 +4,39 @@ import './realProductDemos.css';
 type ProductTab = 'juno' | 'swing';
 
 export function JunoSourceDemo() {
+  const [launched, setLaunched] = useState(false);
+
   return (
     <div className="juno-live-embed">
       <header><div><i /> JUNO <small>LIVE APPLICATION BUILD</small></div><span>E:\Juno\juno · Agora RTC</span></header>
+      {launched ? (
+        <iframe
+          src="/demos/juno/index.html"
+          title="Interactive Juno voice and video application"
+          allow="microphone; camera; display-capture; autoplay"
+        />
+      ) : (
+        <div className="juno-live-launch">
+          <div>
+            <span>LIVE VOICE + VIDEO DEMO</span>
+            <h3>Step inside Juno.</h3>
+            <p>The application stays dormant until you launch it. Camera and microphone access may be requested after you continue.</p>
+            <button type="button" onClick={() => setLaunched(true)}>Try it out <span>↗</span></button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+export function SateSourceDemo() {
+  return (
+    <div className="sate-live-embed">
+      <header><div><i /> SATE <small>LIVE APPLICATION BUILD</small></div><span>GROUP RESTAURANT RECOMMENDATIONS</span></header>
       <iframe
-        src="/demos/juno/index.html"
-        title="Interactive Juno voice and video application"
-        allow="microphone; camera; display-capture; autoplay"
+        src="/demos/sate/index.html"
+        title="Interactive Sate restaurant recommendation application"
+        allow="geolocation"
       />
     </div>
   );

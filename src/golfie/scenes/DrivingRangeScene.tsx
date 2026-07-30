@@ -44,6 +44,45 @@ function SkyBackground() {
   return <primitive attach="background" object={skyTexture} />;
 }
 
+/** Keep the physical orbit pivot on the stereo handoff and continuously align
+ * that exact world point with the HUD's 50% screen centerline. */
+function CenteredHandoffProjection({ target }: { target: CameraVector }) {
+  const { camera, size } = useThree();
+  const viewOffset = useRef(0);
+  const projectedTarget = useRef(new THREE.Vector3());
+
+  useEffect(() => {
+    viewOffset.current = 0;
+    return () => {
+      if (!(camera instanceof THREE.PerspectiveCamera)) return;
+      camera.clearViewOffset();
+      camera.updateProjectionMatrix();
+    };
+  }, [camera, size.height, size.width, target]);
+
+  useFrame(() => {
+    if (!(camera instanceof THREE.PerspectiveCamera) || size.width <= 0 || size.height <= 0) return;
+    camera.updateMatrixWorld();
+    projectedTarget.current.set(...target).project(camera);
+    // The rendered handoff marker sits one stage-grid unit to the right of the
+    // raw orbit coordinate. Center the visible join against the same 50% line
+    // used by the shot selector, launch radar, and transport controls.
+    const visibleHandoffBias = size.width / 96;
+    const horizontalError = projectedTarget.current.x * size.width * 0.5 + visibleHandoffBias;
+    if (Math.abs(horizontalError) < 0.2) return;
+
+    viewOffset.current = THREE.MathUtils.clamp(
+      viewOffset.current + horizontalError * 0.65,
+      -size.width * 0.25,
+      size.width * 0.25,
+    );
+    camera.setViewOffset(size.width, size.height, viewOffset.current, 0, size.width, size.height);
+    camera.updateProjectionMatrix();
+  });
+
+  return null;
+}
+
 function FreeCameraControls({
   enabled,
   position,
@@ -247,7 +286,7 @@ export function DrivingRangeScene({
   const cameraTarget = useMemo<CameraVector>(() => {
     const stereoHandoff = scenePoints.measured.at(-1);
     if (!stereoHandoff) return fittedCameraTarget;
-    return [stereoHandoff.x, fittedCameraTarget[1], stereoHandoff.z];
+    return [stereoHandoff.x, stereoHandoff.y, stereoHandoff.z];
   }, [fittedCameraTarget, scenePoints.measured]);
 
   const toggle = (key: LayerKey) => setVisibleLayers((prev) => ({ ...prev, [key]: !prev[key] }));
@@ -302,6 +341,7 @@ export function DrivingRangeScene({
             gl.toneMappingExposure = 1.08;
           }}
         >
+          <CenteredHandoffProjection target={cameraTarget} />
           <AdaptiveDpr pixelated />
           <fogExp2 attach="fog" args={["#b7d1d9", 0.0019]} />
           <SkyBackground />

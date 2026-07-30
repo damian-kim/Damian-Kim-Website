@@ -31,9 +31,9 @@ export default function GolfieProductDemo({ compact = false }: { compact?: boole
   const frameRef = useRef<HTMLDivElement>(null);
   const [scale, setScale] = useState(1);
   const [mode, setMode] = useState<'sample' | 'real'>('real');
+  const [view, setView] = useState<'flight' | 'swing'>('flight');
   const [parameters, setParameters] = useState(SAMPLE);
   const [playKey, setPlayKey] = useState(0);
-  const [showSwing, setShowSwing] = useState(false);
   const payload = useMemo(() => makePayload(mode === 'real' ? REAL : parameters, mode === 'real'), [mode, parameters]);
 
   useLayoutEffect(() => { const frame = frameRef.current; if (!frame) return; const update = () => setScale(frame.clientWidth / DESIGN_WIDTH); update(); const observer = new ResizeObserver(update); observer.observe(frame); return () => observer.disconnect(); }, []);
@@ -52,12 +52,14 @@ export default function GolfieProductDemo({ compact = false }: { compact?: boole
 
   return <div ref={frameRef} className={`golfie-product-demo${compact ? ' golfie-product-demo--compact' : ''}`} aria-label="Interactive Golfie shot simulator">
     <div className="golfie-product-demo__stage" style={{ width: DESIGN_WIDTH, height: DESIGN_HEIGHT, transform: `scale(${scale})` }}>
-      <header className="app-header"><div className="app-header__row"><span className="app-header__wordmark">GOLFIE</span><nav className="app-header__nav"><span className="app-header__link">Upload</span><span className="app-header__link">Calibrate</span><span className="app-header__link app-header__link--active">Demo range</span><span className="app-header__link">Course map</span></nav></div></header>
-      <div className="golfie-product-demo__simulator"><ShotSimulatorView key={`${mode}-${playKey}`} payload={payload} title={mode === 'sample' ? 'Custom Shot Lab' : 'Real Shot Replay'} subtitle={mode === 'sample' ? 'Adjustable synthetic trajectory' : 'Measured session 8497991969EC'} sidebarControls={mode === 'sample' ? sampleControls : undefined} />
-        <div className="portfolio-shot-modes"><button className={mode === 'real' ? 'active' : ''} onClick={() => setMode('real')}>01 Real shot<small>Swing-derived + YOLO</small></button><button className={mode === 'sample' ? 'active' : ''} onClick={() => setMode('sample')}>02 Custom shot<small>Adjustable physics</small></button></div>
-        {mode === 'real' && <div className="portfolio-real-shot-actions"><span>Parameters locked to stereo reconstruction</span><button onClick={() => setShowSwing(true)}>Open YOLO swing comparison</button></div>}
-      </div>
+      <header className="app-header"><div className="app-header__row"><nav className="app-header__nav golfie-view-selector" role="tablist" aria-label="Golfie demo view"><button type="button" role="tab" aria-selected={view === 'flight'} className={`app-header__link ${view === 'flight' ? 'app-header__link--active' : ''}`} onClick={() => setView('flight')}>Ball flight</button><button type="button" role="tab" aria-selected={view === 'swing'} className={`app-header__link ${view === 'swing' ? 'app-header__link--active' : ''}`} onClick={() => setView('swing')}>YOLO swing comparison</button></nav></div></header>
+      {view === 'flight' ? (
+        <div className="golfie-product-demo__simulator"><ShotSimulatorView key={`${mode}-${playKey}`} payload={payload} title={mode === 'sample' ? 'Custom Shot Lab' : 'Real Shot Replay'} subtitle={mode === 'sample' ? 'Adjustable synthetic trajectory' : 'Measured session 8497991969EC'} sidebarControls={mode === 'sample' ? sampleControls : undefined} />
+          <div className="portfolio-shot-modes"><button className={mode === 'real' ? 'active' : ''} onClick={() => setMode('real')}>01 Real shot<small>Swing-derived + YOLO</small></button><button className={mode === 'sample' ? 'active' : ''} onClick={() => setMode('sample')}>02 Custom shot<small>Adjustable physics</small></button></div>
+        </div>
+      ) : (
+        <div className="golfie-product-demo__swing"><GolfieSourceSwingDemo /></div>
+      )}
     </div>
-    {showSwing && <div className="portfolio-swing-modal"><button onClick={() => setShowSwing(false)}>Close comparison x</button><GolfieSourceSwingDemo /></div>}
   </div>;
 }

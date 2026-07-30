@@ -12,7 +12,6 @@
   :focus-visible { outline: 2px solid currentColor; outline-offset: 4px; }
 }
 
-.golfie-product-demo:has(.portfolio-swing-modal) { overflow: visible; }
 .golfie-product-demo--compact .portfolio-shot-modes,
 .golfie-product-demo--compact .portfolio-parameter-sidebar,
 .golfie-product-demo--compact .portfolio-real-shot-actions { display: none; }
@@ -93,10 +92,9 @@
   }
   .golfie-product-demo__stage { position: absolute; inset: 0 auto auto 0; display: grid; grid-template-rows: 53px minmax(0, 1fr); transform-origin: top left; font-family: var(--font-display); }
   .golfie-product-demo__stage .app-header { position: relative; }
-  .golfie-product-demo__stage .app-header__row { max-width: none; height: 53px; padding: 0 34px; }
-  .golfie-product-demo__stage .app-header__wordmark { cursor: default; }
-  .golfie-product-demo__stage .app-header__link { cursor: default; }
   .golfie-product-demo__simulator { position: relative; min-height: 0; overflow: hidden; }
+  .golfie-product-demo__swing { min-height: 0; overflow: hidden; }
+  .golfie-product-demo__swing .golfie-source-swing { min-height: 677px; box-shadow: none; }
   .golfie-product-demo__back { position: absolute; z-index: 110; left: 20px; top: 20px; padding: 6px 12px; color: var(--color-ink); background: rgba(8,12,16,.72); border: 1px solid rgba(255,255,255,.15); border-radius: var(--radius-sm); font-size: 12px; letter-spacing: .02em; text-transform: uppercase; cursor: default; }
   .golfie-product-demo button { font-family: var(--font-display); }
   .golfie-product-demo .mono { font-family: var(--font-mono); }
@@ -112,8 +110,6 @@
   .portfolio-parameter-sidebar label b { color: #fff; font: 600 9px var(--font-mono); white-space: nowrap; }
   .portfolio-parameter-sidebar input { width: 100%; height: 14px; margin: 5px 0 0; accent-color: #98afc7; }
   .portfolio-parameter-sidebar > button { min-height: 38px; padding: 8px 10px; color: #0d0e11; background: #98afc7; border-radius: 5px; font-size: 10px; font-weight: 700; cursor: pointer; }
-  .portfolio-real-shot-actions { position: absolute; z-index: 124; left: 50%; top: 92px; width: 298px; display: grid; gap: 8px; padding: 10px; transform: translateX(-50%); color: #98a2b3; background: rgba(8,12,16,.92); border: 1px solid rgba(255,255,255,.15); border-radius: 8px; font: 9px var(--font-mono); text-align: center; backdrop-filter: blur(12px); }.portfolio-real-shot-actions button { width: 100%; padding: 10px 14px; color: #0d0e11; background: #d1b89d; border-radius: 5px; cursor: pointer; }
-  .portfolio-swing-modal { position: fixed; z-index: 500; inset: 3vh 3vw; padding: 48px 18px 18px; color: #fff; background: #090c0a; border: 1px solid rgba(255,255,255,.2); overflow: auto; box-shadow: 0 30px 120px #000; }.portfolio-swing-modal > button { position: absolute; right: 18px; top: 14px; padding: 8px 12px; color: #fff; background: #252a25; cursor: pointer; }
 
   .project-demo {
     --demo-bg: #090d0a;
@@ -774,6 +770,14 @@
   .monolith-demo-project aside > p { margin: 0; color: #5e5a52; font-size: 11px; line-height: 1.75; }
   .monolith-demo-project aside > strong { display: flex; align-items: end; gap: 14px; margin-top: 38px; padding-top: 22px; border-top: 1px solid var(--mono-line-light); color: #947b4c; font-family: "DM Mono", monospace; font-size: clamp(30px, 3.6vw, 52px); font-weight: 300; }
   .monolith-demo-project aside > strong small { max-width: 100px; margin-bottom: 6px; color: #6f6a60; font-size: 7px; line-height: 1.4; }
+  .monolith-demo-project--sate { grid-template-columns: 1fr; gap: clamp(38px, 5vw, 72px); align-items: stretch; padding-block: 10vh; }
+  .monolith-demo-project--sate aside { display: grid; grid-template-columns: minmax(230px, .7fr) minmax(300px, 1fr) minmax(190px, .42fr); gap: clamp(30px, 5vw, 80px); align-items: end; }
+  .monolith-demo-project--sate aside > div > span { color: #947b4c; font-family: "DM Mono", monospace; font-size: 7px; letter-spacing: .1em; text-transform: uppercase; }
+  .monolith-demo-project--sate aside h3 { margin: 20px 0 0; }
+  .monolith-demo-project--sate aside > p { max-width: 560px; padding-top: 22px; border-top: 1px solid var(--mono-line-light); }
+  .monolith-demo-project--sate aside > strong { margin-top: 0; }
+  .monolith-demo-project--sate .sate-live-embed { height: clamp(720px, 65vw, 900px); }
+  .monolith-demo-project--sate .sate-live-embed iframe { min-height: 0; }
   .monolith-about-heading h2 { font-size: clamp(50px, 6vw, 92px); }
   .monolith-contact h2 { font-size: clamp(65px, 8.5vw, 132px); }
 }
@@ -812,6 +816,9 @@
 
     .flight-nav, .monolith-nav { height: 60px; grid-template-columns: 1fr auto; padding-inline: 18px; }
     .flight-nav nav, .monolith-nav nav { display: none; }
+    .monolith-demo-project--sate aside { grid-template-columns: 1fr; gap: 28px; }
+    .monolith-demo-project--sate aside > p { max-width: none; }
+    .monolith-demo-project--sate .sate-live-embed { height: 760px; }
     .flight-contact-link { font-size: 0; }
     .flight-contact-link::after { content: "CONTACT ↗"; font-size: 7px; font-family: "DM Mono", monospace; }
     .monolith-nav > span { font-size: 0; }
