@@ -68,6 +68,24 @@ const COACH_FINDINGS: CoachFinding[] = [
   { id: 'finish-balance', phase: '06 · Finish', time: 1.88, title: 'Balanced finish is a repeatable strength', status: 'strength', confidence: 91, summary: 'The swing reaches a tall, supported finish with the torso stacked over the lead side and no late recovery step.', evidence: ['Center finishes over lead leg', 'Trail foot releases', 'Shoulders complete rotation'], impact: 'A stable finish is evidence that momentum is being managed through the full motion.', fixes: ['Preserve this finish while changing transition', 'Hold the pose for two seconds after each drill swing', 'Do not chase speed until the finish remains stable'], drill: 'Hit sets of five at 70% speed and score only whether the finish can be held for a two-count.', checkpoint: 'Chest faces the target, trail heel is released, and balance remains entirely supported by the lead side.' },
 ];
 
+const COACH_DIAGRAMS: Record<string, { current: string; target: string; cue: string; focus: 'center' | 'arms' | 'hips' | 'posture' | 'finish' }> = {
+  'address-balance': { current: 'Pressure trails center', target: 'Pressure between feet', cue: 'Move the center line forward without losing spine tilt.', focus: 'center' },
+  'takeaway-width': { current: 'Hands leave the chest', target: 'Chest and hands move together', cue: 'Keep the arm triangle connected through shaft-parallel.', focus: 'arms' },
+  'top-width': { current: 'Elbow triangle narrows', target: 'Width stays intact', cue: 'End the arm swing when the shoulder turn ends.', focus: 'arms' },
+  'transition-sequence': { current: 'Chest and hips start together', target: 'Pelvis leads briefly', cue: 'Shift pressure, open the hips, then release the chest.', focus: 'hips' },
+  'impact-posture': { current: 'Pelvis moves toward ball', target: 'Lead hip replaces trail hip', cue: 'Keep hip depth while rotating around the lead heel.', focus: 'posture' },
+  'finish-balance': { current: 'Good lead-side support', target: 'Preserve this finish', cue: 'Hold the stacked finish while rehearsing earlier changes.', focus: 'finish' },
+};
+
+function CoachFixDiagram({ findingId }: { findingId: string }) {
+  const diagram = COACH_DIAGRAMS[findingId];
+  const armsCurrent = diagram.focus === 'arms' ? '82,56 98,28 107,58' : '72,58 51,78 39,100';
+  const armsTarget = diagram.focus === 'arms' ? '245,57 270,25 293,58' : '245,58 225,78 214,99';
+  const currentBodyX = diagram.focus === 'posture' ? 101 : diagram.focus === 'center' ? 94 : 88;
+  const targetBodyX = 265;
+  return <div className="golfie-fix-diagram"><div><span>MOVEMENT MAP</span><strong>{diagram.cue}</strong></div><svg viewBox="0 0 350 170" role="img" aria-label={`${diagram.current}. Target: ${diagram.target}.`}><line className="diagram-reference" x1="175" y1="16" x2="175" y2="151" /><g className="diagram-current"><text x="20" y="18">CURRENT</text><circle cx={currentBodyX} cy="38" r="10" /><line x1={currentBodyX} y1="49" x2={currentBodyX + (diagram.focus === 'posture' ? 8 : 0)} y2="103" /><line x1={currentBodyX - 24} y1="58" x2={currentBodyX + 24} y2="58" /><line x1={currentBodyX - 18} y1="102" x2={currentBodyX + 18} y2="102" /><polyline points={armsCurrent} /><line x1={currentBodyX - 14} y1="103" x2={currentBodyX - 27} y2="146" /><line x1={currentBodyX + 14} y1="103" x2={currentBodyX + 27} y2="146" />{diagram.focus === 'hips' && <path className="diagram-emphasis" d="M62 112 Q91 130 121 105" />}{diagram.focus === 'center' && <line className="diagram-emphasis" x1="106" y1="47" x2="106" y2="145" />}</g><path className="diagram-arrow" d="M145 84 H202 M194 76 L203 84 L194 92" /><g className="diagram-target"><text x="222" y="18">TARGET</text><circle cx={targetBodyX} cy="38" r="10" /><line x1={targetBodyX} y1="49" x2={targetBodyX} y2="103" /><line x1={targetBodyX - 24} y1="58" x2={targetBodyX + 24} y2="58" /><line x1={targetBodyX - 18} y1="102" x2={targetBodyX + 18} y2="102" /><polyline points={armsTarget} /><line x1={targetBodyX - 14} y1="103" x2={targetBodyX - 27} y2="146" /><line x1={targetBodyX + 14} y1="103" x2={targetBodyX + 27} y2="146" />{diagram.focus === 'hips' && <path className="diagram-emphasis" d="M239 109 Q267 93 293 106" />}{diagram.focus === 'posture' && <path className="diagram-emphasis" d="M242 108 Q265 96 289 101" />}{diagram.focus === 'finish' && <line className="diagram-emphasis" x1="265" y1="49" x2="265" y2="146" />}</g><text className="diagram-caption" x="20" y="163">{diagram.current}</text><text className="diagram-caption" x="222" y="163">{diagram.target}</text></svg></div>;
+}
+
 export function GolfieSourceSwingDemo() {
   const videos = useRef(new Map<string, HTMLVideoElement>());
   const [page, setPage] = useState<'comparison' | 'coach' | 'issue'>('comparison');
@@ -148,7 +166,7 @@ export function GolfieSourceSwingDemo() {
           <main className="golfie-issue-page" id={`golfie-coach-${finding.id}`}>
             <header><div><span>{finding.phase}</span><h1>{finding.title}</h1><p>{finding.summary}</p></div><div><strong>{finding.confidence}%</strong><span>MODEL CONFIDENCE</span></div></header>
             <section className="golfie-issue-frame"><figure><video ref={register('issue-camera-b')} src={src('camera_b', 'stripped')} muted playsInline preload="metadata" onLoadedMetadata={(event) => { event.currentTarget.currentTime = Math.min(finding.time, event.currentTarget.duration); }} /><figcaption>Face-on diagnostic frame · {finding.time.toFixed(2)} seconds</figcaption></figure><div><span>WHY IT MATTERS</span><p>{finding.impact}</p><span>MODEL EVIDENCE</span><ul>{finding.evidence.map((item) => <li key={item}>{item}</li>)}</ul></div></section>
-            <section className="golfie-issue-fix"><div><span>HOW TO FIX IT</span><ol>{finding.fixes.map((item) => <li key={item}>{item}</li>)}</ol></div><div><span>RECOMMENDED DRILL</span><h2>{finding.drill}</h2><span>SUCCESS CHECKPOINT</span><p>{finding.checkpoint}</p></div></section>
+            <section className="golfie-issue-fix"><div><span>HOW TO FIX IT</span><ol>{finding.fixes.map((item) => <li key={item}>{item}</li>)}</ol></div><div><CoachFixDiagram findingId={finding.id} /><div className="golfie-drill-copy"><span>RECOMMENDED DRILL</span><h2>{finding.drill}</h2><span>SUCCESS CHECKPOINT</span><p>{finding.checkpoint}</p></div></div></section>
             <footer><button type="button" onClick={() => setFindingIndex(Math.max(0, findingIndex - 1))} disabled={findingIndex === 0}>← Previous issue</button><button type="button" onClick={() => setFindingIndex(Math.min(COACH_FINDINGS.length - 1, findingIndex + 1))} disabled={findingIndex === COACH_FINDINGS.length - 1}>Next issue →</button></footer>
           </main>
         )}
@@ -157,7 +175,7 @@ export function GolfieSourceSwingDemo() {
   }
   return (
     <div className="golfie-source-swing">
-      <header><div><i /> GOLFIE VISION <small>SESSION 8497991969EC</small></div><div className="golfie-source-header-actions"><span>REAL PROCESSED OUTPUT · 30 FPS</span><button type="button" onClick={() => { setFindingIndex(0); setPage('coach'); }}>Open AI Coach →</button></div></header>
+      <header><div><i /> GOLFIE VISION <small>SESSION 8497991969EC</small></div><span>REAL PROCESSED OUTPUT · 30 FPS</span></header>
       <div className="golfie-source-legend">
         <span><i className="key-left" />Anatomical left arm</span><span><i className="key-right" />Anatomical right arm</span><span><i className="key-shoulder" />Shoulder axis</span><span><i className="key-hips" />Hip axis</span><span><i className="key-center" />2D posture center</span>
       </div>
@@ -170,7 +188,7 @@ export function GolfieSourceSwingDemo() {
         ))}
       </div>
       <div className="golfie-source-timeline"><input aria-label="Replay position" type="range" min="0" max={duration} step={1 / frameRate} value={Math.min(time, duration)} onChange={(event) => { setAllPlaying(false); seekAll(Number(event.target.value)); }} /><span>{time.toFixed(2)}s / {duration.toFixed(2)}s</span></div>
-      <footer><div><button type="button" onClick={() => { setAllPlaying(false); seekAll(time - 1 / frameRate); }}>│◀</button><button type="button" className="golfie-source-play" onClick={() => setAllPlaying(!playing)}>{playing ? 'Pause' : 'Play'}</button><button type="button" onClick={() => { setAllPlaying(false); seekAll(time + 1 / frameRate); }}>▶│</button></div><label>Speed<select value={speed} onChange={(event) => setSpeed(Number(event.target.value))}>{SPEEDS.map((value) => <option key={value} value={value}>{value}×</option>)}</select></label><span>← → frame step · synchronized dual-camera replay</span></footer>
+      <footer><div><button type="button" onClick={() => { setAllPlaying(false); seekAll(time - 1 / frameRate); }}>│◀</button><button type="button" className="golfie-source-play" onClick={() => setAllPlaying(!playing)}>{playing ? 'Pause' : 'Play'}</button><button type="button" onClick={() => { setAllPlaying(false); seekAll(time + 1 / frameRate); }}>▶│</button></div><button type="button" className="golfie-source-coach-cta" onClick={() => { setFindingIndex(0); setPage('coach'); }}><small>AI FORM ANALYSIS</small><strong>Open AI Coach</strong><i>→</i></button><label>Speed<select value={speed} onChange={(event) => setSpeed(Number(event.target.value))}>{SPEEDS.map((value) => <option key={value} value={value}>{value}×</option>)}</select></label></footer>
     </div>
   );
 }
