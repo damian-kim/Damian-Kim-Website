@@ -169,25 +169,14 @@
 
 .ball-tracker {
   display: block;
-  width: 16px;
-  height: 16px;
-  border: 1px solid rgba(55, 55, 50, 0.42);
+  width: 8px;
+  height: 8px;
+  border: 1px solid rgba(4, 15, 10, 0.9);
   border-radius: 50%;
-  background:
-    radial-gradient(circle at 31% 38%, rgba(95,96,91,.32) 0 4%, transparent 5%),
-    radial-gradient(circle at 57% 27%, rgba(95,96,91,.3) 0 4%, transparent 5%),
-    radial-gradient(circle at 69% 49%, rgba(95,96,91,.34) 0 4%, transparent 5%),
-    radial-gradient(circle at 43% 61%, rgba(95,96,91,.3) 0 4%, transparent 5%),
-    radial-gradient(circle at 65% 73%, rgba(95,96,91,.34) 0 4%, transparent 5%),
-    radial-gradient(circle at 27% 76%, rgba(95,96,91,.3) 0 4%, transparent 5%),
-    radial-gradient(circle at 18% 53%, rgba(95,96,91,.28) 0 3.5%, transparent 5%),
-    radial-gradient(circle at 48% 44%, rgba(95,96,91,.3) 0 3.5%, transparent 5%),
-    radial-gradient(circle at 80% 30%, rgba(95,96,91,.28) 0 3.5%, transparent 5%),
-    radial-gradient(circle at 81% 64%, rgba(95,96,91,.32) 0 3.5%, transparent 5%),
-    radial-gradient(circle at 48% 84%, rgba(95,96,91,.3) 0 3.5%, transparent 5%),
-    #f5f5ef;
-  transform: rotate(var(--ball-spin, 0rad));
-  will-change: transform;
+  background: #fff;
+  box-shadow:
+    0 0 0 2px rgba(76, 194, 115, 0.38),
+    0 0 8px rgba(255, 255, 255, 0.95);
 }
 
 .range-label {

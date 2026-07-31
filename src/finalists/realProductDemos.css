@@ -13,12 +13,15 @@
 .monolith-product-stage { min-height: 650px; }
 
 /* The iframe is the production build from E:/Juno/juno, not a portfolio recreation. */
-.juno-live-embed { min-height: 650px; display: grid; grid-template-rows: 46px 1fr; color: #1d0601; background: #f9f6f3; box-shadow: 0 30px 90px rgba(0,0,0,.18); overflow: hidden; }
+.juno-live-embed { position: relative; min-height: 650px; display: grid; grid-template-rows: 46px 1fr; color: #1d0601; background: #f9f6f3; box-shadow: 0 30px 90px rgba(0,0,0,.18); overflow: hidden; }
 .juno-live-embed > header { display: flex; align-items: center; justify-content: space-between; padding: 0 18px; border-bottom: 1px solid rgba(29,6,1,.12); background: #ebe5dc; font: 8px "DM Mono", monospace; letter-spacing: .07em; }
 .juno-live-embed > header div { display: flex; align-items: center; gap: 9px; }
 .juno-live-embed > header div i { width: 7px; height: 7px; border-radius: 50%; background: #ff6700; box-shadow: 0 0 10px rgba(255,103,0,.45); }
 .juno-live-embed > header small, .juno-live-embed > header span { color: #7a665e; font-size: 7px; }
 .juno-live-embed iframe { width: 100%; height: 100%; min-height: 604px; border: 0; background: #f9f6f3; }
+.juno-service-notice { position: absolute; z-index: 6; top: 58px; left: 50%; display: flex; align-items: center; gap: 14px; width: max-content; max-width: calc(100% - 32px); padding: 10px 12px 10px 16px; border: 1px solid rgba(29,6,1,.16); border-radius: 8px; color: #5d4d47; background: rgba(249,246,243,.96); box-shadow: 0 10px 30px rgba(29,6,1,.14); font: 600 11px "Instrument Sans", sans-serif; transform: translateX(-50%); backdrop-filter: blur(12px); }
+.juno-service-notice a { display: inline-flex; align-items: center; gap: 7px; padding: 8px 10px; border-radius: 5px; color: #fff; background: #ff6700; text-decoration: none; white-space: nowrap; }
+.juno-service-notice a:hover { background: #e85e00; }
 .juno-live-launch { min-height: 604px; display: grid; place-items: center; padding: 40px; text-align: center; background: radial-gradient(circle at 50% 42%, rgba(255,103,0,.13), transparent 35%), linear-gradient(rgba(29,6,1,.035) 1px, transparent 1px), linear-gradient(90deg,rgba(29,6,1,.035) 1px,transparent 1px), #f9f6f3; background-size: auto, 28px 28px, 28px 28px, auto; }
 .juno-live-launch > div { max-width: 430px; }
 .juno-live-launch > div > span { color: #7c6dfa; font: 8px "DM Mono", monospace; letter-spacing: .15em; }
