@@ -1,5 +1,3 @@
-import { useEffect, useRef } from 'react';
-import { animate, createScope, stagger } from 'animejs';
 import { experienceProof, supportingProjects } from './content';
 import { GolfieDemo } from './ProjectDemos';
 import { JunoSourceDemo, SateSourceDemo } from './RealProductDemos';
@@ -21,54 +19,7 @@ function QuietReveal({ children, className = '' }: { children: React.ReactNode; 
   return <div className={className}>{children}</div>;
 }
 
-function MonolithHeroReveal() {
-  const revealRef = useRef<HTMLDivElement>(null);
-
-  const moveReveal = (event: React.PointerEvent<HTMLDivElement>) => {
-    const bounds = event.currentTarget.getBoundingClientRect();
-    event.currentTarget.style.setProperty('--reveal-x', `${event.clientX - bounds.left}px`);
-    event.currentTarget.style.setProperty('--reveal-y', `${event.clientY - bounds.top}px`);
-  };
-
-  return (
-    <div className="monolith-object-reveal" ref={revealRef} onPointerMove={moveReveal} data-hero>
-      <div className="monolith-object-reveal__base">
-        <span className="monolith-object-reveal__orbit monolith-object-reveal__orbit--one" />
-        <span className="monolith-object-reveal__orbit monolith-object-reveal__orbit--two" />
-        <MonolithBall className="quiet-ball--hero" />
-        <p>Hover to inspect</p>
-      </div>
-      <div className="monolith-object-reveal__layer" aria-hidden="true">
-        <div className="monolith-object-reveal__glow" />
-        <MonolithBall className="quiet-ball--hero quiet-ball--revealed" />
-        <div className="monolith-object-reveal__readout">
-          <span>01 / CURRENT WORK</span>
-          <strong>Golfie</strong>
-          <p>Computer vision<br />Physics<br />Interactive 3D</p>
-        </div>
-      </div>
-      <span className="monolith-object-reveal__cursor">REVEAL</span>
-    </div>
-  );
-}
-
 export default function QuietMonolithPage() {
-  const heroRef = useRef<HTMLElement>(null);
-
-  useEffect(() => {
-    if (!heroRef.current || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-    const scope = createScope({ root: heroRef }).add(() => {
-      animate('[data-hero]', {
-        opacity: [0, 1],
-        y: [22, 0],
-        duration: 900,
-        delay: stagger(90),
-        ease: 'out(4)',
-      });
-    });
-    return () => scope.revert();
-  }, []);
-
   return (
     <div className="monolith-page" id="monolith-top">
       <header className="monolith-nav">
@@ -77,21 +28,11 @@ export default function QuietMonolithPage() {
       </header>
 
       <main>
-        <section className="monolith-hero monolith-hero--reframed" aria-labelledby="monolith-title" ref={heroRef}>
-          <div className="monolith-hero-number" data-hero><span>DK / 26</span><i />PRODUCT ENGINEERING</div>
-          <div className="monolith-hero-copy">
-            <p data-hero>I LIKE TO SOLVE HARD PROBLEMS.</p>
-            <h1 id="monolith-title" data-hero>Hard problems.<br /><em>Clear products.</em></h1>
-            <div className="monolith-hero-intro" data-hero>
-              <p>I turn computer vision, physics, and real-time systems into products people can actually use.</p>
-              <a href="#monolith-work">Explore the work <span>↓</span></a>
-            </div>
-          </div>
-          <MonolithHeroReveal />
-          <div className="monolith-hero-projects" data-hero>
-            <span><b>01</b> Golfie <small>Current</small></span>
-            <span><b>02</b> Juno <small>Voice + video</small></span>
-            <span><b>03</b> Sate <small>Group discovery</small></span>
+        <section className="monolith-hero monolith-hero--minimal" aria-labelledby="monolith-title">
+          <div className="monolith-hero-minimal-copy">
+            <h1 id="monolith-title">Damian Kim</h1>
+            <p>I like solving hard problems.</p>
+            <a href="#monolith-work">Explore the work</a>
           </div>
         </section>
 
