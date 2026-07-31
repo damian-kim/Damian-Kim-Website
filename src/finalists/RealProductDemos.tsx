@@ -8,17 +8,11 @@ export function JunoSourceDemo() {
     <div className="juno-live-embed">
       <header><div><i /> JUNO <small>LIVE APPLICATION BUILD</small></div><span>E:\Juno\juno · Agora RTC</span></header>
       {launched ? (
-        <>
-          <div className="juno-service-notice" role="note">
-            <span>Voice calls do not connect in this portfolio preview.</span>
-            <a href="https://www.juno.rest/" target="_blank" rel="noreferrer">Open Juno to join a call <b>↗</b></a>
-          </div>
-          <iframe
-            src="/demos/juno/index.html?embed=portfolio"
-            title="Interactive Juno voice and video application"
-            allow="microphone; camera; display-capture; autoplay"
-          />
-        </>
+        <iframe
+          src="/demos/juno/index.html?embed=portfolio"
+          title="Interactive Juno voice and video application"
+          allow="microphone; camera; display-capture; autoplay"
+        />
       ) : (
         <div className="juno-live-launch">
           <div>

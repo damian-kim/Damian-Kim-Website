@@ -19,6 +19,10 @@ function QuietReveal({ children, className = '' }: { children: React.ReactNode; 
   return <div className={className}>{children}</div>;
 }
 
+function ProjectSiteLink({ href, project }: { href: string; project: string }) {
+  return <a className="project-site-link" href={href} target="_blank" rel="noreferrer" aria-label={`Visit the ${project} website`}>Visit site <span aria-hidden="true">↗</span></a>;
+}
+
 export default function QuietMonolithPage() {
   return (
     <div className="monolith-page" id="monolith-top">
@@ -39,7 +43,7 @@ export default function QuietMonolithPage() {
         <section className="monolith-golfie" id="monolith-work">
           <QuietReveal className="monolith-golfie-heading">
             <div><p>01 / CURRENT WORK</p><h2>Golfie</h2></div>
-            <p>Modeling golf mechanics with computer vision, physics, and interactive 3D.</p>
+            <div className="monolith-project-intro"><p>Modeling golf mechanics with computer vision, physics, and interactive 3D.</p><ProjectSiteLink href="https://golfie-sim.vercel.app/" project="Golfie" /></div>
           </QuietReveal>
           <QuietReveal className="monolith-featured-demo"><GolfieDemo tone="monolith" /></QuietReveal>
           <div className="monolith-golfie-story">
@@ -64,11 +68,11 @@ export default function QuietMonolithPage() {
         <section className="monolith-projects">
           <QuietReveal className="monolith-section-heading"><h2>Previous projects</h2></QuietReveal>
           <QuietReveal className="monolith-demo-project monolith-demo-project--previous monolith-demo-project--juno">
-            <aside><div><span>02 · {supportingProjects[0].type}</span><h3>{supportingProjects[0].name}</h3></div><p>{supportingProjects[0].detail}</p><strong>{supportingProjects[0].result}<small>{supportingProjects[0].resultLabel}</small></strong></aside>
+            <aside><div><span>02 · {supportingProjects[0].type}</span><h3>{supportingProjects[0].name}</h3><ProjectSiteLink href="https://www.juno.rest/" project="Juno" /></div><p>{supportingProjects[0].detail}</p><strong>{supportingProjects[0].result}<small>{supportingProjects[0].resultLabel}</small></strong></aside>
             <div className="monolith-demo-frame"><JunoSourceDemo /></div>
           </QuietReveal>
           <QuietReveal className="monolith-demo-project monolith-demo-project--previous monolith-demo-project--sate">
-            <aside><div><span>03 · {supportingProjects[1].type}</span><h3>{supportingProjects[1].name}</h3></div><p>{supportingProjects[1].detail}</p><strong>{supportingProjects[1].result}<small>{supportingProjects[1].resultLabel}</small></strong></aside>
+            <aside><div><span>03 · {supportingProjects[1].type}</span><h3>{supportingProjects[1].name}</h3><ProjectSiteLink href="https://satelab.vercel.app/" project="Sate" /></div><p>{supportingProjects[1].detail}</p><strong>{supportingProjects[1].result}<small>{supportingProjects[1].resultLabel}</small></strong></aside>
             <div className="monolith-demo-frame"><SateSourceDemo /></div>
           </QuietReveal>
         </section>

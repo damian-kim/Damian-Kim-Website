@@ -758,7 +758,15 @@
   .monolith-golfie-heading { display: grid; grid-template-columns: 1fr .6fr; gap: 8vw; align-items: end; }
   .monolith-golfie-heading > div > p { margin: 0 0 1vh; color: var(--mono-gold); font-family: "DM Mono", monospace; font-size: 8px; letter-spacing: .14em; }
   .monolith-golfie-heading h2 { font-size: clamp(58px, 7vw, 106px); }
-  .monolith-golfie-heading > p { margin: 0 0 1vh; color: #817d75; font-size: 12px; line-height: 1.7; }
+  .monolith-project-intro { display: flex; flex-direction: column; align-items: flex-start; gap: 22px; }
+  .monolith-project-intro > p { margin: 0; color: #817d75; font-size: 12px; line-height: 1.7; }
+  .project-site-link { display: inline-flex; align-items: center; gap: 12px; width: max-content; padding: 12px 17px; border: 1px solid currentColor; border-radius: 999px; color: #947b4c; font-family: "DM Mono", monospace; font-size: 9px; font-weight: 700; letter-spacing: .1em; text-decoration: none; text-transform: uppercase; transition: color .2s ease, background .2s ease, transform .2s ease; }
+  .project-site-link span { font-size: 14px; line-height: 1; transition: transform .2s ease; }
+  .project-site-link:hover { color: var(--mono-cream); background: #947b4c; transform: translateY(-2px); }
+  .project-site-link:hover span { transform: translate(2px, -2px); }
+  .project-site-link:focus-visible { outline: 2px solid currentColor; outline-offset: 4px; }
+  .monolith-golfie .project-site-link { color: var(--mono-gold); }
+  .monolith-golfie .project-site-link:hover { color: var(--mono-black); background: var(--mono-gold); }
   .monolith-featured-demo { margin-top: 7vh; }
   .monolith-golfie-story { margin-top: 8vh; padding: 0; display: grid; grid-template-columns: repeat(3, 1fr); border-top: 1px solid var(--mono-line-dark); }
   .monolith-story-chapter { min-height: 360px; padding: 45px 3vw 35px 0; border-right: 1px solid var(--mono-line-dark); border-bottom: 0; }
@@ -781,6 +789,7 @@
   .monolith-demo-project--previous aside { display: grid; grid-template-columns: minmax(230px, .7fr) minmax(300px, 1fr) minmax(190px, .42fr); gap: clamp(30px, 5vw, 80px); align-items: end; }
   .monolith-demo-project--previous aside > div > span { color: #947b4c; font-family: "DM Mono", monospace; font-size: 7px; letter-spacing: .1em; text-transform: uppercase; }
   .monolith-demo-project--previous aside h3 { margin: 20px 0 0; }
+  .monolith-demo-project--previous aside .project-site-link { margin-top: 24px; }
   .monolith-demo-project--previous aside > p { max-width: 560px; padding-top: 22px; border-top: 1px solid var(--mono-line-light); }
   .monolith-demo-project--previous aside > strong { margin-top: 0; }
   .monolith-demo-project--juno .juno-live-embed { height: clamp(680px, 58vw, 780px); }
@@ -1033,7 +1042,7 @@
     .monolith-hero-caption { display: none; }
     .monolith-golfie { padding: 100px 20px; }
     .monolith-golfie-heading { display: block; }
-    .monolith-golfie-heading > p { margin-top: 24px; }
+    .monolith-project-intro { margin-top: 24px; }
     .monolith-golfie-story { grid-template-columns: 1fr; }
     .monolith-story-chapter { min-height: 300px; padding: 35px 0 !important; border-right: 0; border-bottom: 1px solid var(--mono-line-dark); }
     .monolith-story-chapter h3 { margin: 60px 0 20px; }
