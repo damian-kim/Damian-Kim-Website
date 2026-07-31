@@ -88,6 +88,166 @@ function CoachFixDiagram({ findingId }: { findingId: string }) {
 
 export function GolfieSourceSwingDemo() {
   const videos = useRef(new Map<string, HTMLVideoElement>());
+  const [mode, setMode] = useState<'comparison' | 'coach'>('comparison');
+  const [videoKind, setVideoKind] = useState<VideoKind>('stripped');
+  const [findingIndex, setFindingIndex] = useState(1);
+  const [practiceOpen, setPracticeOpen] = useState(false);
+  const [playing, setPlaying] = useState(false);
+  const [speed, setSpeed] = useState(1);
+  const [time, setTime] = useState(0);
+  const [duration, setDuration] = useState(1);
+  const frameRate = 30;
+  const finding = COACH_FINDINGS[findingIndex];
+
+  const register = (key: string) => (node: HTMLVideoElement | null) => {
+    if (node) videos.current.set(key, node); else videos.current.delete(key);
+  };
+  const src = (camera: Camera, kind: VideoKind) => `${GOLFIE_ASSET_ROOT}/${camera}_${kind}.mp4`;
+  const seekAll = useCallback((next: number) => {
+    const bounded = Math.max(0, Math.min(next, duration));
+    videos.current.forEach((video) => {
+      if (Number.isFinite(video.duration)) video.currentTime = Math.min(bounded, video.duration);
+    });
+    setTime(bounded);
+  }, [duration]);
+  const setAllPlaying = useCallback((next: boolean) => {
+    setPlaying(next);
+    videos.current.forEach((video) => {
+      video.playbackRate = speed;
+      if (next) void video.play().catch(() => setPlaying(false)); else video.pause();
+    });
+  }, [speed]);
+  const syncFromMaster = (master: HTMLVideoElement) => {
+    setTime(master.currentTime);
+    videos.current.forEach((video) => {
+      if (video !== master && Math.abs(video.currentTime - master.currentTime) > .06) {
+        video.currentTime = Math.min(master.currentTime, video.duration || master.currentTime);
+      }
+    });
+  };
+  const chooseFinding = (index: number) => {
+    setFindingIndex(index);
+    setPracticeOpen(false);
+    setAllPlaying(false);
+    window.setTimeout(() => seekAll(COACH_FINDINGS[index].time), 0);
+  };
+
+  useEffect(() => {
+    videos.current.forEach((video) => { video.playbackRate = speed; });
+  }, [speed]);
+  useEffect(() => {
+    setAllPlaying(false);
+    const timer = window.setTimeout(() => seekAll(mode === 'coach' ? finding.time : time), 0);
+    return () => window.clearTimeout(timer);
+  }, [mode, videoKind]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const videoSurface = (camera: Camera, master = false, className = '') => (
+    <figure className={className} key={`${camera}-${videoKind}`}>
+      <figcaption><span>{camera === 'camera_a' ? 'DOWN THE LINE' : 'FACE ON'}</span><small>{videoKind === 'stripped' ? 'POSE LAYER' : 'ORIGINAL'}</small></figcaption>
+      <video
+        ref={register(`${mode}-${camera}`)}
+        src={src(camera, videoKind)}
+        muted
+        playsInline
+        preload="metadata"
+        onLoadedMetadata={(event) => {
+          event.currentTarget.playbackRate = speed;
+          if (master) setDuration(event.currentTarget.duration || 1);
+        }}
+        onTimeUpdate={master ? (event) => syncFromMaster(event.currentTarget) : undefined}
+        onEnded={master ? () => setAllPlaying(false) : undefined}
+      />
+      <i className="golfie-studio-scanline" />
+    </figure>
+  );
+
+  if (mode === 'coach') {
+    return (
+      <div className="golfie-studio golfie-studio--coach">
+        <header className="golfie-studio-header">
+          <button type="button" className="golfie-studio-back" onClick={() => setMode('comparison')}>← Swing lab</button>
+          <div><span>GOLFIE</span><strong>AI COACH</strong></div>
+          <small>SESSION 8497991969EC · 30 FPS</small>
+        </header>
+        <main className="golfie-studio-coach">
+          <nav className="golfie-studio-phases" aria-label="Swing phases">
+            <span>SWING PHASES</span>
+            {COACH_FINDINGS.map((item, index) => (
+              <button type="button" className={index === findingIndex ? 'active' : ''} key={item.id} onClick={() => chooseFinding(index)}>
+                <b>{String(index + 1).padStart(2, '0')}</b><div><small>{item.phase.split('·')[1]}</small><strong>{item.title}</strong></div><i className={`status-${item.status}`}>{item.status}</i>
+              </button>
+            ))}
+          </nav>
+          <section className="golfie-studio-review">
+            {videoSurface('camera_b', true, 'golfie-studio-review__main')}
+            {videoSurface('camera_a', false, 'golfie-studio-review__secondary')}
+            <div className="golfie-studio-review__marker"><span>{String(findingIndex + 1).padStart(2, '0')}</span><i /><small>{finding.phase.replace('·', '/')}</small></div>
+            <div className="golfie-studio-review__controls">
+              <button type="button" onClick={() => seekAll(time - 1 / frameRate)}>│◀</button>
+              <button type="button" className="golfie-studio-play" onClick={() => setAllPlaying(!playing)}>{playing ? 'Pause review' : 'Play through'}</button>
+              <button type="button" onClick={() => seekAll(time + 1 / frameRate)}>▶│</button>
+              <span>{time.toFixed(2)}s</span>
+            </div>
+          </section>
+          <article className={`golfie-studio-insight ${practiceOpen ? 'practice-open' : ''}`}>
+            <div className="golfie-studio-insight__eyebrow"><span className={`status-${finding.status}`}>{finding.status}</span><small>{finding.phase}</small></div>
+            {!practiceOpen ? (
+              <>
+                <h1>{finding.title}</h1>
+                <p>{finding.summary}</p>
+                <div className="golfie-studio-impact"><span>WHY IT MATTERS</span><strong>{finding.impact}</strong></div>
+                <button type="button" className="golfie-studio-practice-button" onClick={() => setPracticeOpen(true)}>Practice this fix <span>→</span></button>
+              </>
+            ) : (
+              <>
+                <button type="button" className="golfie-studio-close-practice" onClick={() => setPracticeOpen(false)}>← Analysis</button>
+                <span className="golfie-studio-practice-label">PRACTICE PLAN</span>
+                <h1>{finding.drill}</h1>
+                <ol>{finding.fixes.map((item) => <li key={item}>{item}</li>)}</ol>
+                <div className="golfie-studio-check"><span>SUCCESS LOOKS LIKE</span><strong>{finding.checkpoint}</strong></div>
+              </>
+            )}
+          </article>
+        </main>
+      </div>
+    );
+  }
+
+  return (
+    <div className="golfie-studio golfie-studio--comparison">
+      <header className="golfie-studio-header">
+        <div><span>GOLFIE</span><strong>SWING LAB</strong></div>
+        <nav aria-label="Video layer">
+          <button type="button" className={videoKind === 'stripped' ? 'active' : ''} onClick={() => setVideoKind('stripped')}>Analysis</button>
+          <button type="button" className={videoKind === 'replay_original' ? 'active' : ''} onClick={() => setVideoKind('replay_original')}>Original</button>
+        </nav>
+        <small>DUAL-CAMERA SESSION · 8497991969EC</small>
+      </header>
+      <main className="golfie-studio-comparison">
+        <section className="golfie-studio-canvas">
+          {videoSurface('camera_a', true)}
+          {videoSurface('camera_b')}
+          <div className="golfie-studio-canvas__label"><span>01</span><strong>SAME SWING.<br />TWO ANGLES.</strong></div>
+        </section>
+        <aside className="golfie-studio-session">
+          <span>SESSION REVIEW</span>
+          <h1>See the move.<br /><em>Then improve it.</em></h1>
+          <p>Move through the swing frame by frame, compare both views, then let the coach turn the motion into a clear practice plan.</p>
+          <div><span><b>06</b> swing phases</span><span><b>03</b> priorities</span><span><b>02</b> camera views</span></div>
+        </aside>
+      </main>
+      <div className="golfie-studio-timeline"><span>{time.toFixed(2)}s</span><input aria-label="Replay position" type="range" min="0" max={duration} step={1 / frameRate} value={Math.min(time, duration)} onChange={(event) => { setAllPlaying(false); seekAll(Number(event.target.value)); }} /><span>{duration.toFixed(2)}s</span></div>
+      <footer className="golfie-studio-footer">
+        <div><button type="button" onClick={() => seekAll(time - 1 / frameRate)}>│◀</button><button type="button" className="golfie-studio-play" onClick={() => setAllPlaying(!playing)}>{playing ? 'Pause' : 'Play swing'}</button><button type="button" onClick={() => seekAll(time + 1 / frameRate)}>▶│</button></div>
+        <button type="button" className="golfie-studio-coach-cta" onClick={() => { setMode('coach'); chooseFinding(1); }}><span>OPEN AI COACH</span><strong>Get the practice plan</strong><i>→</i></button>
+        <label>Speed<select value={speed} onChange={(event) => setSpeed(Number(event.target.value))}>{SPEEDS.map((value) => <option key={value} value={value}>{value}×</option>)}</select></label>
+      </footer>
+    </div>
+  );
+}
+
+export function GolfieSourceSwingDemoLegacy() {
+  const videos = useRef(new Map<string, HTMLVideoElement>());
   const [page, setPage] = useState<'comparison' | 'coach' | 'issue'>('comparison');
   const [findingIndex, setFindingIndex] = useState(0);
   const [playing, setPlaying] = useState(false);
