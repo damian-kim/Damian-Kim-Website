@@ -36,7 +36,30 @@ export default function GolfieProductDemo({ compact = false }: { compact?: boole
   const [playKey, setPlayKey] = useState(0);
   const payload = useMemo(() => makePayload(mode === 'real' ? REAL : parameters, mode === 'real'), [mode, parameters]);
 
-  useLayoutEffect(() => { const frame = frameRef.current; if (!frame) return; const update = () => setScale(frame.clientWidth / DESIGN_WIDTH); update(); const observer = new ResizeObserver(update); observer.observe(frame); return () => observer.disconnect(); }, []);
+  useLayoutEffect(() => {
+    const frame = frameRef.current;
+    if (!frame) return;
+    let animationFrame = 0;
+    const update = () => {
+      window.cancelAnimationFrame(animationFrame);
+      animationFrame = window.requestAnimationFrame(() => {
+        const availableWidth = Math.max(0, frame.clientWidth - 2);
+        const availableHeight = Math.max(0, frame.clientHeight - 2);
+        setScale(Math.min(availableWidth / DESIGN_WIDTH, availableHeight / DESIGN_HEIGHT));
+      });
+    };
+    update();
+    const observer = new ResizeObserver(update);
+    observer.observe(frame);
+    window.addEventListener('resize', update);
+    window.visualViewport?.addEventListener('resize', update);
+    return () => {
+      window.cancelAnimationFrame(animationFrame);
+      observer.disconnect();
+      window.removeEventListener('resize', update);
+      window.visualViewport?.removeEventListener('resize', update);
+    };
+  }, []);
 
   const controls = [
     ['velocity', 'Velocity', 20, 75, 1, 'm/s'], ['angle', 'Angle', 5, 35, 1, 'deg'], ['direction', 'Direction', -15, 15, 1, 'deg'], ['backspin', 'Backspin', 0, 6500, 100, 'rpm'], ['sidespin', 'Sidespin', -2500, 2500, 100, 'rpm'], ['drag', 'Drag', .1, .5, .01, 'Cd'],

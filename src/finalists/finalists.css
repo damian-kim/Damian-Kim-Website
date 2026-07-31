@@ -92,7 +92,13 @@
   }
   .golfie-product-demo__stage { position: absolute; inset: 0 auto auto 0; display: grid; grid-template-rows: 53px minmax(0, 1fr); transform-origin: top left; font-family: var(--font-display); }
   .golfie-product-demo__stage .app-header { position: relative; }
-  .golfie-product-demo__simulator { position: relative; min-height: 0; overflow: hidden; }
+  .golfie-product-demo__simulator { position: relative; width: 1600px; height: 677px; min-height: 677px; overflow: hidden; }
+  .golfie-product-demo__simulator > .shot-simulator-hud,
+  .golfie-product-demo__simulator .shot-simulator-hud__canvas-container,
+  .golfie-product-demo__simulator .driving-range,
+  .golfie-product-demo__simulator .driving-range__canvas-wrap { width: 100%; height: 100%; min-height: 0; }
+  .golfie-product-demo__simulator .driving-range__canvas-wrap > div,
+  .golfie-product-demo__simulator .driving-range__canvas-wrap canvas { width: 100% !important; height: 100% !important; display: block; }
   .golfie-product-demo__swing { min-height: 0; overflow: hidden; }
   .golfie-product-demo__swing .golfie-source-swing { min-height: 677px; box-shadow: none; }
   .golfie-product-demo__back { position: absolute; z-index: 110; left: 20px; top: 20px; padding: 6px 12px; color: var(--color-ink); background: rgba(8,12,16,.72); border: 1px solid rgba(255,255,255,.15); border-radius: var(--radius-sm); font-size: 12px; letter-spacing: .02em; text-transform: uppercase; cursor: default; }
