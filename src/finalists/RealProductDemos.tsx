@@ -89,9 +89,7 @@ function CoachFixDiagram({ findingId }: { findingId: string }) {
 export function GolfieSourceSwingDemo() {
   const videos = useRef(new Map<string, HTMLVideoElement>());
   const [mode, setMode] = useState<'comparison' | 'coach'>('comparison');
-  const [videoKind, setVideoKind] = useState<VideoKind>('stripped');
   const [findingIndex, setFindingIndex] = useState(1);
-  const [practiceOpen, setPracticeOpen] = useState(false);
   const [playing, setPlaying] = useState(false);
   const [speed, setSpeed] = useState(1);
   const [time, setTime] = useState(0);
@@ -127,7 +125,6 @@ export function GolfieSourceSwingDemo() {
   };
   const chooseFinding = (index: number) => {
     setFindingIndex(index);
-    setPracticeOpen(false);
     setAllPlaying(false);
     window.setTimeout(() => seekAll(COACH_FINDINGS[index].time), 0);
   };
@@ -139,14 +136,14 @@ export function GolfieSourceSwingDemo() {
     setAllPlaying(false);
     const timer = window.setTimeout(() => seekAll(mode === 'coach' ? finding.time : time), 0);
     return () => window.clearTimeout(timer);
-  }, [mode, videoKind]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [mode]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const videoSurface = (camera: Camera, master = false, className = '') => (
-    <figure className={className} key={`${camera}-${videoKind}`}>
-      <figcaption><span>{camera === 'camera_a' ? 'DOWN THE LINE' : 'FACE ON'}</span><small>{videoKind === 'stripped' ? 'POSE LAYER' : 'ORIGINAL'}</small></figcaption>
+  const videoSurface = (camera: Camera, kind: VideoKind, master = false, className = '') => (
+    <figure className={className} key={`${camera}-${kind}`}>
+      <figcaption><span>{camera === 'camera_a' ? 'DOWN THE LINE' : 'FACE ON'}</span><small>{kind === 'stripped' ? 'YOLO CAPTURE' : 'ORIGINAL'}</small></figcaption>
       <video
-        ref={register(`${mode}-${camera}`)}
-        src={src(camera, videoKind)}
+        ref={register(`${mode}-${camera}-${kind}`)}
+        src={src(camera, kind)}
         muted
         playsInline
         preload="metadata"
@@ -157,6 +154,27 @@ export function GolfieSourceSwingDemo() {
         onTimeUpdate={master ? (event) => syncFromMaster(event.currentTarget) : undefined}
         onEnded={master ? () => setAllPlaying(false) : undefined}
       />
+      <i className="golfie-studio-scanline" />
+    </figure>
+  );
+
+  const coachOverlaySurface = (camera: Camera, master = false, className = '') => (
+    <figure className={`${className} golfie-studio-overlay-video`} key={`coach-overlay-${camera}`}>
+      <figcaption><span>{camera === 'camera_a' ? 'DOWN THE LINE' : 'FACE ON'}</span><small>ORIGINAL + YOLO POSE</small></figcaption>
+      <video
+        ref={register(`coach-${camera}-original`)}
+        src={src(camera, 'replay_original')}
+        muted
+        playsInline
+        preload="metadata"
+        onLoadedMetadata={(event) => {
+          event.currentTarget.playbackRate = speed;
+          if (master) setDuration(event.currentTarget.duration || 1);
+        }}
+        onTimeUpdate={master ? (event) => syncFromMaster(event.currentTarget) : undefined}
+        onEnded={master ? () => setAllPlaying(false) : undefined}
+      />
+      <video ref={register(`coach-${camera}-pose`)} className="golfie-studio-pose-layer" src={src(camera, 'stripped')} muted playsInline preload="metadata" />
       <i className="golfie-studio-scanline" />
     </figure>
   );
@@ -179,8 +197,8 @@ export function GolfieSourceSwingDemo() {
             ))}
           </nav>
           <section className="golfie-studio-review">
-            {videoSurface('camera_b', true, 'golfie-studio-review__main')}
-            {videoSurface('camera_a', false, 'golfie-studio-review__secondary')}
+            {coachOverlaySurface('camera_b', true, 'golfie-studio-review__main')}
+            {coachOverlaySurface('camera_a', false, 'golfie-studio-review__secondary')}
             <div className="golfie-studio-review__marker"><span>{String(findingIndex + 1).padStart(2, '0')}</span><i /><small>{finding.phase.replace('·', '/')}</small></div>
             <div className="golfie-studio-review__controls">
               <button type="button" onClick={() => seekAll(time - 1 / frameRate)}>│◀</button>
@@ -189,24 +207,13 @@ export function GolfieSourceSwingDemo() {
               <span>{time.toFixed(2)}s</span>
             </div>
           </section>
-          <article className={`golfie-studio-insight ${practiceOpen ? 'practice-open' : ''}`}>
+          <article className="golfie-studio-insight">
             <div className="golfie-studio-insight__eyebrow"><span className={`status-${finding.status}`}>{finding.status}</span><small>{finding.phase}</small></div>
-            {!practiceOpen ? (
-              <>
-                <h1>{finding.title}</h1>
-                <p>{finding.summary}</p>
-                <div className="golfie-studio-impact"><span>WHY IT MATTERS</span><strong>{finding.impact}</strong></div>
-                <button type="button" className="golfie-studio-practice-button" onClick={() => setPracticeOpen(true)}>Practice this fix <span>→</span></button>
-              </>
-            ) : (
-              <>
-                <button type="button" className="golfie-studio-close-practice" onClick={() => setPracticeOpen(false)}>← Analysis</button>
-                <span className="golfie-studio-practice-label">PRACTICE PLAN</span>
-                <h1>{finding.drill}</h1>
-                <ol>{finding.fixes.map((item) => <li key={item}>{item}</li>)}</ol>
-                <div className="golfie-studio-check"><span>SUCCESS LOOKS LIKE</span><strong>{finding.checkpoint}</strong></div>
-              </>
-            )}
+            <h1>{finding.title}</h1>
+            <p>{finding.summary}</p>
+            <div className="golfie-studio-impact"><span>WHY IT MATTERS</span><strong>{finding.impact}</strong></div>
+            <div className="golfie-studio-fix"><span>HOW TO FIX IT</span><ol>{finding.fixes.map((item) => <li key={item}>{item}</li>)}</ol></div>
+            <div className="golfie-studio-drill"><span>DRILL</span><strong>{finding.drill}</strong></div>
           </article>
         </main>
       </div>
@@ -217,17 +224,13 @@ export function GolfieSourceSwingDemo() {
     <div className="golfie-studio golfie-studio--comparison">
       <header className="golfie-studio-header">
         <div><span>GOLFIE</span><strong>SWING LAB</strong></div>
-        <nav aria-label="Video layer">
-          <button type="button" className={videoKind === 'stripped' ? 'active' : ''} onClick={() => setVideoKind('stripped')}>Analysis</button>
-          <button type="button" className={videoKind === 'replay_original' ? 'active' : ''} onClick={() => setVideoKind('replay_original')}>Original</button>
-        </nav>
+        <strong className="golfie-studio-header__comparison">YOLO CAPTURE / ORIGINAL VIDEO</strong>
         <small>DUAL-CAMERA SESSION · 8497991969EC</small>
       </header>
       <main className="golfie-studio-comparison">
         <section className="golfie-studio-canvas">
-          {videoSurface('camera_a', true)}
-          {videoSurface('camera_b')}
-          <div className="golfie-studio-canvas__label"><span>01</span><strong>SAME SWING.<br />TWO ANGLES.</strong></div>
+          <div className="golfie-studio-camera-pair"><h2>CAMERA A · DOWN THE LINE</h2><div>{videoSurface('camera_a', 'stripped')}{videoSurface('camera_a', 'replay_original', true)}</div></div>
+          <div className="golfie-studio-camera-pair"><h2>CAMERA B · FACE ON</h2><div>{videoSurface('camera_b', 'stripped')}{videoSurface('camera_b', 'replay_original')}</div></div>
         </section>
         <aside className="golfie-studio-session">
           <span>SESSION REVIEW</span>

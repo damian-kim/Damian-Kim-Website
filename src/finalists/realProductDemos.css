@@ -105,6 +105,7 @@
 .golfie-studio-header > div span { color: var(--studio-gold); font-size: 15px; font-weight: 850; letter-spacing: -.03em; }
 .golfie-studio-header > div strong { color: #8f897f; font-size: 10px; font-weight: 650; letter-spacing: .13em; }
 .golfie-studio-header > small { justify-self: end; color: #6f6a62; font-size: 9px; font-weight: 600; letter-spacing: .09em; }
+.golfie-studio-header__comparison { justify-self: center; color: #a29a8e; font-size: 10px; letter-spacing: .13em; }
 .golfie-studio-header nav { display: grid; grid-template-columns: 1fr 1fr; min-width: 250px; height: 36px; padding: 3px; border: 1px solid var(--studio-line); border-radius: 999px; }
 .golfie-studio-header nav button { border: 0; border-radius: 999px; color: #817b72; background: transparent; font-size: 11px; font-weight: 700; cursor: pointer; }
 .golfie-studio-header nav button.active { color: #17140f; background: var(--studio-gold); }
@@ -113,7 +114,11 @@
 
 .golfie-studio--comparison { display: grid; grid-template-rows: 58px minmax(0,1fr) 42px 76px; }
 .golfie-studio-comparison { min-height: 0; display: grid; grid-template-columns: minmax(0,1.46fr) minmax(360px,.54fr); }
-.golfie-studio-canvas { position: relative; min-width: 0; display: grid; grid-template-columns: 1fr 1fr; border-right: 1px solid var(--studio-line); background: #030303; overflow: hidden; }
+.golfie-studio-canvas { position: relative; min-width: 0; display: grid; grid-template-rows: 1fr 1fr; border-right: 1px solid var(--studio-line); background: #030303; overflow: hidden; }
+.golfie-studio-camera-pair { min-height: 0; display: grid; grid-template-rows: 25px minmax(0,1fr); border-bottom: 1px solid var(--studio-line); }
+.golfie-studio-camera-pair:last-child { border-bottom: 0; }
+.golfie-studio-camera-pair > h2 { display: flex; align-items: center; margin: 0; padding: 0 14px; color: var(--studio-gold); background: #0b0a08; font-size: 8px; font-weight: 750; letter-spacing: .11em; }
+.golfie-studio-camera-pair > div { min-height: 0; display: grid; grid-template-columns: 1fr 1fr; }
 .golfie-studio-canvas figure, .golfie-studio-review figure { position: relative; min-width: 0; margin: 0; background: #000; overflow: hidden; }
 .golfie-studio-canvas figure + figure { border-left: 1px solid var(--studio-line); }
 .golfie-studio-canvas video, .golfie-studio-review video { display: block; width: 100%; height: 100%; object-fit: contain; }
@@ -152,12 +157,17 @@
 .golfie-studio-review { position: relative; min-width: 0; min-height: 0; background: #010101; overflow: hidden; }
 .golfie-studio-review__main { position: absolute !important; inset: 0; }.golfie-studio-review__main figcaption { right: 39%; }
 .golfie-studio-review__secondary { position: absolute !important; z-index: 5; right: 18px; top: 54px; width: 34%; height: 31%; border: 1px solid rgba(216,196,154,.42); box-shadow: 0 14px 40px rgba(0,0,0,.6); }
+.golfie-studio-overlay-video > video:first-of-type { position: absolute; inset: 0; }
+.golfie-studio-pose-layer { position: absolute; z-index: 2; inset: 0; mix-blend-mode: screen; opacity: .92; pointer-events: none; }
 .golfie-studio-review__marker { position: absolute; z-index: 6; left: 22px; top: 62px; display: grid; grid-template-columns: auto 55px auto; gap: 10px; align-items: center; color: var(--studio-gold); }.golfie-studio-review__marker span { font-size: 28px; font-weight: 700; }.golfie-studio-review__marker i { height: 1px; background: var(--studio-gold); }.golfie-studio-review__marker small { color: #ddd5c7; font-size: 9px; font-weight: 700; }
 .golfie-studio-review__controls { position: absolute; z-index: 7; left: 50%; bottom: 18px; display: flex; align-items: center; gap: 7px; padding: 7px; background: rgba(10,9,8,.88); border: 1px solid var(--studio-line); transform: translateX(-50%); backdrop-filter: blur(12px); }.golfie-studio-review__controls button { height: 34px; padding: 0 11px; border: 1px solid var(--studio-line); color: #e9e2d6; background: transparent; cursor: pointer; }.golfie-studio-review__controls .golfie-studio-play { color: #15120d; background: var(--studio-gold); }.golfie-studio-review__controls > span { min-width: 52px; color: #9a9389; font-size: 9px; text-align: center; }
 .golfie-studio-insight { min-width: 0; display: flex; flex-direction: column; padding: 30px 30px 26px; border-left: 1px solid var(--studio-line); background: radial-gradient(circle at 100% 0, rgba(216,196,154,.09), transparent 38%), #0f0e0c; overflow: hidden; }
 .golfie-studio-insight__eyebrow { display: flex; justify-content: space-between; align-items: center; }.golfie-studio-insight__eyebrow span { font-size: 9px; font-weight: 800; letter-spacing: .11em; text-transform: uppercase; }.golfie-studio-insight__eyebrow small { color: #777168; font-size: 9px; font-weight: 700; }
-.golfie-studio-insight h1 { margin: 42px 0 20px; font-size: 38px; line-height: .94; letter-spacing: -.04em; font-weight: 620; }.golfie-studio-insight > p { margin: 0; color: #bbb3a7; font-size: 14px; line-height: 1.55; }
-.golfie-studio-impact, .golfie-studio-check { margin-top: 28px; padding-top: 18px; border-top: 1px solid var(--studio-line); }.golfie-studio-impact span, .golfie-studio-check span, .golfie-studio-practice-label { display: block; margin-bottom: 9px; color: var(--studio-gold); font-size: 9px; font-weight: 800; letter-spacing: .12em; }.golfie-studio-impact strong, .golfie-studio-check strong { color: #d9d1c5; font-size: 13px; line-height: 1.48; font-weight: 500; }
+.golfie-studio-insight h1 { margin: 22px 0 12px; font-size: 32px; line-height: .96; letter-spacing: -.04em; font-weight: 620; }.golfie-studio-insight > p { margin: 0; color: #bbb3a7; font-size: 13px; line-height: 1.45; }
+.golfie-studio-impact, .golfie-studio-fix, .golfie-studio-drill { margin-top: 17px; padding-top: 13px; border-top: 1px solid var(--studio-line); }
+.golfie-studio-impact span, .golfie-studio-fix > span, .golfie-studio-drill span { display: block; margin-bottom: 7px; color: var(--studio-gold); font-size: 9px; font-weight: 800; letter-spacing: .12em; }
+.golfie-studio-impact strong, .golfie-studio-drill strong { color: #d9d1c5; font-size: 12px; line-height: 1.42; font-weight: 500; }
+.golfie-studio-fix ol { margin: 0; padding-left: 18px; color: #d9d1c5; font-size: 11px; line-height: 1.35; }.golfie-studio-fix li + li { margin-top: 5px; }
 .golfie-studio-practice-button { width: 100%; min-height: 55px; display: flex; justify-content: space-between; align-items: center; margin-top: auto; padding: 0 17px; border: 1px solid var(--studio-gold); color: #15120d; background: var(--studio-gold); font-size: 13px; font-weight: 800; cursor: pointer; }.golfie-studio-practice-button span { font-size: 21px; }
 .golfie-studio-close-practice { width: max-content; padding: 0; border: 0; color: #9e978c; background: transparent; font-size: 10px; font-weight: 700; cursor: pointer; }.golfie-studio-practice-label { margin-top: 30px; }.golfie-studio-insight.practice-open h1 { margin: 10px 0 19px; font-size: 27px; line-height: 1.05; }.golfie-studio-insight ol { margin: 0; padding: 18px 0 18px 22px; border-top: 1px solid var(--studio-line); border-bottom: 1px solid var(--studio-line); color: #d8d0c3; font-size: 13px; line-height: 1.48; }.golfie-studio-insight ol li + li { margin-top: 10px; }.golfie-studio-check { margin-top: auto; }
 
