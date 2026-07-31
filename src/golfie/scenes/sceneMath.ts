@@ -45,10 +45,13 @@ export function computeSceneBounds(pointSets: ScenePoint[][]): SceneBounds {
 /** Camera position + orbit target scaled to the shot length, so a 10m
  * putt-length demo and a 250m drive both frame reasonably. */
 export function fitCameraToBounds(bounds: SceneBounds) {
-  const range = bounds.maxDownrangeM;
+  // Keep short/custom shots framed against the same full driving-range canvas
+  // as the real reference drive instead of tightening the camera around them.
+  const range = Math.max(bounds.maxDownrangeM, 205);
+  const presentationCenter = Math.max(bounds.centerDownrangeM, range * 0.46);
   return {
     position: [-10, 2.8, 12] as [number, number, number],
-    target: [Math.min(Math.max(bounds.centerDownrangeM, range * 0.32), range * 0.55), 1.35, bounds.centerLateralM] as [number, number, number],
+    target: [Math.min(Math.max(presentationCenter, range * 0.32), range * 0.55), 1.35, bounds.centerLateralM] as [number, number, number],
   };
 }
 

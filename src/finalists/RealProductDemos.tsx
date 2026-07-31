@@ -68,6 +68,14 @@ const COACH_FINDINGS: CoachFinding[] = [
   { id: 'finish-balance', phase: '06 · Finish', time: 1.88, title: 'Balanced finish is a repeatable strength', status: 'strength', confidence: 91, summary: 'The swing reaches a tall, supported finish with the torso stacked over the lead side and no late recovery step.', evidence: ['Center finishes over lead leg', 'Trail foot releases', 'Shoulders complete rotation'], impact: 'A stable finish is evidence that momentum is being managed through the full motion.', fixes: ['Preserve this finish while changing transition', 'Hold the pose for two seconds after each drill swing', 'Do not chase speed until the finish remains stable'], drill: 'Hit sets of five at 70% speed and score only whether the finish can be held for a two-count.', checkpoint: 'Chest faces the target, trail heel is released, and balance remains entirely supported by the lead side.' },
 ];
 
+const SWING_SCORE_COMPONENTS = [
+  { label: 'Setup', score: 84, weight: 20 },
+  { label: 'Structure', score: 72, weight: 25 },
+  { label: 'Sequence', score: 65, weight: 35 },
+  { label: 'Balance', score: 92, weight: 20 },
+];
+const SWING_COMPOSITE_SCORE = Math.round(SWING_SCORE_COMPONENTS.reduce((total, component) => total + component.score * component.weight / 100, 0));
+
 const COACH_DIAGRAMS: Record<string, { current: string; target: string; cue: string; focus: 'center' | 'arms' | 'hips' | 'posture' | 'finish' }> = {
   'address-balance': { current: 'Pressure trails center', target: 'Pressure between feet', cue: 'Move the center line forward without losing spine tilt.', focus: 'center' },
   'takeaway-width': { current: 'Hands leave the chest', target: 'Chest and hands move together', cue: 'Keep the arm triangle connected through shaft-parallel.', focus: 'arms' },
@@ -233,17 +241,18 @@ export function GolfieSourceSwingDemo() {
           <div className="golfie-studio-camera-pair"><h2>CAMERA B · FACE ON</h2><div>{videoSurface('camera_b', 'stripped')}{videoSurface('camera_b', 'replay_original')}</div></div>
         </section>
         <aside className="golfie-studio-session">
-          <span>SESSION REVIEW</span>
-          <h1>See the move.<br /><em>Then improve it.</em></h1>
-          <p>Move through the swing frame by frame, compare both views, then let the coach turn the motion into a clear practice plan.</p>
-          <div><span><b>06</b> swing phases</span><span><b>03</b> priorities</span><span><b>02</b> camera views</span></div>
+          <span>COMPOSITE SWING SCORE</span>
+          <div className="golfie-studio-score"><strong>{SWING_COMPOSITE_SCORE}</strong><small>/ 100</small></div>
+          <div className="golfie-studio-score-breakdown">
+            {SWING_SCORE_COMPONENTS.map((component) => <div key={component.label}><span><b>{component.label}</b><small>{component.weight}% weight</small><strong>{component.score}</strong></span><i><b style={{ width: `${component.score}%` }} /></i></div>)}
+          </div>
+          <p className="golfie-studio-score-formula">Weighted form score · setup 20% · structure 25% · sequence 35% · balance 20%</p>
         </aside>
       </main>
       <div className="golfie-studio-timeline"><span>{time.toFixed(2)}s</span><input aria-label="Replay position" type="range" min="0" max={duration} step={1 / frameRate} value={Math.min(time, duration)} onChange={(event) => { setAllPlaying(false); seekAll(Number(event.target.value)); }} /><span>{duration.toFixed(2)}s</span></div>
       <footer className="golfie-studio-footer">
-        <div><button type="button" onClick={() => seekAll(time - 1 / frameRate)}>│◀</button><button type="button" className="golfie-studio-play" onClick={() => setAllPlaying(!playing)}>{playing ? 'Pause' : 'Play swing'}</button><button type="button" onClick={() => seekAll(time + 1 / frameRate)}>▶│</button></div>
-        <button type="button" className="golfie-studio-coach-cta" onClick={() => { setMode('coach'); chooseFinding(1); }}><span>OPEN AI COACH</span><strong>Get the practice plan</strong><i>→</i></button>
-        <label>Speed<select value={speed} onChange={(event) => setSpeed(Number(event.target.value))}>{SPEEDS.map((value) => <option key={value} value={value}>{value}×</option>)}</select></label>
+        <div><button type="button" onClick={() => seekAll(time - 1 / frameRate)}>│◀</button><button type="button" className="golfie-studio-play" onClick={() => setAllPlaying(!playing)}>{playing ? 'Pause' : 'Play swing'}</button><button type="button" onClick={() => seekAll(time + 1 / frameRate)}>▶│</button><label>Speed<select value={speed} onChange={(event) => setSpeed(Number(event.target.value))}>{SPEEDS.map((value) => <option key={value} value={value}>{value}×</option>)}</select></label></div>
+        <button type="button" className="golfie-studio-coach-cta" onClick={() => { setMode('coach'); chooseFinding(1); }}><span>OPEN AI COACH</span><strong>Break it down</strong><i>→</i></button>
       </footer>
     </div>
   );
