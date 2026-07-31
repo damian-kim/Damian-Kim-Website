@@ -14,6 +14,7 @@ export default defineConfig({
         main: resolve(rootDir, 'index.html'),
         concepts: resolve(rootDir, 'concepts.html'),
         finalists: resolve(rootDir, 'finalists.html'),
+        heroLab: resolve(rootDir, 'hero-lab.html'),
       },
     },
   },
