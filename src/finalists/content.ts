@@ -23,23 +23,36 @@ export const supportingProjects = [
 
 export const experienceProof = [
   {
-    year: '2026',
+    year: 'May 2026 - Present',
+    place: 'Golfie',
+    location: 'Durham, NC',
+    role: 'Founder and Software Engineer',
+    summary: 'Architecting a dual-camera trajectory reconstruction product across computer vision, numerical physics, video synchronization, and interactive 3D.',
+    metric: 'Stereo vision + RK4 flight modeling',
+  },
+  {
+    year: 'Jan - Apr 2026',
     place: 'Duke University',
-    role: 'Discrete Mathematics TA',
-    summary: 'Teaching graph theory, logic, proof techniques, and combinatorics.',
+    location: 'Durham, NC',
+    role: 'Teaching Assistant, Discrete Mathematics',
+    summary: 'Taught weekly recitations, held office hours, and graded and edited exams for Duke\'s Discrete Mathematics course.',
+    metric: 'Teaching logic, proofs, and combinatorics',
   },
   {
-    year: '2023–24',
+    year: 'Jun 2023 - Aug 2024',
     place: 'Mayo Clinic',
-    role: 'Software Engineering Intern · AI FAST',
-    summary: 'Production ML and cloud data systems for a 2+ TB radiology dataset.',
-    metric: '20× less repeated scan volume',
+    location: 'Rochester, MN',
+    role: 'Software Engineering Intern, AI FAST',
+    summary: 'Built production ML integrations, automated research pipelines, and GCP data systems for a 2+ TB radiology imaging dataset.',
+    metric: '20x less scan volume / 15-70% lower latency',
   },
   {
-    year: '2021',
+    year: 'Jun - Aug 2021',
     place: 'NASA Langley',
+    location: 'Hampton, VA',
     role: 'Research Mentee',
-    summary: 'Computer vision for polymer-composite void analysis using CNNs.',
+    summary: 'Created and evaluated a TensorFlow/Keras CNN for detecting voids in cross-sectional images of polymer composites.',
+    metric: 'Computer vision for materials research',
   },
 ];
 

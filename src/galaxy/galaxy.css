@@ -1,0 +1,33 @@
+* { box-sizing: border-box; }
+html, body, #galaxy-root { width: 100%; height: 100%; margin: 0; overflow: hidden; }
+body { color: #eee9df; background: #030304; font-family: "Instrument Sans", sans-serif; -webkit-font-smoothing: antialiased; }
+a { color: inherit; text-decoration: none; }
+.galaxy-page { position: relative; width: 100%; height: 100%; isolation: isolate; background: #030304; }
+.galaxy-page::after { content: ""; position: absolute; z-index: 2; inset: 0; pointer-events: none; background: radial-gradient(circle at 50% 48%, transparent 30%, rgba(0,0,0,.18) 70%, rgba(0,0,0,.64) 100%); }
+.galaxy-page canvas { position: absolute !important; inset: 0; }
+.galaxy-nav { position: absolute; z-index: 5; left: 0; right: 0; top: 0; height: 72px; padding: 0 clamp(22px, 4vw, 68px); display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,.13); background: linear-gradient(rgba(3,3,4,.7), transparent); }
+.galaxy-nav a { display: flex; align-items: center; gap: 14px; color: #b9b2aa; font-size: 11px; }
+.galaxy-nav a span { padding: 7px 9px; border: 1px solid #f1773c; color: #f59461; font-weight: 700; }
+.galaxy-nav p { margin: 0; color: #69656a; font: 8px "DM Mono", monospace; letter-spacing: .14em; }
+.galaxy-intro { position: absolute; z-index: 4; left: clamp(24px, 5vw, 86px); top: 50%; width: min(480px, 40vw); transform: translateY(-50%); pointer-events: none; }
+.galaxy-intro > span { color: #f27b43; font: 9px "DM Mono", monospace; letter-spacing: .17em; }
+.galaxy-intro h1 { margin: 26px 0 30px; font-size: clamp(52px, 6vw, 104px); font-weight: 480; line-height: .82; letter-spacing: -.07em; }
+.galaxy-intro h1 em { color: #ff8a50; font-family: "Newsreader", serif; font-weight: 400; }
+.galaxy-intro p { max-width: 390px; margin: 0; color: #948e88; font-size: 13px; line-height: 1.65; }
+.galaxy-readout { position: absolute; z-index: 5; right: clamp(22px, 4vw, 68px); top: 50%; width: 170px; border-top: 1px solid rgba(255,255,255,.16); transform: translateY(-50%); }
+.galaxy-readout > div { padding: 14px 0; display: flex; justify-content: space-between; align-items: baseline; border-bottom: 1px solid rgba(255,255,255,.11); }
+.galaxy-readout span { color: #625f62; font: 7px "DM Mono", monospace; letter-spacing: .12em; }
+.galaxy-readout strong { color: #d8d0c7; font: 10px "DM Mono", monospace; font-weight: 400; }
+.galaxy-readout > div:last-child strong { color: #ff8a50; }
+.galaxy-footer { position: absolute; z-index: 5; left: clamp(22px, 4vw, 68px); right: clamp(22px, 4vw, 68px); bottom: 25px; display: flex; align-items: center; gap: 18px; color: #5e5a5c; font: 7px "DM Mono", monospace; letter-spacing: .1em; text-transform: uppercase; pointer-events: none; }
+.galaxy-footer i { flex: 1; height: 1px; background: rgba(255,255,255,.11); }
+@media (max-width: 760px) {
+  .galaxy-nav { height: 60px; padding-inline: 16px; }
+  .galaxy-nav p, .galaxy-readout { display: none; }
+  .galaxy-intro { left: 20px; top: auto; bottom: 88px; width: calc(100% - 40px); transform: none; }
+  .galaxy-intro h1 { margin: 16px 0 18px; font-size: clamp(52px, 16vw, 76px); }
+  .galaxy-intro p { max-width: 320px; font-size: 11px; }
+  .galaxy-footer { left: 20px; right: 20px; bottom: 20px; }
+  .galaxy-footer span:last-child { display: none; }
+}
+@media (prefers-reduced-motion: reduce) { .galaxy-footer span:first-child { display: none; } }

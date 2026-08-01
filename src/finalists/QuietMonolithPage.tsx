@@ -2,18 +2,10 @@ import { experienceProof, supportingProjects } from './content';
 import { GolfieDemo } from './ProjectDemos';
 import { JunoSourceDemo, SateSourceDemo } from './RealProductDemos';
 import HeroGravityMesh from './HeroGravityMesh';
+import ContactSection from './ContactSection';
 
 function MonolithMark() {
   return <a className="monolith-mark" href="#monolith-top" aria-label="Damian Kim, back to top">DK<span>Damian Kim</span></a>;
-}
-
-function MonolithBall({ className = '' }: { className?: string }) {
-  return (
-    <div className={`quiet-ball ${className}`} aria-hidden="true">
-      {Array.from({ length: 42 }, (_, index) => <i key={index} />)}
-      <span>01<small>GOLFIE</small></span>
-    </div>
-  );
 }
 
 function QuietReveal({ children, className = '' }: { children: React.ReactNode; className?: string }) {
@@ -29,7 +21,7 @@ export default function QuietMonolithPage() {
     <div className="monolith-page" id="monolith-top">
       <header className="monolith-nav">
         <MonolithMark />
-        <nav aria-label="Quiet Monolith navigation"><a href="#monolith-work">Work</a><a href="#monolith-about">About</a><a href="#monolith-contact">Contact</a></nav>
+        <nav aria-label="Primary navigation"><a href="#monolith-about">About</a><a href="#monolith-projects">Projects</a><a href="#monolith-contact">Contact</a></nav>
       </header>
 
       <main>
@@ -42,13 +34,13 @@ export default function QuietMonolithPage() {
             <h1 id="monolith-title">Damian Kim</h1>
             <p>I like solving hard problems.</p>
             <div className="monolith-hero-actions">
-              <a href="#monolith-work">Explore work</a>
-              <a href="https://www.linkedin.com/in/damian-kim-56287a202" target="_blank" rel="noreferrer">Resume</a>
+              <a href="#monolith-projects">Explore projects</a>
+              <a href="https://www.linkedin.com/in/damian-kim-56287a202" target="_blank" rel="noreferrer">LinkedIn</a>
             </div>
           </div>
         </section>
 
-        <section className="monolith-golfie" id="monolith-work">
+        <section className="monolith-golfie" id="monolith-projects">
           <QuietReveal className="monolith-golfie-heading">
             <div><p>01 / CURRENT WORK</p><h2>Golfie</h2></div>
             <div className="monolith-project-intro"><p>Modeling golf mechanics with computer vision, physics, and interactive 3D.</p><ProjectSiteLink href="https://golfie-sim.vercel.app/" project="Golfie" /></div>
@@ -86,25 +78,26 @@ export default function QuietMonolithPage() {
         </section>
 
         <section className="monolith-about" id="monolith-about">
-          <QuietReveal className="monolith-about-heading"><span>EXPERIENCE</span><h2>Research, production,<br />and teaching.</h2></QuietReveal>
-          <div className="monolith-experience">
-            {experienceProof.map((item) => (
-              <QuietReveal key={item.place}>
-                <span>{item.year}</span><h3>{item.place}</h3><p>{item.role}</p><p>{item.summary}</p>{item.metric && <strong>{item.metric}</strong>}
+          <QuietReveal className="monolith-about-heading">
+            <div><span>ABOUT</span><h2>Computer science,<br />mathematics, and a bias toward building.</h2></div>
+            <div className="monolith-about-summary">
+              <p>I&apos;m a Duke Computer Science and Mathematics student building products where rigorous models meet clear, usable interfaces.</p>
+              <dl><div><dt>Education</dt><dd>Duke University, B.S. 2027</dd></div><div><dt>Focus</dt><dd>Computer vision, physics, ML systems</dd></div><div><dt>GPA</dt><dd>3.8</dd></div></dl>
+            </div>
+          </QuietReveal>
+          <div className="monolith-experience-heading"><span>EXPERIENCE</span><p>A concise record of the teams and problems that shaped how I build.</p></div>
+          <div className="monolith-experience-timeline">
+            {experienceProof.map((item, index) => (
+              <QuietReveal className="monolith-timeline-item" key={`${item.place}-${item.role}`}>
+                <div className="monolith-timeline-meta"><span>{item.year}</span><small>{item.location}</small></div>
+                <div className="monolith-timeline-marker"><i /><b>{String(index + 1).padStart(2, '0')}</b></div>
+                <article><p>{item.role}</p><h3>{item.place}</h3><div>{item.summary}</div>{item.metric && <strong>{item.metric}</strong>}</article>
               </QuietReveal>
             ))}
           </div>
         </section>
 
-        <section className="monolith-contact" id="monolith-contact">
-          <div className="monolith-contact-glow" aria-hidden="true"><MonolithBall className="quiet-ball--closing" /></div>
-          <QuietReveal>
-            <p>CONTACT</p>
-            <h2>Get in touch.</h2>
-            <a href="mailto:damiank0428@gmail.com"><span>Email</span><strong>damiank0428@gmail.com ↗</strong></a>
-          </QuietReveal>
-          <footer><MonolithMark /><span>DURHAM, NORTH CAROLINA</span><span>© {new Date().getFullYear()}</span></footer>
-        </section>
+        <ContactSection />
       </main>
     </div>
   );
