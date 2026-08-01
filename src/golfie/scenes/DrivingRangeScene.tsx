@@ -255,8 +255,6 @@ export function DrivingRangeScene({
   const [cameraMode, setCameraMode] = useState<"chase" | "orbit">("orbit");
   const [rendererRevision, setRendererRevision] = useState(0);
   const playToken = externalPlayToken !== undefined ? externalPlayToken : localPlayToken;
-  const previousPlayToken = useRef(playToken);
-  const hasAutoFollowed = useRef(false);
   const scenePoints = useMemo(
     () => ({
       simulated: conformToRange(simulated),
@@ -277,15 +275,6 @@ export function DrivingRangeScene({
     hot.on("vite:afterUpdate", resetRenderer);
     return () => hot.off("vite:afterUpdate", resetRenderer);
   }, []);
-
-  useEffect(() => {
-    if (previousPlayToken.current === playToken) return;
-    previousPlayToken.current = playToken;
-    if (!hasAutoFollowed.current) {
-      hasAutoFollowed.current = true;
-      setCameraMode("chase");
-    }
-  }, [playToken]);
 
   const bounds = useMemo(
     () => computeSceneBounds([scenePoints.simulated, scenePoints.measured, scenePoints.fitted]),

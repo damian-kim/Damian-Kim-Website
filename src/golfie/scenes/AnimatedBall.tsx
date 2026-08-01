@@ -30,6 +30,9 @@ export function AnimatedBall({ points, playToken, chaseCamera = false }: Animate
   const firstPointTime = points.length > 0 ? points[0].t : 0;
   const duration = points.length > 0 ? points[points.length - 1].t - firstPointTime : 0;
 
+  // Run before Drei's Html projection callbacks. Ball Cam changes the camera
+  // every frame; updating it first keeps the DOM ball/yardage markers on the
+  // same camera matrix as the WebGL trajectory instead of one frame behind.
   useFrame((state, delta) => {
     if (!ballRef.current || points.length === 0) return;
 
@@ -105,7 +108,7 @@ export function AnimatedBall({ points, playToken, chaseCamera = false }: Animate
       state.camera.lookAt(ball);
       state.camera.updateMatrixWorld();
     }
-  });
+  }, -1);
 
   return (
     <group ref={ballRef}>
