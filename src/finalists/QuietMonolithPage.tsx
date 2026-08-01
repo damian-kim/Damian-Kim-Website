@@ -32,11 +32,27 @@ export default function QuietMonolithPage() {
       </header>
 
       <main>
-        <section className="monolith-hero monolith-hero--minimal" aria-labelledby="monolith-title">
+        <section
+          className="monolith-hero monolith-hero--minimal"
+          aria-labelledby="monolith-title"
+          onPointerMove={(event) => {
+            const rect = event.currentTarget.getBoundingClientRect();
+            event.currentTarget.style.setProperty('--grid-x', `${((event.clientX - rect.left) / rect.width - .5) * 10}deg`);
+            event.currentTarget.style.setProperty('--grid-y', `${((event.clientY - rect.top) / rect.height - .5) * 10}deg`);
+          }}
+          onPointerLeave={(event) => {
+            event.currentTarget.style.setProperty('--grid-x', '0deg');
+            event.currentTarget.style.setProperty('--grid-y', '0deg');
+          }}
+        >
+          <div className="monolith-perspective-grid" aria-hidden="true"><div /><i /></div>
           <div className="monolith-hero-minimal-copy">
             <h1 id="monolith-title">Damian Kim</h1>
             <p>I like solving hard problems.</p>
-            <a href="#monolith-work">Explore the work</a>
+            <div className="monolith-hero-actions">
+              <a href="#monolith-work">Explore work</a>
+              <a href="https://www.linkedin.com/in/damian-kim-56287a202" target="_blank" rel="noreferrer">Resume</a>
+            </div>
           </div>
         </section>
 
