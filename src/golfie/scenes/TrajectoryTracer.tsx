@@ -7,9 +7,10 @@ interface TrajectoryTracerProps {
   dashed?: boolean;
   lineWidth?: number;
   showPoints?: boolean;
+  renderOrder?: number;
 }
 
-export function TrajectoryTracer({ points, color, dashed = false, lineWidth = 2.5, showPoints = false }: TrajectoryTracerProps) {
+export function TrajectoryTracer({ points, color, dashed = false, lineWidth = 2.5, showPoints = false, renderOrder = 0 }: TrajectoryTracerProps) {
   if (points.length < 2) return null;
   const vertices: [number, number, number][] = points.map((p) => [p.x, p.y, p.z]);
   return (
@@ -21,9 +22,10 @@ export function TrajectoryTracer({ points, color, dashed = false, lineWidth = 2.
         dashed={dashed}
         dashSize={dashed ? 0.6 : undefined}
         gapSize={dashed ? 0.4 : undefined}
+        renderOrder={renderOrder}
       />
       {showPoints && points.map((point, index) => (
-        <mesh key={`${point.t}-${index}`} position={[point.x, point.y, point.z]}>
+        <mesh key={`${point.t}-${index}`} position={[point.x, point.y, point.z]} renderOrder={renderOrder + 1}>
           <sphereGeometry args={[index === points.length - 1 ? 0.22 : 0.14, 12, 12]} />
           <meshBasicMaterial color={color} toneMapped={false} />
         </mesh>

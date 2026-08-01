@@ -263,6 +263,7 @@ export function DrivingRangeScene({
     }),
     [fitted, measured, simulated],
   );
+  const physicsPoints = scenePoints.fitted.length > 1 ? scenePoints.fitted : scenePoints.simulated;
 
   // Three.js resources held by a Fast Refresh boundary can outlive the GPU
   // buffers that react-three-fiber disposed during the update. Recreate the
@@ -312,7 +313,7 @@ export function DrivingRangeScene({
             label="Physics prediction"
             active={visibleLayers.fitted}
             onClick={() => toggle("fitted")}
-            count={fitted.length}
+            count={fitted.length > 1 ? fitted.length : simulated.length}
             colorVar="--color-physics"
             description="Modeled flight after stereo ends."
           />
@@ -365,14 +366,11 @@ export function DrivingRangeScene({
           />
           <RangeEnvironment bounds={bounds} />
           <ContactShadows position={[0, 0.055, 0]} opacity={0.32} scale={55} blur={2.8} far={14} color="#172012" />
-          {scenePoints.simulated.length > 1 && (
-            <TrajectoryTracer points={scenePoints.simulated} color="#151712" lineWidth={2.5} />
+          {visibleLayers.fitted && physicsPoints.length > 1 && (
+            <TrajectoryTracer points={physicsPoints} color="#090909" dashed lineWidth={3.5} renderOrder={1} />
           )}
-          {visibleLayers.measured && (
-            <TrajectoryTracer points={scenePoints.measured} color="#d8c49a" lineWidth={4} showPoints />
-          )}
-          {visibleLayers.fitted && (
-            <TrajectoryTracer points={scenePoints.fitted} color="#090909" dashed lineWidth={3.5} />
+          {visibleLayers.measured && scenePoints.measured.length > 1 && (
+            <TrajectoryTracer points={scenePoints.measured} color="#d8c49a" dashed lineWidth={4} showPoints renderOrder={3} />
           )}
           {visibleLayers.measured && visibleLayers.fitted && scenePoints.measured.length > 0 && (
             <TrajectoryHandoff point={scenePoints.measured[scenePoints.measured.length - 1]} />

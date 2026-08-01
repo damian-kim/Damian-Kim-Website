@@ -14,11 +14,14 @@ const MAX_LAUNCH_RPM = 3200;
 const MIN_FLIGHT_RPM = 520;
 const BALL_POINT = new Float32Array([0, 0, 0]);
 const BALL_VERTEX_SHADER = `
-  uniform float uSize;
+  uniform float uViewportHeight;
+  uniform float uPixelRatio;
+  uniform float uWorldDiameter;
   void main() {
     vec4 viewPosition = modelViewMatrix * vec4(position, 1.0);
     gl_Position = projectionMatrix * viewPosition;
-    gl_PointSize = uSize;
+    float perspectiveSize = uWorldDiameter * uViewportHeight * projectionMatrix[1][1] / (2.0 * max(-viewPosition.z, 0.001));
+    gl_PointSize = clamp(perspectiveSize, 1.25 * uPixelRatio, 10.0 * uPixelRatio);
   }
 `;
 const BALL_FRAGMENT_SHADER = `
@@ -108,7 +111,9 @@ export function AnimatedBall({ points, playToken, chaseCamera = false }: Animate
     const speed = velocity.length();
 
     if (markerMaterialRef.current) {
-      markerMaterialRef.current.uniforms.uSize.value = 16 * state.gl.getPixelRatio();
+      const pixelRatio = state.gl.getPixelRatio();
+      markerMaterialRef.current.uniforms.uPixelRatio.value = pixelRatio;
+      markerMaterialRef.current.uniforms.uViewportHeight.value = state.size.height * pixelRatio;
     }
 
     if (markerMaterialRef.current && startTimeRef.current !== null && elapsed < duration) {
@@ -147,7 +152,14 @@ export function AnimatedBall({ points, playToken, chaseCamera = false }: Animate
           ref={markerMaterialRef}
           vertexShader={BALL_VERTEX_SHADER}
           fragmentShader={BALL_FRAGMENT_SHADER}
-          uniforms={{ uSize: { value: 16 }, uSpin: { value: 0 } }}
+          uniforms={{
+            uViewportHeight: { value: 720 },
+            uPixelRatio: { value: 1 },
+            // Slight readability allowance over the 42.67 mm physical diameter,
+            // while retaining correct perspective falloff in a scaled portfolio demo.
+            uWorldDiameter: { value: 0.09 },
+            uSpin: { value: 0 },
+          }}
           transparent
           depthWrite={false}
           toneMapped={false}
