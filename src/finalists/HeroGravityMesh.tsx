@@ -7,10 +7,6 @@ type Body = {
   vy: number;
   targetX: number;
   targetY: number;
-  tiltX: number;
-  tiltY: number;
-  tiltVx: number;
-  tiltVy: number;
   rollX: number;
   rollY: number;
 };
@@ -20,6 +16,8 @@ const BASE_TILT_X = Math.PI * .32;
 const FOCAL_LENGTH = 920;
 const MESH_HORIZON = .16;
 const GRAVITY_CUTOFF = 2.45;
+const COS_TILT_X = Math.cos(BASE_TILT_X);
+const SIN_TILT_X = Math.sin(BASE_TILT_X);
 const DIMPLES = [
   [-.58, -.49], [-.2, -.66], [.22, -.62], [.55, -.42],
   [-.72, -.13], [-.37, -.23], [.03, -.29], [.42, -.18], [.73, .02],
@@ -43,10 +41,6 @@ export default function HeroGravityMesh() {
       vy: 0,
       targetX: 0,
       targetY: 0,
-      tiltX: BASE_TILT_X,
-      tiltY: 0,
-      tiltVx: 0,
-      tiltVy: 0,
       rollX: 0,
       rollY: 0,
     };
@@ -64,10 +58,8 @@ export default function HeroGravityMesh() {
     let wellRadiusSquared = wellRadius * wellRadius;
     let gravityCutoffSquared = (wellRadius * GRAVITY_CUTOFF) ** 2;
     let gravityFadeStartSquared = (wellRadius * 2.05) ** 2;
-    let cosTiltX = Math.cos(BASE_TILT_X);
-    let sinTiltX = Math.sin(BASE_TILT_X);
-    let cosTiltY = 1;
-    let sinTiltY = 0;
+    let animationRunning = false;
+    let wakeAnimation = () => {};
 
     const resize = () => {
       const rect = hero.getBoundingClientRect();
@@ -88,6 +80,7 @@ export default function HeroGravityMesh() {
         body.x = body.targetX = width * .5;
         body.y = body.targetY = height * .53;
       }
+      wakeAnimation();
     };
 
     const movePointer = (event: PointerEvent) => {
@@ -96,31 +89,31 @@ export default function HeroGravityMesh() {
       body.targetX = clamp(event.clientX - rect.left, 26, width - 26);
       body.targetY = clamp(event.clientY - rect.top, 26, height - 26);
       pointerActive = true;
+      wakeAnimation();
     };
 
     const leavePointer = () => {
       pointerActive = false;
       body.targetX = width * .5;
       body.targetY = height * .53;
+      wakeAnimation();
     };
 
     const onMotionPreference = (event: MediaQueryListEvent) => {
       reducedMotion = event.matches;
+      wakeAnimation();
     };
 
     const project = (x: number, y: number, z: number) => {
       const cx = width * .5;
       const cy = height * .53;
-      let px = x - cx;
-      let py = y - cy;
-
-      const x1 = px * cosTiltY + z * sinTiltY;
-      let z1 = -px * sinTiltY + z * cosTiltY;
-      const y1 = py * cosTiltX - z1 * sinTiltX;
-      z1 = py * sinTiltX + z1 * cosTiltX;
+      const px = x - cx;
+      const py = y - cy;
+      const y1 = py * COS_TILT_X - z * SIN_TILT_X;
+      const z1 = py * SIN_TILT_X + z * COS_TILT_X;
 
       const scale = FOCAL_LENGTH / (FOCAL_LENGTH - z1);
-      return { x: cx + x1 * scale, y: cy + y1 * scale, scale };
+      return { x: cx + px * scale, y: cy + y1 * scale, scale };
     };
 
     // Intersect a screen-space ray with the tilted mesh plane. This keeps the
@@ -130,19 +123,16 @@ export default function HeroGravityMesh() {
       const cy = height * .53;
       const u = screenX - cx;
       const v = screenY - cy;
-      const normalX = sinTiltY;
-      const normalY = -cosTiltY * sinTiltX;
-      const normalZ = cosTiltY * cosTiltX;
-      const denominator = FOCAL_LENGTH * normalZ - u * normalX - v * normalY;
+      const normalY = -SIN_TILT_X;
+      const normalZ = COS_TILT_X;
+      const denominator = FOCAL_LENGTH * normalZ - v * normalY;
       const rayScale = (FOCAL_LENGTH * normalZ - localZ) / Math.max(80, denominator);
       const x1 = u * rayScale;
       const y1 = v * rayScale;
       const z1 = FOCAL_LENGTH * (1 - rayScale);
 
-      const planeY = y1 * cosTiltX + z1 * sinTiltX;
-      const zAfterX = -y1 * sinTiltX + z1 * cosTiltX;
-      const planeX = x1 * cosTiltY - zAfterX * sinTiltY;
-      return { x: cx + planeX, y: cy + planeY };
+      const planeY = y1 * COS_TILT_X + z1 * SIN_TILT_X;
+      return { x: cx + x1, y: cy + planeY };
     };
 
     const surfacePoint = (x: number, y: number) => {
@@ -310,21 +300,6 @@ export default function HeroGravityMesh() {
         body.rollY += body.vy * dt / 18;
       }
 
-      const nx = (body.x / width - .5) * 2;
-      const ny = (body.y / height - .5) * 2;
-      const targetTiltX = BASE_TILT_X + ny * .045;
-      const targetTiltY = -nx * .075;
-      const tiltSpring = 12;
-      const tiltDamping = 6.2;
-      body.tiltVx += ((targetTiltX - body.tiltX) * tiltSpring - body.tiltVx * tiltDamping) * dt;
-      body.tiltVy += ((targetTiltY - body.tiltY) * tiltSpring - body.tiltVy * tiltDamping) * dt;
-      body.tiltX += body.tiltVx * dt;
-      body.tiltY += body.tiltVy * dt;
-      cosTiltX = Math.cos(body.tiltX);
-      sinTiltX = Math.sin(body.tiltX);
-      cosTiltY = Math.cos(body.tiltY);
-      sinTiltY = Math.sin(body.tiltY);
-
       const centerDepth = -wellRadius * .44;
       const ballPlane = unprojectToPlane(body.x, body.y, centerDepth);
       ballPlaneX = ballPlane.x;
@@ -334,6 +309,23 @@ export default function HeroGravityMesh() {
       context.clearRect(0, 0, width, height);
       drawMesh();
       drawBall();
+
+      const settled = Math.abs(body.targetX - body.x) < .08
+        && Math.abs(body.targetY - body.y) < .08
+        && Math.abs(body.vx) < .08
+        && Math.abs(body.vy) < .08;
+      if (settled || reducedMotion) {
+        animationRunning = false;
+        frame = 0;
+      } else {
+        frame = requestAnimationFrame(tick);
+      }
+    };
+
+    wakeAnimation = () => {
+      if (animationRunning) return;
+      animationRunning = true;
+      previousTime = performance.now();
       frame = requestAnimationFrame(tick);
     };
 
@@ -344,7 +336,7 @@ export default function HeroGravityMesh() {
     hero.addEventListener('pointerleave', leavePointer);
     motionQuery.addEventListener('change', onMotionPreference);
     resize();
-    frame = requestAnimationFrame(tick);
+    wakeAnimation();
 
     return () => {
       cancelAnimationFrame(frame);
