@@ -1,16 +1,45 @@
-import type { FormEvent } from 'react';
+import { useState, type FormEvent } from 'react';
 
 const EMAIL = 'damiank0428@gmail.com';
 
 export default function ContactSection() {
-  const sendEmail = (event: FormEvent<HTMLFormElement>) => {
+  const [status, setStatus] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle');
+
+  const sendEmail = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    const data = new FormData(event.currentTarget);
+    const form = event.currentTarget;
+    const data = new FormData(form);
     const subject = String(data.get('subject') ?? '').trim();
     const replyTo = String(data.get('email') ?? '').trim();
     const message = String(data.get('message') ?? '').trim();
-    const body = `Reply to: ${replyTo}\n\n${message}`;
-    window.location.href = `mailto:${EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    const honeypot = String(data.get('_honey') ?? '').trim();
+
+    if (honeypot) return;
+
+    setStatus('sending');
+
+    try {
+      const response = await fetch(`https://formsubmit.co/ajax/${EMAIL}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Accept: 'application/json',
+        },
+        body: JSON.stringify({
+          email: replyTo,
+          _subject: subject,
+          message,
+          _template: 'table',
+        }),
+      });
+
+      if (!response.ok) throw new Error('Message delivery failed');
+
+      form.reset();
+      setStatus('sent');
+    } catch {
+      setStatus('error');
+    }
   };
 
   return (
@@ -31,6 +60,10 @@ export default function ContactSection() {
 
         <form className="monolith-contact-form" onSubmit={sendEmail} aria-describedby="contact-form-note">
           <div className="monolith-form-heading"><span>NEW MESSAGE</span><small>All fields required</small></div>
+          <label className="monolith-form-honey" aria-hidden="true">
+            <span>Leave this blank</span>
+            <input type="text" name="_honey" tabIndex={-1} autoComplete="off" />
+          </label>
           <label>
             <span>Your email</span>
             <input type="email" name="email" autoComplete="email" placeholder="you@example.com" required />
@@ -43,8 +76,14 @@ export default function ContactSection() {
             <span>Message</span>
             <textarea name="message" rows={7} placeholder="A little context goes a long way..." required />
           </label>
-          <button type="submit">Send message <span aria-hidden="true">-&gt;</span></button>
-          <p id="contact-form-note">This opens your email app with the message ready to send.</p>
+          <button type="submit" disabled={status === 'sending'}>
+            {status === 'sending' ? 'Sending...' : 'Send message'} <span aria-hidden="true">-&gt;</span>
+          </button>
+          <p id="contact-form-note" className={`monolith-form-status monolith-form-status--${status}`} aria-live="polite">
+            {status === 'sent' && 'Message sent. Thanks — I’ll be in touch.'}
+            {status === 'error' && 'Something went wrong. Please try again or email me directly.'}
+            {(status === 'idle' || status === 'sending') && 'Your message is sent directly from this form.'}
+          </p>
         </form>
       </div>
 

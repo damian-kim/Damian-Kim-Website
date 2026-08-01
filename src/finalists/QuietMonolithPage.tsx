@@ -79,10 +79,12 @@ export default function QuietMonolithPage() {
 
         <section className="monolith-about" id="monolith-about">
           <QuietReveal className="monolith-about-heading">
-            <div><span>ABOUT</span><h2>Computer science,<br />mathematics, and a bias toward building.</h2></div>
+            <div className="monolith-about-portrait">
+              <img src="/damian-photo.jpg" alt="Damian Kim" />
+            </div>
             <div className="monolith-about-summary">
-              <p>I&apos;m a Duke Computer Science and Mathematics student building products where rigorous models meet clear, usable interfaces.</p>
-              <dl><div><dt>Education</dt><dd>Duke University, B.S. 2027</dd></div><div><dt>Focus</dt><dd>Computer vision, physics, ML systems</dd></div><div><dt>GPA</dt><dd>3.8</dd></div></dl>
+              <span>ABOUT</span>
+              <h2>CS &amp; Math at<br />Duke University.</h2>
             </div>
           </QuietReveal>
           <div className="monolith-experience-heading"><span>EXPERIENCE</span><p>A concise record of the teams and problems that shaped how I build.</p></div>
@@ -91,7 +93,7 @@ export default function QuietMonolithPage() {
               <QuietReveal className="monolith-timeline-item" key={`${item.place}-${item.role}`}>
                 <div className="monolith-timeline-meta"><span>{item.year}</span><small>{item.location}</small></div>
                 <div className="monolith-timeline-marker"><i /><b>{String(index + 1).padStart(2, '0')}</b></div>
-                <article><p>{item.role}</p><h3>{item.place}</h3><div>{item.summary}</div>{item.metric && <strong>{item.metric}</strong>}</article>
+                <article><p>{item.role}</p><h3>{item.place}</h3><div>{item.summary}</div></article>
               </QuietReveal>
             ))}
           </div>

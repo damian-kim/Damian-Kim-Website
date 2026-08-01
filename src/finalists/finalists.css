@@ -677,15 +677,13 @@
   .monolith-project > footer { display: flex; justify-content: space-between; color: #78746b; font-family: "DM Mono", monospace; font-size: 7px; letter-spacing: .06em; }
 
   .monolith-about { padding: 15vh 7vw 17vh; border-bottom: 1px solid var(--mono-line-dark); scroll-margin-top: 70px; }
-  .monolith-about-heading { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(280px, .65fr); gap: 8vw; align-items: end; }
-  .monolith-about-heading > div:first-child > span { display: block; margin-bottom: 4vh; color: var(--mono-gold); font-family: "DM Mono", monospace; font-size: 9px; letter-spacing: .16em; }
-  .monolith-about-heading h2 { max-width: 920px; margin: 0; font-family: "Newsreader", serif; font-size: clamp(55px, 7vw, 112px); line-height: .9; letter-spacing: -.06em; font-weight: 400; }
+  .monolith-about-heading { display: grid; grid-template-columns: minmax(280px, .7fr) minmax(0, 1.3fr); gap: 8vw; align-items: center; }
+  .monolith-about-portrait { position: relative; max-width: 520px; overflow: hidden; aspect-ratio: 1; background: #171612; }
+  .monolith-about-portrait::after { content: ""; position: absolute; inset: 0; border: 1px solid rgba(238,234,224,.16); pointer-events: none; }
+  .monolith-about-portrait img { width: 100%; height: 100%; display: block; object-fit: cover; filter: saturate(.82) contrast(1.03); }
   .monolith-about-summary { padding-top: 28px; border-top: 1px solid var(--mono-line-dark); }
-  .monolith-about-summary > p { margin: 0 0 38px; color: #aaa49a; font-family: "Newsreader", serif; font-size: clamp(20px, 2vw, 29px); line-height: 1.32; }
-  .monolith-about-summary dl { margin: 0; }
-  .monolith-about-summary dl > div { display: grid; grid-template-columns: 82px 1fr; gap: 18px; padding: 11px 0; border-top: 1px solid rgba(238,234,224,.09); }
-  .monolith-about-summary dt { color: #6f6b63; font: 8px "DM Mono", monospace; letter-spacing: .08em; text-transform: uppercase; }
-  .monolith-about-summary dd { margin: 0; color: #b8b2a7; font-size: 11px; }
+  .monolith-about-summary > span { display: block; margin-bottom: 4vh; color: var(--mono-gold); font-family: "DM Mono", monospace; font-size: 9px; letter-spacing: .16em; }
+  .monolith-about-summary h2 { max-width: 760px; margin: 0; font-family: "Newsreader", serif; font-size: clamp(48px, 6vw, 92px); line-height: .92; letter-spacing: -.055em; font-weight: 400; }
   .monolith-experience-heading { max-width: 1080px; margin: 15vh auto 0; padding-bottom: 24px; display: flex; justify-content: space-between; gap: 40px; border-bottom: 1px solid var(--mono-line-dark); }
   .monolith-experience-heading span { color: var(--mono-gold); font: 9px "DM Mono", monospace; letter-spacing: .16em; }
   .monolith-experience-heading p { max-width: 410px; margin: 0; color: #77736b; font-size: 11px; line-height: 1.6; text-align: right; }
@@ -693,16 +691,15 @@
   .monolith-timeline-item { min-height: 245px; display: grid; grid-template-columns: 180px 74px minmax(0, 1fr); }
   .monolith-timeline-meta { padding: 40px 24px 40px 0; display: flex; flex-direction: column; gap: 10px; text-align: right; }
   .monolith-timeline-meta span { color: #c8c1b5; font: 9px/1.5 "DM Mono", monospace; }
-  .monolith-timeline-meta small { color: #66625b; font: 7px "DM Mono", monospace; letter-spacing: .08em; text-transform: uppercase; }
+  .monolith-timeline-meta small { color: #8a857c; font: 11px/1.45 "Instrument Sans", sans-serif; }
   .monolith-timeline-marker { position: relative; display: flex; justify-content: center; padding-top: 41px; }
   .monolith-timeline-marker::before { content: ""; position: absolute; left: 50%; top: 0; bottom: 0; width: 1px; background: var(--mono-line-dark); }
   .monolith-timeline-marker i { position: relative; z-index: 1; width: 11px; height: 11px; border: 2px solid var(--mono-gold); border-radius: 50%; background: var(--mono-black); box-shadow: 0 0 0 7px var(--mono-black); }
   .monolith-timeline-marker b { position: absolute; top: 61px; color: #57534c; font: 7px "DM Mono", monospace; }
   .monolith-timeline-item article { padding: 38px 0 46px 36px; border-bottom: 1px solid var(--mono-line-dark); }
-  .monolith-timeline-item article > p { margin: 0 0 8px; color: var(--mono-gold); font: 8px "DM Mono", monospace; letter-spacing: .08em; text-transform: uppercase; }
-  .monolith-timeline-item article h3 { margin: 0 0 20px; font-size: clamp(31px, 3.4vw, 52px); line-height: 1; letter-spacing: -.055em; font-weight: 500; }
+  .monolith-timeline-item article > p { margin: 0 0 9px; color: var(--mono-gold); font: 500 13px/1.45 "Instrument Sans", sans-serif; letter-spacing: .01em; }
+  .monolith-timeline-item article h3 { margin: 0 0 20px; font-size: clamp(26px, 2.7vw, 40px); line-height: 1.05; letter-spacing: -.035em; font-weight: 500; }
   .monolith-timeline-item article > div { max-width: 720px; color: #8f8a81; font-size: 13px; line-height: 1.7; }
-  .monolith-timeline-item article strong { display: inline-flex; margin-top: 22px; padding: 8px 11px; border: 1px solid rgba(216,196,154,.25); color: #bca87e; font: 7px "DM Mono", monospace; font-weight: 500; letter-spacing: .08em; text-transform: uppercase; }
 
   .monolith-principles { padding: 14vh 7vw; color: var(--mono-ink); background: var(--mono-cream); }
   .monolith-principles > div:last-child { display: grid; grid-template-columns: repeat(3, 1fr); border-top: 1px solid var(--mono-line-light); }
@@ -738,7 +735,11 @@
   .monolith-contact-form input:focus, .monolith-contact-form textarea:focus { border-color: var(--mono-gold); background: rgba(216,196,154,.045); }
   .monolith-contact-form button { min-height: 52px; padding: 0 18px; display: flex; align-items: center; justify-content: space-between; color: var(--mono-black); background: var(--mono-gold); border: 1px solid var(--mono-gold); font-size: 12px; font-weight: 750; cursor: pointer; transition: color .2s ease, background .2s ease; }
   .monolith-contact-form button:hover { color: var(--mono-gold); background: transparent; }
+  .monolith-contact-form button:disabled { cursor: wait; opacity: .68; }
+  .monolith-contact-form .monolith-form-honey { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
   .monolith-contact-form > p { margin: -10px 0 0; color: #625e57; font-size: 9px; line-height: 1.5; }
+  .monolith-contact-form > .monolith-form-status--sent { color: #a9c5a6; }
+  .monolith-contact-form > .monolith-form-status--error { color: #d9a19b; }
   .monolith-contact > footer { position: relative; z-index: 3; margin-top: 13vh; padding-top: 24px; display: grid; grid-template-columns: 1fr auto auto; gap: 4vw; align-items: center; border-top: 1px solid var(--mono-line-dark); color: #69665f; font-family: "DM Mono", monospace; font-size: 8px; }
   .monolith-contact > footer > a:nth-child(2) { color: #9c927e; text-transform: uppercase; letter-spacing: .08em; }
   .monolith-contact > footer > a:nth-child(2):hover { color: var(--mono-gold); }
@@ -1122,19 +1123,21 @@
     .monolith-nav nav a { min-width: 0; padding: 9px 10px; font-size: 9px; }
 
     .monolith-about { padding: 100px 20px 115px; }
-    .monolith-about-heading h2 { font-size: clamp(46px, 14vw, 66px); }
-    .monolith-about-summary { margin-top: 46px; }
-    .monolith-about-summary > p { font-size: 22px; }
+    .monolith-about-heading { gap: 46px; }
+    .monolith-about-portrait { width: min(100%, 480px); }
+    .monolith-about-summary { margin-top: 0; }
+    .monolith-about-summary h2 { font-size: clamp(45px, 13vw, 64px); }
     .monolith-experience-heading { margin-top: 100px; flex-direction: column; gap: 16px; }
     .monolith-experience-heading p { text-align: left; }
     .monolith-timeline-item { min-height: 0; grid-template-columns: 78px 34px minmax(0, 1fr); }
     .monolith-timeline-meta { padding: 32px 8px 32px 0; text-align: left; }
     .monolith-timeline-meta span { font-size: 7px; }
-    .monolith-timeline-meta small { font-size: 6px; }
+    .monolith-timeline-meta small { font-size: 9px; }
     .monolith-timeline-marker { padding-top: 35px; }
     .monolith-timeline-marker b { display: none; }
     .monolith-timeline-item article { padding: 31px 0 38px 16px; }
-    .monolith-timeline-item article h3 { font-size: 34px; }
+    .monolith-timeline-item article > p { font-size: 11px; }
+    .monolith-timeline-item article h3 { font-size: 29px; }
     .monolith-timeline-item article > div { font-size: 12px; }
 
     .monolith-contact { min-height: 0; padding: 105px 20px 34px; }
