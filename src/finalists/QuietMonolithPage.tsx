@@ -1,6 +1,7 @@
 import { experienceProof, supportingProjects } from './content';
 import { GolfieDemo } from './ProjectDemos';
 import { JunoSourceDemo, SateSourceDemo } from './RealProductDemos';
+import HeroGravityMesh from './HeroGravityMesh';
 
 function MonolithMark() {
   return <a className="monolith-mark" href="#monolith-top" aria-label="Damian Kim, back to top">DK<span>Damian Kim</span></a>;
@@ -35,17 +36,8 @@ export default function QuietMonolithPage() {
         <section
           className="monolith-hero monolith-hero--minimal"
           aria-labelledby="monolith-title"
-          onPointerMove={(event) => {
-            const rect = event.currentTarget.getBoundingClientRect();
-            event.currentTarget.style.setProperty('--grid-x', `${((event.clientX - rect.left) / rect.width - .5) * 10}deg`);
-            event.currentTarget.style.setProperty('--grid-y', `${((event.clientY - rect.top) / rect.height - .5) * 10}deg`);
-          }}
-          onPointerLeave={(event) => {
-            event.currentTarget.style.setProperty('--grid-x', '0deg');
-            event.currentTarget.style.setProperty('--grid-y', '0deg');
-          }}
         >
-          <div className="monolith-perspective-grid" aria-hidden="true"><div /><i /></div>
+          <HeroGravityMesh />
           <div className="monolith-hero-minimal-copy">
             <h1 id="monolith-title">Damian Kim</h1>
             <p>I like solving hard problems.</p>
