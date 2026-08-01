@@ -14,7 +14,9 @@ type Body = {
 const clamp = (value: number, min: number, max: number) => Math.min(max, Math.max(min, value));
 const BASE_TILT_X = Math.PI * .32;
 const FOCAL_LENGTH = 920;
-const MESH_HORIZON = .16;
+// The plane is fixed now, so it can recede almost through the full hero. Keep
+// a narrow guard above the vanishing region to avoid unbounded off-screen rows.
+const MESH_HORIZON = .04;
 const GRAVITY_CUTOFF = 2.45;
 const COS_TILT_X = Math.cos(BASE_TILT_X);
 const SIN_TILT_X = Math.sin(BASE_TILT_X);
