@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="Tidal Lattice: a seeded Three.js galaxy of thousands of independently tumbling cubes.">
-  <title>Tidal Lattice — Damian Kim</title>
+  <title>Ember Lattice — Damian Kim</title>
   <script type="importmap">
   {
     "imports": {
@@ -77,8 +77,8 @@
   <div class="container">
     <aside class="sidebar">
       <a class="portfolio-link" href="/">← Back to portfolio</a>
-      <h1>Tidal Lattice</h1>
-      <div class="subtitle">A rotating spiral galaxy built from independently tumbling cubes.</div>
+      <h1>Ember Lattice</h1>
+      <div class="subtitle">An incandescent rotating galaxy built from independently tumbling cubes.</div>
 
       <div class="control-section">
         <h3>Seed</h3>
@@ -98,6 +98,8 @@
         <div class="control-group"><label>Disk Thickness</label><div class="slider-container"><input type="range" id="thickness" min="2" max="12" step=".5" value="6" oninput="updateParam('thickness', this.value)"><span class="value-display" id="thickness-value">6</span></div></div>
         <div class="control-group"><label>Galaxy Rotation</label><div class="slider-container"><input type="range" id="rotationSpeed" min="0" max=".2" step=".005" value=".065" oninput="updateParam('rotationSpeed', this.value)"><span class="value-display" id="rotationSpeed-value">0.065</span></div></div>
         <div class="control-group"><label>Cube Tumble</label><div class="slider-container"><input type="range" id="tumbleSpeed" min="0" max="2" step=".05" value=".75" oninput="updateParam('tumbleSpeed', this.value)"><span class="value-display" id="tumbleSpeed-value">0.75</span></div></div>
+        <div class="control-group"><label>Bloom</label><div class="slider-container"><input type="range" id="bloomStrength" min="0" max="2" step=".05" value="1.2" oninput="updateParam('bloomStrength', this.value)"><span class="value-display" id="bloomStrength-value">1.2</span></div></div>
+        <div class="control-group"><label>Core Light</label><div class="slider-container"><input type="range" id="coreIntensity" min=".3" max="2.5" step=".05" value="1.45" oninput="updateParam('coreIntensity', this.value)"><span class="value-display" id="coreIntensity-value">1.45</span></div></div>
       </div>
 
       <div class="control-section">
@@ -124,6 +126,10 @@
   <script type="module">
     import * as THREE from 'three';
     import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+    import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+    import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+    import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+    import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 
     let params = {
       seed: 428,
@@ -133,6 +139,8 @@
       thickness: 6,
       rotationSpeed: .065,
       tumbleSpeed: .75,
+      bloomStrength: 1.2,
+      coreIntensity: 1.45,
       colorPalette: ['#ff7138', '#b8a495', '#718fd1'],
     };
     const defaultParams = { ...params, colorPalette: [...params.colorPalette] };
@@ -153,8 +161,11 @@
     let renderer;
     let controls;
     let clock;
+    let composer;
+    let bloomPass;
     let cubeField;
     let starField;
+    let coreGlow;
     let reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
     const vertexShader = `
@@ -166,10 +177,12 @@
       attribute vec3 aAxis;
       attribute float aSpin;
       attribute float aPhase;
+      attribute float aEmission;
       attribute vec3 aColor;
       varying vec3 vNormal;
       varying vec3 vWorldPosition;
       varying vec3 vColor;
+      varying float vEmission;
 
       vec3 rotateAxis(vec3 vector, vec3 axis, float angle) {
         float sine = sin(angle);
@@ -202,15 +215,18 @@
         vWorldPosition = worldPosition.xyz;
         vNormal = normalize(mat3(modelMatrix) * formedNormal);
         vColor = aColor;
+        vEmission = aEmission;
         gl_Position = projectionMatrix * viewMatrix * worldPosition;
       }
     `;
 
     const fragmentShader = `
       precision highp float;
+      uniform float uCoreIntensity;
       varying vec3 vNormal;
       varying vec3 vWorldPosition;
       varying vec3 vColor;
+      varying float vEmission;
 
       void main() {
         vec3 normal = normalize(vNormal);
@@ -218,13 +234,15 @@
         vec3 coreDirection = normalize(-vWorldPosition + vec3(0.0, 2.0, 0.0));
         vec3 keyDirection = normalize(vec3(-.45, .8, .35));
         float radius = length(vWorldPosition.xz);
-        float coreLight = max(dot(normal, coreDirection), 0.0) * (1.15 / (1.0 + radius * .026));
-        float keyLight = max(dot(normal, keyDirection), 0.0) * .7;
+        float coreLight = max(dot(normal, coreDirection), 0.0) * (uCoreIntensity / (1.0 + radius * .026));
+        float keyLight = max(dot(normal, keyDirection), 0.0) * .78;
         float rim = pow(1.0 - max(dot(normal, viewDirection), 0.0), 2.4);
         float coreGlow = exp(-radius * .055);
         vec3 color = vColor * (.16 + keyLight + coreLight);
-        color += vec3(1.0, .23, .055) * coreGlow * .9;
+        color += vec3(1.0, .22, .045) * coreGlow * uCoreIntensity * 1.15;
         color += mix(vColor, vec3(.65, .75, 1.0), .45) * rim * .22;
+        float brightFace = pow(max(dot(normal, viewDirection), 0.0), 2.0) * (.25 + keyLight);
+        color += mix(vColor, vec3(1.0, .72, .42), coreGlow) * vEmission * brightFace;
         float fog = smoothstep(58.0, 108.0, length(cameraPosition - vWorldPosition));
         color = mix(color, vec3(.012, .011, .014), fog * .78);
         gl_FragColor = vec4(color, 1.0);
@@ -246,6 +264,11 @@
       renderer.toneMapping = THREE.ACESFilmicToneMapping;
       renderer.toneMappingExposure = 1.2;
       container.appendChild(renderer.domElement);
+      composer = new EffectComposer(renderer);
+      composer.addPass(new RenderPass(scene, camera));
+      bloomPass = new UnrealBloomPass(new THREE.Vector2(container.clientWidth, container.clientHeight), params.bloomStrength, .72, .34);
+      composer.addPass(bloomPass);
+      composer.addPass(new OutputPass());
       controls = new OrbitControls(camera, renderer.domElement);
       controls.enableDamping = true;
       controls.dampingFactor = .055;
@@ -275,6 +298,7 @@
       const axes = new Float32Array(count * 3);
       const spins = new Float32Array(count);
       const phases = new Float32Array(count);
+      const emissions = new Float32Array(count);
       const colors = new Float32Array(count * 3);
       const coreColor = new THREE.Color(params.colorPalette[0]);
       const armColor = new THREE.Color(params.colorPalette[1]);
@@ -283,12 +307,17 @@
 
       for (let index = 0; index < count; index++) {
         const cursor = index * 3;
-        const radius = Math.pow(rng(), .56) * params.radius;
+        const corePopulation = rng() < .58;
+        const radius = corePopulation
+          ? Math.pow(rng(), 1.62) * params.radius * .7
+          : Math.pow(rng(), .72) * params.radius;
         const arm = index % params.armCount;
         const armAngle = arm / params.armCount * Math.PI * 2;
-        const armWidth = .13 + radius * .0065;
-        const angle = armAngle + radius * .205 + randomNormal() * armWidth;
-        const radialScatter = randomNormal() * (.45 + radius * .018);
+        const armWidth = .22 + radius * .009;
+        const spiralAngle = armAngle + radius * .19 + randomNormal() * armWidth;
+        const armInfluence = Math.min(1, radius / 14);
+        const angle = (rng() * Math.PI * 2) * (1 - armInfluence) + spiralAngle * armInfluence;
+        const radialScatter = randomNormal() * (.65 + radius * .026);
         const resolvedRadius = Math.max(.15, radius + radialScatter);
         const coreBulge = Math.exp(-radius * .09);
         const heightScale = params.thickness * (.18 + coreBulge * .82);
@@ -298,10 +327,10 @@
         basePositions[cursor + 2] = Math.sin(angle) * resolvedRadius;
 
         const sizeBias = Math.pow(rng(), 3.15);
-        const baseSize = .075 + sizeBias * (.54 + coreBulge * .22);
-        scales[cursor] = baseSize * (.58 + rng() * 1.25);
-        scales[cursor + 1] = baseSize * (.55 + rng() * 1.45);
-        scales[cursor + 2] = baseSize * (.58 + rng() * 1.25);
+        const baseSize = .095 + sizeBias * (.7 + coreBulge * .2);
+        scales[cursor] = baseSize * (.55 + rng() * 1.4);
+        scales[cursor + 1] = baseSize * (.5 + rng() * 1.6);
+        scales[cursor + 2] = baseSize * (.55 + rng() * 1.4);
 
         let axisX = rng() * 2 - 1;
         let axisY = rng() * 2 - 1;
@@ -312,6 +341,8 @@
         axes[cursor + 2] = axisZ / axisLength;
         spins[index] = .22 + rng() * 1.55;
         phases[index] = rng() * Math.PI * 2;
+        const sparkChance = .07 + coreBulge * .16;
+        emissions[index] = rng() < sparkChance ? 1.2 + Math.pow(rng(), .45) * 4.8 : rng() * .08;
 
         const coreMix = Math.pow(Math.max(0, 1 - radius / (params.radius * .62)), 2.1);
         mixedColor.copy(armColor).lerp(coreColor, coreMix);
@@ -331,6 +362,7 @@
       geometry.setAttribute('aAxis', new THREE.InstancedBufferAttribute(axes, 3));
       geometry.setAttribute('aSpin', new THREE.InstancedBufferAttribute(spins, 1));
       geometry.setAttribute('aPhase', new THREE.InstancedBufferAttribute(phases, 1));
+      geometry.setAttribute('aEmission', new THREE.InstancedBufferAttribute(emissions, 1));
       geometry.setAttribute('aColor', new THREE.InstancedBufferAttribute(colors, 3));
       geometry.instanceCount = count;
       const material = new THREE.ShaderMaterial({
@@ -340,6 +372,7 @@
           uTime: { value: 0 },
           uRotationSpeed: { value: params.rotationSpeed },
           uTumbleSpeed: { value: params.tumbleSpeed },
+          uCoreIntensity: { value: params.coreIntensity },
         },
       });
       cubeField = new THREE.Mesh(geometry, material);
@@ -347,6 +380,28 @@
       scene.add(cubeField);
       box.dispose();
       createStars();
+      createCoreGlow();
+    }
+
+    function createCoreGlow() {
+      const canvas = document.createElement('canvas');
+      canvas.width = 256;
+      canvas.height = 256;
+      const context = canvas.getContext('2d');
+      const gradient = context.createRadialGradient(128, 128, 0, 128, 128, 128);
+      gradient.addColorStop(0, 'rgba(255, 206, 142, .9)');
+      gradient.addColorStop(.09, 'rgba(255, 117, 52, .6)');
+      gradient.addColorStop(.38, 'rgba(155, 47, 22, .18)');
+      gradient.addColorStop(1, 'rgba(40, 8, 4, 0)');
+      context.fillStyle = gradient;
+      context.fillRect(0, 0, 256, 256);
+      const texture = new THREE.CanvasTexture(canvas);
+      texture.colorSpace = THREE.SRGBColorSpace;
+      const material = new THREE.SpriteMaterial({ map: texture, transparent: true, opacity: .58, blending: THREE.AdditiveBlending, depthWrite: false, depthTest: false });
+      coreGlow = new THREE.Sprite(material);
+      coreGlow.scale.set(54, 54, 1);
+      coreGlow.renderOrder = 8;
+      scene.add(coreGlow);
     }
 
     function createStars() {
@@ -372,18 +427,20 @@
       const delta = Math.min(clock.getDelta(), .05);
       if (!document.hidden && cubeField && !reducedMotion) cubeField.material.uniforms.uTime.value += delta;
       controls.update();
-      renderer.render(scene, camera);
+      composer.render();
     }
 
     function disposeSystem() {
-      for (const object of [cubeField, starField]) {
+      for (const object of [cubeField, starField, coreGlow]) {
         if (!object) continue;
         scene.remove(object);
-        object.geometry.dispose();
+        if (object.geometry) object.geometry.dispose();
+        if (object.material.map) object.material.map.dispose();
         object.material.dispose();
       }
       cubeField = null;
       starField = null;
+      coreGlow = null;
     }
 
     window.updateParam = function (name, value) {
@@ -391,6 +448,8 @@
       document.getElementById(`${name}-value`).textContent = Number(value).toString();
       if (name === 'rotationSpeed' && cubeField) cubeField.material.uniforms.uRotationSpeed.value = params.rotationSpeed;
       else if (name === 'tumbleSpeed' && cubeField) cubeField.material.uniforms.uTumbleSpeed.value = params.tumbleSpeed;
+      else if (name === 'bloomStrength' && bloomPass) bloomPass.strength = params.bloomStrength;
+      else if (name === 'coreIntensity' && cubeField) cubeField.material.uniforms.uCoreIntensity.value = params.coreIntensity;
       else initializeSystem();
     };
 
@@ -418,7 +477,7 @@
     };
     window.resetParameters = function () {
       params = { ...defaultParams, colorPalette: [...defaultParams.colorPalette] };
-      for (const name of ['cubeCount', 'armCount', 'radius', 'thickness', 'rotationSpeed', 'tumbleSpeed']) {
+      for (const name of ['cubeCount', 'armCount', 'radius', 'thickness', 'rotationSpeed', 'tumbleSpeed', 'bloomStrength', 'coreIntensity']) {
         document.getElementById(name).value = params[name];
         document.getElementById(`${name}-value`).textContent = params[name];
       }
@@ -431,7 +490,7 @@
       initializeSystem();
     };
     window.downloadPNG = function () {
-      renderer.render(scene, camera);
+      composer.render();
       const link = document.createElement('a');
       link.download = `tidal-lattice-${params.seed}.png`;
       link.href = renderer.domElement.toDataURL('image/png');
@@ -443,6 +502,7 @@
       camera.aspect = container.clientWidth / container.clientHeight;
       camera.updateProjectionMatrix();
       renderer.setSize(container.clientWidth, container.clientHeight);
+      composer.setSize(container.clientWidth, container.clientHeight);
     });
 
     init();
