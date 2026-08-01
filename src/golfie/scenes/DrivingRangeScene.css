@@ -167,18 +167,6 @@
   overflow: hidden;
 }
 
-.ball-tracker {
-  display: block;
-  width: 8px;
-  height: 8px;
-  border: 1px solid rgba(4, 15, 10, 0.9);
-  border-radius: 50%;
-  background: #fff;
-  box-shadow:
-    0 0 0 2px rgba(76, 194, 115, 0.38),
-    0 0 8px rgba(255, 255, 255, 0.95);
-}
-
 .range-label {
   font-family: var(--font-mono);
   font-size: 11px;

@@ -365,6 +365,9 @@ export function DrivingRangeScene({
           />
           <RangeEnvironment bounds={bounds} />
           <ContactShadows position={[0, 0.055, 0]} opacity={0.32} scale={55} blur={2.8} far={14} color="#172012" />
+          {scenePoints.simulated.length > 1 && (
+            <TrajectoryTracer points={scenePoints.simulated} color="#151712" lineWidth={2.5} />
+          )}
           {visibleLayers.measured && (
             <TrajectoryTracer points={scenePoints.measured} color="#d8c49a" lineWidth={4} showPoints />
           )}
