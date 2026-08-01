@@ -18,6 +18,8 @@ type Body = {
 const clamp = (value: number, min: number, max: number) => Math.min(max, Math.max(min, value));
 const BASE_TILT_X = Math.PI * .32;
 const FOCAL_LENGTH = 920;
+const MESH_HORIZON = .16;
+const GRAVITY_CUTOFF = 2.45;
 const DIMPLES = [
   [-.58, -.49], [-.2, -.66], [.22, -.62], [.55, -.42],
   [-.72, -.13], [-.37, -.23], [.03, -.29], [.42, -.18], [.73, .02],
@@ -58,16 +60,30 @@ export default function HeroGravityMesh() {
     let reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     let ballPlaneX = 0;
     let ballPlaneY = 0;
+    let wellRadius = 125;
+    let wellRadiusSquared = wellRadius * wellRadius;
+    let gravityCutoffSquared = (wellRadius * GRAVITY_CUTOFF) ** 2;
+    let gravityFadeStartSquared = (wellRadius * 2.05) ** 2;
+    let cosTiltX = Math.cos(BASE_TILT_X);
+    let sinTiltX = Math.sin(BASE_TILT_X);
+    let cosTiltY = 1;
+    let sinTiltY = 0;
 
     const resize = () => {
       const rect = hero.getBoundingClientRect();
       width = Math.max(1, rect.width);
       height = Math.max(1, rect.height);
-      dpr = Math.min(window.devicePixelRatio || 1, 2);
+      // A dense animated line mesh gains very little above 1.5x DPR, while the
+      // number of shaded pixels grows quadratically on Retina displays.
+      dpr = Math.min(window.devicePixelRatio || 1, 1.5);
       canvas.width = Math.round(width * dpr);
       canvas.height = Math.round(height * dpr);
       canvas.style.width = `${width}px`;
       canvas.style.height = `${height}px`;
+      wellRadius = clamp(Math.min(width, height) * .24, 125, 220);
+      wellRadiusSquared = wellRadius * wellRadius;
+      gravityCutoffSquared = (wellRadius * GRAVITY_CUTOFF) ** 2;
+      gravityFadeStartSquared = (wellRadius * 2.05) ** 2;
       if (!pointerActive) {
         body.x = body.targetX = width * .5;
         body.y = body.targetY = height * .53;
@@ -98,15 +114,10 @@ export default function HeroGravityMesh() {
       let px = x - cx;
       let py = y - cy;
 
-      const cosY = Math.cos(body.tiltY);
-      const sinY = Math.sin(body.tiltY);
-      const x1 = px * cosY + z * sinY;
-      let z1 = -px * sinY + z * cosY;
-
-      const cosX = Math.cos(body.tiltX);
-      const sinX = Math.sin(body.tiltX);
-      const y1 = py * cosX - z1 * sinX;
-      z1 = py * sinX + z1 * cosX;
+      const x1 = px * cosTiltY + z * sinTiltY;
+      let z1 = -px * sinTiltY + z * cosTiltY;
+      const y1 = py * cosTiltX - z1 * sinTiltX;
+      z1 = py * sinTiltX + z1 * cosTiltX;
 
       const scale = FOCAL_LENGTH / (FOCAL_LENGTH - z1);
       return { x: cx + x1 * scale, y: cy + y1 * scale, scale };
@@ -119,36 +130,35 @@ export default function HeroGravityMesh() {
       const cy = height * .53;
       const u = screenX - cx;
       const v = screenY - cy;
-      const cosX = Math.cos(body.tiltX);
-      const sinX = Math.sin(body.tiltX);
-      const cosY = Math.cos(body.tiltY);
-      const sinY = Math.sin(body.tiltY);
-      const normalX = sinY;
-      const normalY = -cosY * sinX;
-      const normalZ = cosY * cosX;
+      const normalX = sinTiltY;
+      const normalY = -cosTiltY * sinTiltX;
+      const normalZ = cosTiltY * cosTiltX;
       const denominator = FOCAL_LENGTH * normalZ - u * normalX - v * normalY;
       const rayScale = (FOCAL_LENGTH * normalZ - localZ) / Math.max(80, denominator);
       const x1 = u * rayScale;
       const y1 = v * rayScale;
       const z1 = FOCAL_LENGTH * (1 - rayScale);
 
-      const planeY = y1 * cosX + z1 * sinX;
-      const zAfterX = -y1 * sinX + z1 * cosX;
-      const planeX = x1 * cosY - zAfterX * sinY;
+      const planeY = y1 * cosTiltX + z1 * sinTiltX;
+      const zAfterX = -y1 * sinTiltX + z1 * cosTiltX;
+      const planeX = x1 * cosTiltY - zAfterX * sinTiltY;
       return { x: cx + planeX, y: cy + planeY };
     };
-
-    const gravityRadius = () => clamp(Math.min(width, height) * .24, 125, 220);
 
     const surfacePoint = (x: number, y: number) => {
       const dx = x - ballPlaneX;
       const dy = y - ballPlaneY;
-      const distance = Math.hypot(dx, dy);
-      const radius = gravityRadius();
-      const influence = Math.exp(-(distance * distance) / (2 * radius * radius));
-      const core = Math.exp(-(distance * distance) / (2 * (radius * .38) ** 2));
+      const distanceSquared = dx * dx + dy * dy;
+      if (distanceSquared > gravityCutoffSquared) return { x, y, z: 0 };
+
+      const fade = distanceSquared > gravityFadeStartSquared
+        ? clamp((gravityCutoffSquared - distanceSquared) / (gravityCutoffSquared - gravityFadeStartSquared), 0, 1)
+        : 1;
+      const influence = Math.exp(-distanceSquared / (2 * wellRadiusSquared)) * fade;
+      const coreRadius = wellRadius * .38;
+      const core = Math.exp(-distanceSquared / (2 * coreRadius * coreRadius));
       const pull = influence * .18 + core * .12;
-      const depth = -(radius * .36 * influence + radius * .08 * core);
+      const depth = -(wellRadius * .36 * influence + wellRadius * .08 * core);
 
       return {
         x: x - dx * pull,
@@ -158,10 +168,11 @@ export default function HeroGravityMesh() {
     };
 
     const drawMesh = () => {
-      const spacing = width < 720 ? 40 : 48;
+      const spacing = width < 720 ? 44 : 54;
+      const horizonY = height * MESH_HORIZON;
       const corners = [
-        unprojectToPlane(0, 0),
-        unprojectToPlane(width, 0),
+        unprojectToPlane(0, horizonY),
+        unprojectToPlane(width, horizonY),
         unprojectToPlane(0, height),
         unprojectToPlane(width, height),
       ];
@@ -170,8 +181,12 @@ export default function HeroGravityMesh() {
       const endX = Math.ceil((Math.max(...corners.map((point) => point.x)) + margin) / spacing) * spacing;
       const startY = Math.floor((Math.min(...corners.map((point) => point.y)) - margin) / spacing) * spacing;
       const endY = Math.ceil((Math.max(...corners.map((point) => point.y)) + margin) / spacing) * spacing;
-      const step = 10;
+      const step = width < 720 ? 18 : 16;
 
+      context.save();
+      context.beginPath();
+      context.rect(0, horizonY, width, height - horizonY);
+      context.clip();
       context.lineWidth = 1;
       context.strokeStyle = 'rgba(216, 196, 154, 0.16)';
 
@@ -200,6 +215,17 @@ export default function HeroGravityMesh() {
         }
         context.stroke();
       }
+      context.restore();
+
+      const horizon = context.createLinearGradient(0, 0, width, 0);
+      horizon.addColorStop(0, 'rgba(216, 196, 154, 0)');
+      horizon.addColorStop(.5, 'rgba(216, 196, 154, .1)');
+      horizon.addColorStop(1, 'rgba(216, 196, 154, 0)');
+      context.strokeStyle = horizon;
+      context.beginPath();
+      context.moveTo(0, horizonY + .5);
+      context.lineTo(width, horizonY + .5);
+      context.stroke();
     };
 
     const drawBall = () => {
@@ -294,8 +320,12 @@ export default function HeroGravityMesh() {
       body.tiltVy += ((targetTiltY - body.tiltY) * tiltSpring - body.tiltVy * tiltDamping) * dt;
       body.tiltX += body.tiltVx * dt;
       body.tiltY += body.tiltVy * dt;
+      cosTiltX = Math.cos(body.tiltX);
+      sinTiltX = Math.sin(body.tiltX);
+      cosTiltY = Math.cos(body.tiltY);
+      sinTiltY = Math.sin(body.tiltY);
 
-      const centerDepth = -gravityRadius() * .44;
+      const centerDepth = -wellRadius * .44;
       const ballPlane = unprojectToPlane(body.x, body.y, centerDepth);
       ballPlaneX = ballPlane.x;
       ballPlaneY = ballPlane.y;
