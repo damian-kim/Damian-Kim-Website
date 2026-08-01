@@ -1,17 +1,451 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Box Galaxy - Damian Kim</title>
-    <meta name="description" content="An algorithmic Three.js galaxy composed of 5,200 rotating cubes." />
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Instrument+Sans:wght@400;500;600&family=Newsreader:opsz,wght@6..72,300..600&display=swap" rel="stylesheet">
-  </head>
-  <body>
-    <div id="galaxy-root"></div>
-    <script type="module" src="/src/galaxy/main.tsx"></script>
-  </body>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Tidal Lattice: a seeded Three.js galaxy of thousands of independently tumbling cubes.">
+  <title>Tidal Lattice — Damian Kim</title>
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://unpkg.com/three@0.170.0/build/three.module.js",
+      "three/addons/": "https://unpkg.com/three@0.170.0/examples/jsm/"
+    }
+  }
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&family=Lora:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --anthropic-dark: #141413;
+      --anthropic-light: #faf9f5;
+      --anthropic-mid-gray: #b0aea5;
+      --anthropic-light-gray: #e8e6dc;
+      --anthropic-orange: #d97757;
+      --anthropic-blue: #6a9bcc;
+      --anthropic-green: #788c5d;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { min-height: 100vh; color: var(--anthropic-dark); background: linear-gradient(135deg, var(--anthropic-light), #f5f3ee); font-family: "Poppins", sans-serif; }
+    button, input { font: inherit; }
+    .container { display: flex; min-height: 100vh; padding: 20px; gap: 20px; }
+    .sidebar { width: 320px; flex-shrink: 0; padding: 24px; overflow: auto; background: rgba(255,255,255,.95); border-radius: 12px; box-shadow: 0 10px 30px rgba(20,20,19,.1); backdrop-filter: blur(10px); }
+    .sidebar h1 { margin-bottom: 8px; font: 500 24px "Lora", serif; }
+    .subtitle { margin-bottom: 28px; color: var(--anthropic-mid-gray); font-size: 13px; line-height: 1.5; }
+    .portfolio-link { display: inline-block; margin-bottom: 22px; color: #7c786e; font-size: 12px; text-decoration: none; }
+    .portfolio-link:hover { color: var(--anthropic-orange); }
+    .control-section { margin-bottom: 30px; }
+    .control-section h3 { display: flex; align-items: center; gap: 8px; margin-bottom: 16px; font-size: 16px; font-weight: 600; }
+    .control-section h3::before { content: "•"; color: var(--anthropic-orange); }
+    .seed-input { width: 100%; margin-bottom: 12px; padding: 12px; border: 1px solid var(--anthropic-light-gray); border-radius: 8px; background: var(--anthropic-light); font: 14px "Courier New", monospace; text-align: center; }
+    .seed-input:focus { outline: none; border-color: var(--anthropic-orange); box-shadow: 0 0 0 2px rgba(217,119,87,.1); background: #fff; }
+    .seed-controls { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
+    .control-group { margin-bottom: 18px; }
+    .control-group label { display: block; margin-bottom: 7px; font-size: 13px; font-weight: 500; }
+    .slider-container { display: flex; align-items: center; gap: 12px; }
+    input[type="range"] { flex: 1; height: 4px; border-radius: 2px; outline: none; background: var(--anthropic-light-gray); appearance: none; }
+    input[type="range"]::-webkit-slider-thumb { width: 16px; height: 16px; border-radius: 50%; background: var(--anthropic-orange); cursor: pointer; appearance: none; }
+    input[type="range"]::-moz-range-thumb { width: 16px; height: 16px; border: 0; border-radius: 50%; background: var(--anthropic-orange); cursor: pointer; }
+    .value-display { min-width: 54px; color: var(--anthropic-mid-gray); font: 12px "Courier New", monospace; text-align: right; }
+    .color-group { margin-bottom: 14px; }
+    .color-group label { display: block; margin-bottom: 4px; color: var(--anthropic-mid-gray); font-size: 12px; }
+    .color-picker-container { display: flex; align-items: center; gap: 8px; }
+    input[type="color"] { width: 32px; height: 32px; padding: 0; border: 0; border-radius: 6px; background: none; cursor: pointer; }
+    .color-value { color: var(--anthropic-mid-gray); font: 12px "Courier New", monospace; }
+    .button { width: 100%; padding: 10px 16px; border: 0; border-radius: 6px; color: #fff; background: var(--anthropic-orange); font-size: 14px; font-weight: 500; cursor: pointer; transition: transform .2s, background .2s; }
+    .button:hover { background: #c86641; transform: translateY(-1px); }
+    .button.secondary { background: var(--anthropic-blue); }
+    .button.secondary:hover { background: #5a8bb8; }
+    .button.tertiary { background: var(--anthropic-green); }
+    .button.tertiary:hover { background: #6b7b52; }
+    .button-row { display: flex; gap: 8px; }
+    .canvas-area { flex: 1; min-width: 0; display: flex; align-items: center; justify-content: center; }
+    #canvas-container { position: relative; width: 100%; max-width: 1000px; aspect-ratio: 1; overflow: hidden; border-radius: 12px; background: var(--anthropic-dark); box-shadow: 0 20px 40px rgba(20,20,19,.1); }
+    #canvas-container canvas { display: block; width: 100% !important; height: 100% !important; }
+    .interaction-hint { position: absolute; z-index: 10; bottom: 16px; left: 50%; color: rgba(255,255,255,.45); font-size: 12px; white-space: nowrap; transform: translateX(-50%); pointer-events: none; transition: opacity .5s; }
+    .interaction-hint.hidden { opacity: 0; }
+    .loading { position: absolute; inset: 0; display: grid; place-items: center; color: var(--anthropic-mid-gray); font-size: 16px; }
+    @media (max-width: 700px) {
+      .container { flex-direction: column; padding: 12px; }
+      .sidebar { width: 100%; max-height: none; }
+      .canvas-area { padding: 4px 0 12px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <aside class="sidebar">
+      <a class="portfolio-link" href="/">← Back to portfolio</a>
+      <h1>Tidal Lattice</h1>
+      <div class="subtitle">A rotating spiral galaxy built from independently tumbling cubes.</div>
+
+      <div class="control-section">
+        <h3>Seed</h3>
+        <input type="number" id="seed-input" class="seed-input" value="428" onchange="updateSeed()">
+        <div class="seed-controls">
+          <button class="button secondary" onclick="previousSeed()">← Prev</button>
+          <button class="button secondary" onclick="nextSeed()">Next →</button>
+        </div>
+        <button class="button tertiary" onclick="randomSeedAndUpdate()">↻ Random</button>
+      </div>
+
+      <div class="control-section">
+        <h3>Parameters</h3>
+        <div class="control-group"><label>Cube Count</label><div class="slider-container"><input type="range" id="cubeCount" min="800" max="10000" step="200" value="5200" oninput="updateParam('cubeCount', this.value)"><span class="value-display" id="cubeCount-value">5200</span></div></div>
+        <div class="control-group"><label>Spiral Arms</label><div class="slider-container"><input type="range" id="armCount" min="2" max="8" step="1" value="5" oninput="updateParam('armCount', this.value)"><span class="value-display" id="armCount-value">5</span></div></div>
+        <div class="control-group"><label>Disk Radius</label><div class="slider-container"><input type="range" id="radius" min="32" max="66" step="1" value="52" oninput="updateParam('radius', this.value)"><span class="value-display" id="radius-value">52</span></div></div>
+        <div class="control-group"><label>Disk Thickness</label><div class="slider-container"><input type="range" id="thickness" min="2" max="12" step=".5" value="6" oninput="updateParam('thickness', this.value)"><span class="value-display" id="thickness-value">6</span></div></div>
+        <div class="control-group"><label>Galaxy Rotation</label><div class="slider-container"><input type="range" id="rotationSpeed" min="0" max=".2" step=".005" value=".065" oninput="updateParam('rotationSpeed', this.value)"><span class="value-display" id="rotationSpeed-value">0.065</span></div></div>
+        <div class="control-group"><label>Cube Tumble</label><div class="slider-container"><input type="range" id="tumbleSpeed" min="0" max="2" step=".05" value=".75" oninput="updateParam('tumbleSpeed', this.value)"><span class="value-display" id="tumbleSpeed-value">0.75</span></div></div>
+      </div>
+
+      <div class="control-section">
+        <h3>Colors</h3>
+        <div class="color-group"><label>Core</label><div class="color-picker-container"><input type="color" id="color1" value="#ff7138" onchange="updateColor('color1', this.value)"><span class="color-value" id="color1-value">#ff7138</span></div></div>
+        <div class="color-group"><label>Outer Arms</label><div class="color-picker-container"><input type="color" id="color2" value="#b8a495" onchange="updateColor('color2', this.value)"><span class="color-value" id="color2-value">#b8a495</span></div></div>
+        <div class="color-group"><label>Cold Fragments</label><div class="color-picker-container"><input type="color" id="color3" value="#718fd1" onchange="updateColor('color3', this.value)"><span class="color-value" id="color3-value">#718fd1</span></div></div>
+      </div>
+
+      <div class="control-section">
+        <h3>Actions</h3>
+        <div class="button-row"><button class="button" onclick="resetParameters()">Reset</button><button class="button secondary" onclick="downloadPNG()">Download PNG</button></div>
+      </div>
+    </aside>
+
+    <main class="canvas-area">
+      <div id="canvas-container">
+        <div class="loading">Initializing 3D scene...</div>
+        <div class="interaction-hint">Drag to rotate · Scroll to zoom</div>
+      </div>
+    </main>
+  </div>
+
+  <script type="module">
+    import * as THREE from 'three';
+    import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+    let params = {
+      seed: 428,
+      cubeCount: 5200,
+      armCount: 5,
+      radius: 52,
+      thickness: 6,
+      rotationSpeed: .065,
+      tumbleSpeed: .75,
+      colorPalette: ['#ff7138', '#b8a495', '#718fd1'],
+    };
+    const defaultParams = { ...params, colorPalette: [...params.colorPalette] };
+
+    function mulberry32(seed) {
+      return function () {
+        seed |= 0;
+        seed = (seed + 0x6d2b79f5) | 0;
+        let t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
+        t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+        return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+      };
+    }
+
+    let rng = mulberry32(params.seed);
+    let scene;
+    let camera;
+    let renderer;
+    let controls;
+    let clock;
+    let cubeField;
+    let starField;
+    let reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    const vertexShader = `
+      uniform float uTime;
+      uniform float uRotationSpeed;
+      uniform float uTumbleSpeed;
+      attribute vec3 aBasePosition;
+      attribute vec3 aScale;
+      attribute vec3 aAxis;
+      attribute float aSpin;
+      attribute float aPhase;
+      attribute vec3 aColor;
+      varying vec3 vNormal;
+      varying vec3 vWorldPosition;
+      varying vec3 vColor;
+
+      vec3 rotateAxis(vec3 vector, vec3 axis, float angle) {
+        float sine = sin(angle);
+        float cosine = cos(angle);
+        return vector * cosine + cross(axis, vector) * sine + axis * dot(axis, vector) * (1.0 - cosine);
+      }
+
+      vec3 rotateY(vec3 vector, float angle) {
+        float sine = sin(angle);
+        float cosine = cos(angle);
+        return vec3(cosine * vector.x + sine * vector.z, vector.y, -sine * vector.x + cosine * vector.z);
+      }
+
+      vec3 tiltDisk(vec3 vector) {
+        float sine = -.2377;
+        float cosine = .9713;
+        return vec3(vector.x, cosine * vector.y - sine * vector.z, sine * vector.y + cosine * vector.z);
+      }
+
+      void main() {
+        float localAngle = aPhase + uTime * uTumbleSpeed * aSpin;
+        vec3 localPosition = rotateAxis(position * aScale, aAxis, localAngle);
+        vec3 localNormal = rotateAxis(normal, aAxis, localAngle);
+        float galaxyAngle = uTime * uRotationSpeed;
+        vec3 formedPosition = rotateY(aBasePosition + localPosition, galaxyAngle);
+        vec3 formedNormal = rotateY(localNormal, galaxyAngle);
+        formedPosition = tiltDisk(formedPosition);
+        formedNormal = tiltDisk(formedNormal);
+        vec4 worldPosition = modelMatrix * vec4(formedPosition, 1.0);
+        vWorldPosition = worldPosition.xyz;
+        vNormal = normalize(mat3(modelMatrix) * formedNormal);
+        vColor = aColor;
+        gl_Position = projectionMatrix * viewMatrix * worldPosition;
+      }
+    `;
+
+    const fragmentShader = `
+      precision highp float;
+      varying vec3 vNormal;
+      varying vec3 vWorldPosition;
+      varying vec3 vColor;
+
+      void main() {
+        vec3 normal = normalize(vNormal);
+        vec3 viewDirection = normalize(cameraPosition - vWorldPosition);
+        vec3 coreDirection = normalize(-vWorldPosition + vec3(0.0, 2.0, 0.0));
+        vec3 keyDirection = normalize(vec3(-.45, .8, .35));
+        float radius = length(vWorldPosition.xz);
+        float coreLight = max(dot(normal, coreDirection), 0.0) * (1.15 / (1.0 + radius * .026));
+        float keyLight = max(dot(normal, keyDirection), 0.0) * .7;
+        float rim = pow(1.0 - max(dot(normal, viewDirection), 0.0), 2.4);
+        float coreGlow = exp(-radius * .055);
+        vec3 color = vColor * (.16 + keyLight + coreLight);
+        color += vec3(1.0, .23, .055) * coreGlow * .9;
+        color += mix(vColor, vec3(.65, .75, 1.0), .45) * rim * .22;
+        float fog = smoothstep(58.0, 108.0, length(cameraPosition - vWorldPosition));
+        color = mix(color, vec3(.012, .011, .014), fog * .78);
+        gl_FragColor = vec4(color, 1.0);
+      }
+    `;
+
+    function init() {
+      const container = document.getElementById('canvas-container');
+      scene = new THREE.Scene();
+      scene.background = new THREE.Color(0x080709);
+      scene.fog = new THREE.FogExp2(0x080709, .008);
+      camera = new THREE.PerspectiveCamera(48, container.clientWidth / container.clientHeight, .1, 250);
+      camera.position.set(0, 31, 78);
+      camera.lookAt(0, 0, 0);
+      renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true, powerPreference: 'high-performance' });
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
+      renderer.setSize(container.clientWidth, container.clientHeight);
+      renderer.outputColorSpace = THREE.SRGBColorSpace;
+      renderer.toneMapping = THREE.ACESFilmicToneMapping;
+      renderer.toneMappingExposure = 1.2;
+      container.appendChild(renderer.domElement);
+      controls = new OrbitControls(camera, renderer.domElement);
+      controls.enableDamping = true;
+      controls.dampingFactor = .055;
+      controls.minDistance = 32;
+      controls.maxDistance = 145;
+      clock = new THREE.Clock();
+      initializeSystem();
+      document.querySelector('.loading').style.display = 'none';
+      const hint = document.querySelector('.interaction-hint');
+      renderer.domElement.addEventListener('pointerdown', () => hint.classList.add('hidden'), { once: true });
+      document.addEventListener('visibilitychange', () => {
+        if (!document.hidden) clock.getDelta();
+      });
+      animate();
+    }
+
+    function randomNormal() {
+      return rng() + rng() + rng() + rng() - 2;
+    }
+
+    function initializeSystem() {
+      rng = mulberry32(params.seed);
+      disposeSystem();
+      const count = params.cubeCount;
+      const basePositions = new Float32Array(count * 3);
+      const scales = new Float32Array(count * 3);
+      const axes = new Float32Array(count * 3);
+      const spins = new Float32Array(count);
+      const phases = new Float32Array(count);
+      const colors = new Float32Array(count * 3);
+      const coreColor = new THREE.Color(params.colorPalette[0]);
+      const armColor = new THREE.Color(params.colorPalette[1]);
+      const coldColor = new THREE.Color(params.colorPalette[2]);
+      const mixedColor = new THREE.Color();
+
+      for (let index = 0; index < count; index++) {
+        const cursor = index * 3;
+        const radius = Math.pow(rng(), .56) * params.radius;
+        const arm = index % params.armCount;
+        const armAngle = arm / params.armCount * Math.PI * 2;
+        const armWidth = .13 + radius * .0065;
+        const angle = armAngle + radius * .205 + randomNormal() * armWidth;
+        const radialScatter = randomNormal() * (.45 + radius * .018);
+        const resolvedRadius = Math.max(.15, radius + radialScatter);
+        const coreBulge = Math.exp(-radius * .09);
+        const heightScale = params.thickness * (.18 + coreBulge * .82);
+        const warp = Math.sin(angle * 2.0 + radius * .07) * radius * .018;
+        basePositions[cursor] = Math.cos(angle) * resolvedRadius;
+        basePositions[cursor + 1] = randomNormal() * heightScale + warp;
+        basePositions[cursor + 2] = Math.sin(angle) * resolvedRadius;
+
+        const sizeBias = Math.pow(rng(), 3.15);
+        const baseSize = .075 + sizeBias * (.54 + coreBulge * .22);
+        scales[cursor] = baseSize * (.58 + rng() * 1.25);
+        scales[cursor + 1] = baseSize * (.55 + rng() * 1.45);
+        scales[cursor + 2] = baseSize * (.58 + rng() * 1.25);
+
+        let axisX = rng() * 2 - 1;
+        let axisY = rng() * 2 - 1;
+        let axisZ = rng() * 2 - 1;
+        const axisLength = Math.hypot(axisX, axisY, axisZ) || 1;
+        axes[cursor] = axisX / axisLength;
+        axes[cursor + 1] = axisY / axisLength;
+        axes[cursor + 2] = axisZ / axisLength;
+        spins[index] = .22 + rng() * 1.55;
+        phases[index] = rng() * Math.PI * 2;
+
+        const coreMix = Math.pow(Math.max(0, 1 - radius / (params.radius * .62)), 2.1);
+        mixedColor.copy(armColor).lerp(coreColor, coreMix);
+        if (rng() < .085 + radius / params.radius * .1) mixedColor.lerp(coldColor, .72);
+        mixedColor.multiplyScalar(.72 + rng() * .5);
+        mixedColor.toArray(colors, cursor);
+      }
+
+      const box = new THREE.BoxGeometry(1, 1, 1);
+      const geometry = new THREE.InstancedBufferGeometry();
+      geometry.index = box.index.clone();
+      geometry.setAttribute('position', box.getAttribute('position').clone());
+      geometry.setAttribute('normal', box.getAttribute('normal').clone());
+      geometry.setAttribute('uv', box.getAttribute('uv').clone());
+      geometry.setAttribute('aBasePosition', new THREE.InstancedBufferAttribute(basePositions, 3));
+      geometry.setAttribute('aScale', new THREE.InstancedBufferAttribute(scales, 3));
+      geometry.setAttribute('aAxis', new THREE.InstancedBufferAttribute(axes, 3));
+      geometry.setAttribute('aSpin', new THREE.InstancedBufferAttribute(spins, 1));
+      geometry.setAttribute('aPhase', new THREE.InstancedBufferAttribute(phases, 1));
+      geometry.setAttribute('aColor', new THREE.InstancedBufferAttribute(colors, 3));
+      geometry.instanceCount = count;
+      const material = new THREE.ShaderMaterial({
+        vertexShader,
+        fragmentShader,
+        uniforms: {
+          uTime: { value: 0 },
+          uRotationSpeed: { value: params.rotationSpeed },
+          uTumbleSpeed: { value: params.tumbleSpeed },
+        },
+      });
+      cubeField = new THREE.Mesh(geometry, material);
+      cubeField.frustumCulled = false;
+      scene.add(cubeField);
+      box.dispose();
+      createStars();
+    }
+
+    function createStars() {
+      const count = 1300;
+      const positions = new Float32Array(count * 3);
+      for (let index = 0; index < count; index++) {
+        const radius = 76 + rng() * 58;
+        const theta = rng() * Math.PI * 2;
+        const phi = Math.acos(2 * rng() - 1);
+        positions[index * 3] = radius * Math.sin(phi) * Math.cos(theta);
+        positions[index * 3 + 1] = radius * Math.cos(phi);
+        positions[index * 3 + 2] = radius * Math.sin(phi) * Math.sin(theta);
+      }
+      const geometry = new THREE.BufferGeometry();
+      geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+      const material = new THREE.PointsMaterial({ color: 0xb8bfd1, size: .18, transparent: true, opacity: .68, depthWrite: false, sizeAttenuation: true });
+      starField = new THREE.Points(geometry, material);
+      scene.add(starField);
+    }
+
+    function animate() {
+      requestAnimationFrame(animate);
+      const delta = Math.min(clock.getDelta(), .05);
+      if (!document.hidden && cubeField && !reducedMotion) cubeField.material.uniforms.uTime.value += delta;
+      controls.update();
+      renderer.render(scene, camera);
+    }
+
+    function disposeSystem() {
+      for (const object of [cubeField, starField]) {
+        if (!object) continue;
+        scene.remove(object);
+        object.geometry.dispose();
+        object.material.dispose();
+      }
+      cubeField = null;
+      starField = null;
+    }
+
+    window.updateParam = function (name, value) {
+      params[name] = Number(value);
+      document.getElementById(`${name}-value`).textContent = Number(value).toString();
+      if (name === 'rotationSpeed' && cubeField) cubeField.material.uniforms.uRotationSpeed.value = params.rotationSpeed;
+      else if (name === 'tumbleSpeed' && cubeField) cubeField.material.uniforms.uTumbleSpeed.value = params.tumbleSpeed;
+      else initializeSystem();
+    };
+
+    window.updateColor = function (id, value) {
+      const index = Number(id.replace('color', '')) - 1;
+      params.colorPalette[index] = value;
+      document.getElementById(`${id}-value`).textContent = value;
+      initializeSystem();
+    };
+
+    function updateSeedDisplay() { document.getElementById('seed-input').value = params.seed; }
+    window.updateSeed = function () {
+      const value = Number.parseInt(document.getElementById('seed-input').value, 10);
+      if (Number.isFinite(value) && value > 0) { params.seed = value; initializeSystem(); }
+      else updateSeedDisplay();
+    };
+    window.previousSeed = function () { params.seed = Math.max(1, params.seed - 1); updateSeedDisplay(); initializeSystem(); };
+    window.nextSeed = function () { params.seed += 1; updateSeedDisplay(); initializeSystem(); };
+    window.randomSeedAndUpdate = function () {
+      const randomValue = new Uint32Array(1);
+      crypto.getRandomValues(randomValue);
+      params.seed = randomValue[0] % 999999 + 1;
+      updateSeedDisplay();
+      initializeSystem();
+    };
+    window.resetParameters = function () {
+      params = { ...defaultParams, colorPalette: [...defaultParams.colorPalette] };
+      for (const name of ['cubeCount', 'armCount', 'radius', 'thickness', 'rotationSpeed', 'tumbleSpeed']) {
+        document.getElementById(name).value = params[name];
+        document.getElementById(`${name}-value`).textContent = params[name];
+      }
+      params.colorPalette.forEach((color, index) => {
+        const id = `color${index + 1}`;
+        document.getElementById(id).value = color;
+        document.getElementById(`${id}-value`).textContent = color;
+      });
+      updateSeedDisplay();
+      initializeSystem();
+    };
+    window.downloadPNG = function () {
+      renderer.render(scene, camera);
+      const link = document.createElement('a');
+      link.download = `tidal-lattice-${params.seed}.png`;
+      link.href = renderer.domElement.toDataURL('image/png');
+      link.click();
+    };
+
+    window.addEventListener('resize', () => {
+      const container = document.getElementById('canvas-container');
+      camera.aspect = container.clientWidth / container.clientHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(container.clientWidth, container.clientHeight);
+    });
+
+    init();
+  </script>
+</body>
 </html>
