@@ -677,13 +677,13 @@
   .monolith-project > footer { display: flex; justify-content: space-between; color: #78746b; font-family: "DM Mono", monospace; font-size: 7px; letter-spacing: .06em; }
 
   .monolith-about { padding: 15vh 7vw 17vh; border-bottom: 1px solid var(--mono-line-dark); scroll-margin-top: 70px; }
-  .monolith-about-heading { display: grid; grid-template-columns: minmax(280px, .7fr) minmax(0, 1.3fr); gap: 8vw; align-items: center; }
-  .monolith-about-portrait { position: relative; max-width: 520px; overflow: hidden; aspect-ratio: 1; background: #171612; }
+  .monolith-about-heading { max-width: 980px; margin: 0 auto; display: grid; grid-template-columns: minmax(200px, 300px) minmax(0, 1fr); gap: 7vw; align-items: center; }
+  .monolith-about-portrait { position: relative; width: 100%; max-width: 300px; overflow: hidden; aspect-ratio: 1; background: #171612; }
   .monolith-about-portrait::after { content: ""; position: absolute; inset: 0; border: 1px solid rgba(238,234,224,.16); pointer-events: none; }
   .monolith-about-portrait img { width: 100%; height: 100%; display: block; object-fit: cover; filter: saturate(.82) contrast(1.03); }
   .monolith-about-summary { padding-top: 28px; border-top: 1px solid var(--mono-line-dark); }
   .monolith-about-summary > span { display: block; margin-bottom: 4vh; color: var(--mono-gold); font-family: "DM Mono", monospace; font-size: 9px; letter-spacing: .16em; }
-  .monolith-about-summary h2 { max-width: 760px; margin: 0; font-family: "Newsreader", serif; font-size: clamp(48px, 6vw, 92px); line-height: .92; letter-spacing: -.055em; font-weight: 400; }
+  .monolith-about-summary h2 { max-width: 560px; margin: 0; font-family: "Newsreader", serif; font-size: clamp(32px, 4vw, 56px); line-height: .94; letter-spacing: -.045em; font-weight: 400; }
   .monolith-experience-heading { max-width: 1080px; margin: 15vh auto 0; padding-bottom: 24px; display: flex; justify-content: space-between; gap: 40px; border-bottom: 1px solid var(--mono-line-dark); }
   .monolith-experience-heading span { color: var(--mono-gold); font: 9px "DM Mono", monospace; letter-spacing: .16em; }
   .monolith-experience-heading p { max-width: 410px; margin: 0; color: #77736b; font-size: 11px; line-height: 1.6; text-align: right; }
@@ -698,7 +698,7 @@
   .monolith-timeline-marker b { position: absolute; top: 61px; color: #57534c; font: 7px "DM Mono", monospace; }
   .monolith-timeline-item article { padding: 38px 0 46px 36px; border-bottom: 1px solid var(--mono-line-dark); }
   .monolith-timeline-item article > p { margin: 0 0 9px; color: var(--mono-gold); font: 500 13px/1.45 "Instrument Sans", sans-serif; letter-spacing: .01em; }
-  .monolith-timeline-item article h3 { margin: 0 0 20px; font-size: clamp(26px, 2.7vw, 40px); line-height: 1.05; letter-spacing: -.035em; font-weight: 500; }
+  .monolith-timeline-item article h3 { margin: 0 0 20px; font-size: clamp(21px, 2vw, 30px); line-height: 1.08; letter-spacing: -.025em; font-weight: 500; }
   .monolith-timeline-item article > div { max-width: 720px; color: #8f8a81; font-size: 13px; line-height: 1.7; }
 
   .monolith-principles { padding: 14vh 7vw; color: var(--mono-ink); background: var(--mono-cream); }
@@ -718,26 +718,25 @@
   .monolith-contact-layout { position: relative; z-index: 2; display: grid; grid-template-columns: minmax(0, .9fr) minmax(390px, .65fr); gap: 9vw; align-items: start; }
   .monolith-contact-copy > span { display: block; margin-bottom: 4vh; color: var(--mono-gold); font: 9px "DM Mono", monospace; letter-spacing: .16em; }
   .monolith-contact-copy h2 { max-width: 790px; margin: 0; font-family: "Newsreader", serif; font-size: clamp(65px, 8vw, 126px); line-height: .84; letter-spacing: -.07em; font-weight: 400; }
-  .monolith-contact-copy > p { max-width: 580px; margin: 5vh 0 0; color: #8e8980; font-size: 14px; line-height: 1.7; }
   .monolith-contact-list { max-width: 660px; margin-top: 7vh; border-top: 1px solid var(--mono-line-dark); font-style: normal; }
-  .monolith-contact-list > a, .monolith-contact-list > div { width: 100%; margin: 0; padding: 14px 0; display: grid; grid-template-columns: 95px 1fr; border: 0; border-bottom: 1px solid var(--mono-line-dark); color: #77736b; font-size: 10px; }
+  .monolith-contact-list > a, .monolith-contact-list > div { width: 100%; margin: 0; padding: 18px 0; display: grid; grid-template-columns: 112px 1fr; align-items: baseline; border: 0; border-bottom: 1px solid var(--mono-line-dark); color: #77736b; font-family: "Instrument Sans", sans-serif; font-size: 16px; }
   .monolith-contact-list > a:hover strong { color: var(--mono-cream); }
-  .monolith-contact-list span { color: #666159; font: 7px "DM Mono", monospace; letter-spacing: .09em; text-transform: uppercase; }
-  .monolith-contact-list strong { color: var(--mono-gold); font-weight: 450; transition: color .2s ease; }
+  .monolith-contact-list span { color: #8e8980; font: 500 12px "Instrument Sans", sans-serif; letter-spacing: .02em; }
+  .monolith-contact-list strong { color: var(--mono-gold); font-family: "Instrument Sans", sans-serif; font-size: 16px; font-weight: 500; transition: color .2s ease; }
   .monolith-contact-form { position: relative; z-index: 2; padding: clamp(28px, 4vw, 52px); display: flex; flex-direction: column; gap: 24px; border: 1px solid rgba(216,196,154,.25); background: rgba(9,9,8,.8); box-shadow: 0 35px 100px rgba(0,0,0,.28); backdrop-filter: blur(18px); }
   .monolith-form-heading { display: flex; justify-content: space-between; padding-bottom: 20px; border-bottom: 1px solid var(--mono-line-dark); }
-  .monolith-form-heading span { color: var(--mono-gold); font: 8px "DM Mono", monospace; letter-spacing: .14em; }
-  .monolith-form-heading small { color: #5e5a54; font: 7px "DM Mono", monospace; text-transform: uppercase; }
+  .monolith-form-heading span { color: var(--mono-gold); font: 12px "DM Mono", monospace; letter-spacing: .1em; }
+  .monolith-form-heading small { color: #827d74; font: 11px "Instrument Sans", sans-serif; }
   .monolith-contact-form label { display: flex; flex-direction: column; gap: 9px; }
-  .monolith-contact-form label > span { color: #a49e93; font: 8px "DM Mono", monospace; letter-spacing: .08em; text-transform: uppercase; }
-  .monolith-contact-form input, .monolith-contact-form textarea { width: 100%; border: 1px solid rgba(238,234,224,.14); border-radius: 0; outline: 0; padding: 14px 15px; color: var(--mono-cream); background: rgba(255,255,255,.025); font: 14px/1.5 "Instrument Sans", sans-serif; resize: vertical; transition: border-color .2s ease, background .2s ease; }
-  .monolith-contact-form input::placeholder, .monolith-contact-form textarea::placeholder { color: #57534c; }
+  .monolith-contact-form label > span { color: #b8b1a6; font: 500 12px "Instrument Sans", sans-serif; letter-spacing: .01em; }
+  .monolith-contact-form input, .monolith-contact-form textarea { width: 100%; border: 1px solid rgba(238,234,224,.14); border-radius: 0; outline: 0; padding: 15px 16px; color: var(--mono-cream); background: rgba(255,255,255,.025); font: 16px/1.5 "Instrument Sans", sans-serif; resize: vertical; transition: border-color .2s ease, background .2s ease; }
+  .monolith-contact-form input::placeholder, .monolith-contact-form textarea::placeholder { color: #7d776f; }
   .monolith-contact-form input:focus, .monolith-contact-form textarea:focus { border-color: var(--mono-gold); background: rgba(216,196,154,.045); }
-  .monolith-contact-form button { min-height: 52px; padding: 0 18px; display: flex; align-items: center; justify-content: space-between; color: var(--mono-black); background: var(--mono-gold); border: 1px solid var(--mono-gold); font-size: 12px; font-weight: 750; cursor: pointer; transition: color .2s ease, background .2s ease; }
+  .monolith-contact-form button { min-height: 54px; padding: 0 18px; display: flex; align-items: center; justify-content: space-between; color: var(--mono-black); background: var(--mono-gold); border: 1px solid var(--mono-gold); font-size: 14px; font-weight: 750; cursor: pointer; transition: color .2s ease, background .2s ease; }
   .monolith-contact-form button:hover { color: var(--mono-gold); background: transparent; }
   .monolith-contact-form button:disabled { cursor: wait; opacity: .68; }
-  .monolith-contact-form .monolith-form-honey { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
-  .monolith-contact-form > p { margin: -10px 0 0; color: #625e57; font-size: 9px; line-height: 1.5; }
+  .monolith-contact-form .monolith-form-honey { display: none; }
+  .monolith-contact-form > p { margin: -10px 0 0; color: #827d74; font-size: 11px; line-height: 1.5; }
   .monolith-contact-form > .monolith-form-status--sent { color: #a9c5a6; }
   .monolith-contact-form > .monolith-form-status--error { color: #d9a19b; }
   .monolith-contact > footer { position: relative; z-index: 3; margin-top: 13vh; padding-top: 24px; display: grid; grid-template-columns: 1fr auto auto; gap: 4vw; align-items: center; border-top: 1px solid var(--mono-line-dark); color: #69665f; font-family: "DM Mono", monospace; font-size: 8px; }
@@ -1124,9 +1123,9 @@
 
     .monolith-about { padding: 100px 20px 115px; }
     .monolith-about-heading { gap: 46px; }
-    .monolith-about-portrait { width: min(100%, 480px); }
+    .monolith-about-portrait { width: min(100%, 260px); }
     .monolith-about-summary { margin-top: 0; }
-    .monolith-about-summary h2 { font-size: clamp(45px, 13vw, 64px); }
+    .monolith-about-summary h2 { font-size: clamp(32px, 9vw, 44px); }
     .monolith-experience-heading { margin-top: 100px; flex-direction: column; gap: 16px; }
     .monolith-experience-heading p { text-align: left; }
     .monolith-timeline-item { min-height: 0; grid-template-columns: 78px 34px minmax(0, 1fr); }
@@ -1137,14 +1136,14 @@
     .monolith-timeline-marker b { display: none; }
     .monolith-timeline-item article { padding: 31px 0 38px 16px; }
     .monolith-timeline-item article > p { font-size: 11px; }
-    .monolith-timeline-item article h3 { font-size: 29px; }
+    .monolith-timeline-item article h3 { font-size: 24px; }
     .monolith-timeline-item article > div { font-size: 12px; }
 
     .monolith-contact { min-height: 0; padding: 105px 20px 34px; }
     .monolith-contact-layout { gap: 65px; }
     .monolith-contact-copy h2 { font-size: clamp(55px, 16vw, 75px); }
     .monolith-contact-copy > p { font-size: 13px; }
-    .monolith-contact-list > a, .monolith-contact-list > div { width: 100%; margin: 0; padding: 14px 0; display: grid; grid-template-columns: 76px 1fr; gap: 8px; border-top: 0; border-bottom: 1px solid var(--mono-line-dark); }
+    .monolith-contact-list > a, .monolith-contact-list > div { width: 100%; margin: 0; padding: 16px 0; display: grid; grid-template-columns: 92px 1fr; gap: 8px; border-top: 0; border-bottom: 1px solid var(--mono-line-dark); }
     .monolith-contact-form { min-width: 0; padding: 24px 18px; }
     .monolith-contact > footer { position: relative; left: auto; right: auto; bottom: auto; margin-top: 90px; grid-template-columns: 1fr auto; }
     .monolith-contact > footer .monolith-mark { width: max-content; margin: 0; padding: 0; flex-direction: row; gap: 13px; border: 0; }

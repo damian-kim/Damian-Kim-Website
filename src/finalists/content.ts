@@ -43,7 +43,7 @@ export const experienceProof = [
     place: 'Mayo Clinic',
     location: 'Rochester, MN',
     role: 'Software Engineering Intern, AI FAST',
-    summary: 'Built production ML integrations, automated research pipelines, and GCP data systems for a 2+ TB radiology imaging dataset.',
+    summary: 'Built production ML integrations, created data query pipelines, implemented caching for radiology dataset.',
     metric: '20x less scan volume / 15-70% lower latency',
   },
   {

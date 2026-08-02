@@ -48,8 +48,7 @@ export default function ContactSection() {
       <div className="monolith-contact-layout">
         <div className="monolith-contact-copy">
           <span>CONTACT</span>
-          <h2 id="contact-title">Let&apos;s make something work.</h2>
-          <p>Have a project, research question, or engineering problem worth unpacking? Send the details and I&apos;ll get back to you.</p>
+          <h2 id="contact-title">Let&apos;s Build.</h2>
           <address className="monolith-contact-list">
             <a href={`mailto:${EMAIL}`}><span>Email</span><strong>{EMAIL}</strong></a>
             <a href="tel:5078841666"><span>Phone</span><strong>507-884-1666</strong></a>
