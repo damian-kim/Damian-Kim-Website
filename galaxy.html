@@ -187,6 +187,8 @@
       varying vec3 vNormal;
       varying vec3 vWorldPosition;
       varying vec3 vColor;
+      varying vec3 vFlashDirection;
+      varying float vFlashTone;
       varying float vFlash;
 
       float hash11(float value) {
@@ -240,17 +242,27 @@
         vec3 formedNormal = rotateY(localNormal, galaxyAngle);
         formedPosition = tiltDisk(formedPosition);
         formedNormal = tiltDisk(formedNormal);
+        float flashFaceIndex = floor(hash11(aFlash.x * 19.91) * 3.0);
+        vec3 flashFaceNormal = vec3(1.0, 0.0, 0.0);
+        if (flashFaceIndex < 1.0) flashFaceNormal = vec3(1.0, 0.0, 0.0);
+        else if (flashFaceIndex < 2.0) flashFaceNormal = vec3(0.0, 1.0, 0.0);
+        else flashFaceNormal = vec3(0.0, 0.0, 1.0);
+        vec3 rotatedFlashNormal = rotateZ(rotateY(rotateX(flashFaceNormal, localAngles.x), localAngles.y), localAngles.z);
+        rotatedFlashNormal = tiltDisk(rotateY(rotatedFlashNormal, galaxyAngle));
         vec4 worldPosition = modelMatrix * vec4(formedPosition, 1.0);
         vWorldPosition = worldPosition.xyz;
         vNormal = normalize(mat3(modelMatrix) * formedNormal);
         vColor = aColor;
+        vFlashDirection = normalize(mat3(modelMatrix) * rotatedFlashNormal);
+        if (dot(vFlashDirection, cameraPosition - worldPosition.xyz) < 0.0) vFlashDirection *= -1.0;
+        vFlashTone = hash11(aFlash.x * 41.73);
         float flashClock = uTime * aFlash.y + aFlash.x * 29.17;
         float flashCycle = floor(flashClock);
         float flashPhase = fract(flashClock);
         float spatialActivity = mix(.3, 1.22, pow(radiusRatio, .68));
         float localActivity = clamp(uFlashActivity * spatialActivity, 0.0, 1.0);
         float flashEvent = step(1.0 - localActivity, hash11(aFlash.x + flashCycle * 7.13));
-        float flashEnvelope = smoothstep(0.0, .12, flashPhase) * (1.0 - smoothstep(.28, .72, flashPhase));
+        float flashEnvelope = smoothstep(0.0, .055, flashPhase) * (1.0 - smoothstep(.12, .32, flashPhase));
         vFlash = flashEvent * flashEnvelope * aFlash.z;
         gl_Position = projectionMatrix * viewMatrix * worldPosition;
       }
@@ -262,6 +274,8 @@
       varying vec3 vNormal;
       varying vec3 vWorldPosition;
       varying vec3 vColor;
+      varying vec3 vFlashDirection;
+      varying float vFlashTone;
       varying float vFlash;
 
       void main() {
@@ -275,14 +289,23 @@
         float keyLight = max(dot(normal, keyDirection), 0.0) * .78;
         float rim = pow(1.0 - max(dot(normal, viewDirection), 0.0), 2.4);
         float coreGlow = exp(-radius * .085);
-        vec3 color = vColor * (.27 + keyLight + coreLight);
-        vec3 warmBounce = mix(vColor, vec3(1.0, .46, .22), .3);
+        vec3 coolDirection = normalize(vec3(-coreDirection.z, .24, coreDirection.x));
+        float warmFace = pow(max(dot(normal, coreDirection), 0.0), .8);
+        float coolFace = pow(max(dot(normal, coolDirection), 0.0), .8);
+        vec3 faceColor = mix(vColor, vec3(.26, .32, .6), coolFace * (.32 + (1.0 - coreGlow) * .2));
+        faceColor = mix(faceColor, vec3(.76, .25, .13), warmFace * (.18 + coreGlow * .5));
+        vec3 color = faceColor * (.27 + keyLight + coreLight);
+        vec3 warmBounce = mix(faceColor, vec3(1.0, .46, .22), .3);
         color += warmBounce * coreGlow * uCoreIntensity * .72;
-        color += mix(vColor, vec3(.46, .48, .62), .45) * rim * .22;
+        color += mix(faceColor, vec3(.46, .48, .62), .45) * rim * .22;
         float specular = pow(max(dot(normal, halfDirection), 0.0), 34.0);
         vec3 sparkColor = mix(vec3(.92, .86, .82), vec3(1.0, .72, .53), coreGlow);
         color += sparkColor * specular * (.3 + coreGlow * .5);
-        color += sparkColor * vFlash * (.18 + specular * 3.8);
+        float selectedFace = smoothstep(.86, .985, dot(normal, normalize(vFlashDirection)));
+        float flashLevel = clamp(vFlash / 4.0, 0.0, 1.0);
+        float flashWarmth = clamp(coreGlow * .72 + vFlashTone * .38, 0.0, 1.0);
+        vec3 flashColor = mix(vec3(.38, .43, .61), vec3(.72, .43, .31), flashWarmth);
+        color += flashColor * selectedFace * flashLevel * (.68 + specular * .42);
         float fog = smoothstep(58.0, 108.0, length(cameraPosition - vWorldPosition));
         color = mix(color, vec3(.018, .011, .012), fog * .78);
         gl_FragColor = vec4(color, 1.0);
@@ -300,6 +323,7 @@
       attribute vec3 aMotion;
       attribute vec3 aFlash;
       varying float vFlash;
+      varying float vFlashTone;
 
       float hash11(float value) {
         value = fract(value * .1031);
@@ -344,14 +368,16 @@
         float spatialActivity = mix(.3, 1.22, pow(radiusRatio, .68));
         float localActivity = clamp(uFlashActivity * spatialActivity, 0.0, 1.0);
         float flashEvent = step(1.0 - localActivity, hash11(aFlash.x + flashCycle * 7.13));
-        float flashEnvelope = smoothstep(0.0, .12, flashPhase) * (1.0 - smoothstep(.28, .72, flashPhase));
+        float flashEnvelope = smoothstep(0.0, .055, flashPhase) * (1.0 - smoothstep(.12, .32, flashPhase));
         vFlash = flashEvent * flashEnvelope * aFlash.z;
+        vFlashTone = clamp((1.0 - radiusRatio) * .72 + hash11(aFlash.x * 41.73) * .38, 0.0, 1.0);
       }
     `;
 
     const flashFragmentShader = `
       precision highp float;
       varying float vFlash;
+      varying float vFlashTone;
 
       void main() {
         vec2 squarePosition = abs(gl_PointCoord - .5) * 2.0;
@@ -359,9 +385,10 @@
         float softFill = 1.0 - smoothstep(.18, 1.0, squareDistance);
         float squareFrame = smoothstep(.28, .48, squareDistance) * (1.0 - smoothstep(.76, 1.0, squareDistance));
         float strength = clamp(vFlash / 4.8, 0.0, 1.0);
-        float alpha = (softFill * .035 + squareFrame * .12) * strength;
+        float alpha = (softFill * .025 + squareFrame * .085) * strength;
         if (alpha < .004) discard;
-        gl_FragColor = vec4(vec3(1.55, 1.49, 1.4), alpha);
+        vec3 haloColor = mix(vec3(.38, .42, .56), vec3(.66, .47, .37), vFlashTone);
+        gl_FragColor = vec4(haloColor, alpha);
       }
     `;
 
