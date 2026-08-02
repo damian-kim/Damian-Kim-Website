@@ -97,7 +97,7 @@
         <div class="control-group"><label>Disk Radius</label><div class="slider-container"><input type="range" id="radius" min="32" max="66" step="1" value="52" oninput="updateParam('radius', this.value)"><span class="value-display" id="radius-value">52</span></div></div>
         <div class="control-group"><label>Volume Depth</label><div class="slider-container"><input type="range" id="thickness" min="4" max="24" step=".5" value="11" oninput="updateParam('thickness', this.value)"><span class="value-display" id="thickness-value">11</span></div></div>
         <div class="control-group"><label>Galaxy Rotation</label><div class="slider-container"><input type="range" id="rotationSpeed" min="0" max=".2" step=".005" value=".065" oninput="updateParam('rotationSpeed', this.value)"><span class="value-display" id="rotationSpeed-value">0.065</span></div></div>
-        <div class="control-group"><label>Cube Tumble</label><div class="slider-container"><input type="range" id="tumbleSpeed" min="0" max="2" step=".05" value=".75" oninput="updateParam('tumbleSpeed', this.value)"><span class="value-display" id="tumbleSpeed-value">0.75</span></div></div>
+        <div class="control-group"><label>Cube Tumble</label><div class="slider-container"><input type="range" id="tumbleSpeed" min="0" max="2" step=".05" value=".9" oninput="updateParam('tumbleSpeed', this.value)"><span class="value-display" id="tumbleSpeed-value">0.9</span></div></div>
         <div class="control-group"><label>Flash Activity</label><div class="slider-container"><input type="range" id="flashActivity" min="0" max=".3" step=".01" value=".11" oninput="updateParam('flashActivity', this.value)"><span class="value-display" id="flashActivity-value">0.11</span></div></div>
         <div class="control-group"><label>Bloom</label><div class="slider-container"><input type="range" id="bloomStrength" min="0" max="2" step=".05" value="1.2" oninput="updateParam('bloomStrength', this.value)"><span class="value-display" id="bloomStrength-value">1.2</span></div></div>
         <div class="control-group"><label>Core Light</label><div class="slider-container"><input type="range" id="coreIntensity" min=".3" max="2.5" step=".05" value="1.45" oninput="updateParam('coreIntensity', this.value)"><span class="value-display" id="coreIntensity-value">1.45</span></div></div>
@@ -105,9 +105,9 @@
 
       <div class="control-section">
         <h3>Colors</h3>
-        <div class="color-group"><label>Core Matter</label><div class="color-picker-container"><input type="color" id="color1" value="#a96f61" onchange="updateColor('color1', this.value)"><span class="color-value" id="color1-value">#a96f61</span></div></div>
-        <div class="color-group"><label>Dusty Arms</label><div class="color-picker-container"><input type="color" id="color2" value="#8f827e" onchange="updateColor('color2', this.value)"><span class="color-value" id="color2-value">#8f827e</span></div></div>
-        <div class="color-group"><label>Blue-Violet</label><div class="color-picker-container"><input type="color" id="color3" value="#565d78" onchange="updateColor('color3', this.value)"><span class="color-value" id="color3-value">#565d78</span></div></div>
+        <div class="color-group"><label>Core Matter</label><div class="color-picker-container"><input type="color" id="color1" value="#9e6257" onchange="updateColor('color1', this.value)"><span class="color-value" id="color1-value">#9e6257</span></div></div>
+        <div class="color-group"><label>Dusty Arms</label><div class="color-picker-container"><input type="color" id="color2" value="#8a7a7d" onchange="updateColor('color2', this.value)"><span class="color-value" id="color2-value">#8a7a7d</span></div></div>
+        <div class="color-group"><label>Blue-Violet</label><div class="color-picker-container"><input type="color" id="color3" value="#5d6591" onchange="updateColor('color3', this.value)"><span class="color-value" id="color3-value">#5d6591</span></div></div>
       </div>
 
       <div class="control-section">
@@ -139,11 +139,11 @@
       radius: 52,
       thickness: 11,
       rotationSpeed: .065,
-      tumbleSpeed: .75,
+      tumbleSpeed: .9,
       flashActivity: .11,
       bloomStrength: 1.2,
       coreIntensity: 1.45,
-      colorPalette: ['#a96f61', '#8f827e', '#565d78'],
+      colorPalette: ['#9e6257', '#8a7a7d', '#5d6591'],
     };
     const defaultParams = { ...params, colorPalette: [...params.colorPalette] };
 
@@ -181,6 +181,7 @@
       attribute float aSize;
       attribute vec3 aAngularVelocity;
       attribute vec3 aRotationPhase;
+      attribute vec3 aMotion;
       attribute vec3 aFlash;
       attribute vec3 aColor;
       varying vec3 vNormal;
@@ -224,9 +225,18 @@
         vec3 localPosition = rotateZ(rotateY(rotateX(position * aSize, localAngles.x), localAngles.y), localAngles.z);
         vec3 localNormal = rotateZ(rotateY(rotateX(normal, localAngles.x), localAngles.y), localAngles.z);
         float radiusRatio = clamp(length(aBasePosition.xz) / uRadius, 0.0, 1.0);
-        float orbitalSpeed = mix(.62, 1.5, pow(radiusRatio, .72));
+        float orbitalSpeed = mix(.62, 1.5, pow(radiusRatio, .72)) * aMotion.x;
         float galaxyAngle = uTime * uRotationSpeed * orbitalSpeed;
-        vec3 formedPosition = rotateY(aBasePosition + localPosition, galaxyAngle);
+        float driftPhase = uTime * aMotion.z + aMotion.y;
+        float driftAmount = mix(.14, .82, radiusRatio);
+        vec2 radialDirection = normalize(aBasePosition.xz + vec2(.001));
+        vec2 tangentDirection = vec2(-radialDirection.y, radialDirection.x);
+        vec3 animatedBase = aBasePosition;
+        animatedBase.xz += radialDirection * sin(driftPhase * .73) * driftAmount;
+        animatedBase.xz += tangentDirection * sin(driftPhase * 1.13 + aMotion.y) * driftAmount * .58;
+        animatedBase.y += sin(driftPhase) * (.18 + radiusRatio * .72);
+        animatedBase.y += cos(driftPhase * .61 + aMotion.x * 7.0) * .2;
+        vec3 formedPosition = rotateY(animatedBase + localPosition, galaxyAngle);
         vec3 formedNormal = rotateY(localNormal, galaxyAngle);
         formedPosition = tiltDisk(formedPosition);
         formedNormal = tiltDisk(formedNormal);
@@ -265,8 +275,9 @@
         float keyLight = max(dot(normal, keyDirection), 0.0) * .78;
         float rim = pow(1.0 - max(dot(normal, viewDirection), 0.0), 2.4);
         float coreGlow = exp(-radius * .055);
-        vec3 color = vColor * (.16 + keyLight + coreLight);
-        color += vec3(1.0, .44, .24) * coreGlow * uCoreIntensity * .92;
+        vec3 color = vColor * (.23 + keyLight + coreLight);
+        vec3 warmBounce = mix(vColor, vec3(1.0, .43, .2), .22);
+        color += warmBounce * coreGlow * uCoreIntensity * .58;
         color += mix(vColor, vec3(.46, .48, .62), .45) * rim * .22;
         float specular = pow(max(dot(normal, halfDirection), 0.0), 34.0);
         vec3 sparkColor = mix(vec3(.92, .86, .82), vec3(1.0, .72, .53), coreGlow);
@@ -286,6 +297,7 @@
       uniform float uViewportHeight;
       uniform float uPixelRatio;
       attribute float aSize;
+      attribute vec3 aMotion;
       attribute vec3 aFlash;
       varying float vFlash;
 
@@ -310,8 +322,17 @@
 
       void main() {
         float radiusRatio = clamp(length(position.xz) / uRadius, 0.0, 1.0);
-        float orbitalSpeed = mix(.62, 1.5, pow(radiusRatio, .72));
-        vec3 formedPosition = tiltDisk(rotateY(position, uTime * uRotationSpeed * orbitalSpeed));
+        float orbitalSpeed = mix(.62, 1.5, pow(radiusRatio, .72)) * aMotion.x;
+        float driftPhase = uTime * aMotion.z + aMotion.y;
+        float driftAmount = mix(.14, .82, radiusRatio);
+        vec2 radialDirection = normalize(position.xz + vec2(.001));
+        vec2 tangentDirection = vec2(-radialDirection.y, radialDirection.x);
+        vec3 animatedPosition = position;
+        animatedPosition.xz += radialDirection * sin(driftPhase * .73) * driftAmount;
+        animatedPosition.xz += tangentDirection * sin(driftPhase * 1.13 + aMotion.y) * driftAmount * .58;
+        animatedPosition.y += sin(driftPhase) * (.18 + radiusRatio * .72);
+        animatedPosition.y += cos(driftPhase * .61 + aMotion.x * 7.0) * .2;
+        vec3 formedPosition = tiltDisk(rotateY(animatedPosition, uTime * uRotationSpeed * orbitalSpeed));
         vec4 viewPosition = viewMatrix * modelMatrix * vec4(formedPosition, 1.0);
         gl_Position = projectionMatrix * viewPosition;
         float projectedSize = aSize * uViewportHeight * projectionMatrix[1][1] / (2.0 * max(-viewPosition.z, .001));
@@ -392,6 +413,7 @@
       const sizes = new Float32Array(count);
       const angularVelocities = new Float32Array(count * 3);
       const rotationPhases = new Float32Array(count * 3);
+      const motions = new Float32Array(count * 3);
       const flashes = new Float32Array(count * 3);
       const colors = new Float32Array(count * 3);
       const coreColor = new THREE.Color(params.colorPalette[0]);
@@ -433,14 +455,17 @@
           angularVelocities[cursor + axis] = speedClass * (.24 + rng() * 1.05) * (rng() < .5 ? -1 : 1);
           rotationPhases[cursor + axis] = rng() * Math.PI * 2;
         }
+        motions[cursor] = .72 + rng() * .56;
+        motions[cursor + 1] = rng() * Math.PI * 2;
+        motions[cursor + 2] = .12 + rng() * .2;
         flashes[cursor] = rng();
         flashes[cursor + 1] = .24 + Math.pow(rng(), .7) * .24;
         flashes[cursor + 2] = (1.2 + Math.pow(rng(), .5) * 3.5) * (.55 + radiusRatio * .65);
 
         const coreMix = Math.pow(Math.max(0, 1 - radius / (params.radius * .62)), 2.1);
         mixedColor.copy(armColor).lerp(coreColor, coreMix);
-        if (rng() < .085 + radius / params.radius * .1) mixedColor.lerp(coldColor, .72);
-        mixedColor.multiplyScalar(.62 + rng() * .42);
+        if (rng() < .18 + radiusRatio * .34) mixedColor.lerp(coldColor, .86);
+        mixedColor.multiplyScalar(.68 + rng() * .4);
         mixedColor.toArray(colors, cursor);
       }
 
@@ -454,6 +479,7 @@
       geometry.setAttribute('aSize', new THREE.InstancedBufferAttribute(sizes, 1));
       geometry.setAttribute('aAngularVelocity', new THREE.InstancedBufferAttribute(angularVelocities, 3));
       geometry.setAttribute('aRotationPhase', new THREE.InstancedBufferAttribute(rotationPhases, 3));
+      geometry.setAttribute('aMotion', new THREE.InstancedBufferAttribute(motions, 3));
       geometry.setAttribute('aFlash', new THREE.InstancedBufferAttribute(flashes, 3));
       geometry.setAttribute('aColor', new THREE.InstancedBufferAttribute(colors, 3));
       geometry.instanceCount = count;
@@ -473,15 +499,16 @@
       cubeField.frustumCulled = false;
       scene.add(cubeField);
       box.dispose();
-      createFlashField(basePositions, sizes, flashes);
+      createFlashField(basePositions, sizes, motions, flashes);
       createStars();
       createCoreGlow();
     }
 
-    function createFlashField(basePositions, sizes, flashes) {
+    function createFlashField(basePositions, sizes, motions, flashes) {
       const geometry = new THREE.BufferGeometry();
       geometry.setAttribute('position', new THREE.BufferAttribute(basePositions, 3));
       geometry.setAttribute('aSize', new THREE.BufferAttribute(sizes, 1));
+      geometry.setAttribute('aMotion', new THREE.BufferAttribute(motions, 3));
       geometry.setAttribute('aFlash', new THREE.BufferAttribute(flashes, 3));
       const pixelRatio = renderer.getPixelRatio();
       const material = new THREE.ShaderMaterial({
