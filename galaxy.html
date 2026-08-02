@@ -98,6 +98,7 @@
         <div class="control-group"><label>Disk Thickness</label><div class="slider-container"><input type="range" id="thickness" min="2" max="12" step=".5" value="6" oninput="updateParam('thickness', this.value)"><span class="value-display" id="thickness-value">6</span></div></div>
         <div class="control-group"><label>Galaxy Rotation</label><div class="slider-container"><input type="range" id="rotationSpeed" min="0" max=".2" step=".005" value=".065" oninput="updateParam('rotationSpeed', this.value)"><span class="value-display" id="rotationSpeed-value">0.065</span></div></div>
         <div class="control-group"><label>Cube Tumble</label><div class="slider-container"><input type="range" id="tumbleSpeed" min="0" max="2" step=".05" value=".75" oninput="updateParam('tumbleSpeed', this.value)"><span class="value-display" id="tumbleSpeed-value">0.75</span></div></div>
+        <div class="control-group"><label>Flash Activity</label><div class="slider-container"><input type="range" id="flashActivity" min="0" max=".3" step=".01" value=".09" oninput="updateParam('flashActivity', this.value)"><span class="value-display" id="flashActivity-value">0.09</span></div></div>
         <div class="control-group"><label>Bloom</label><div class="slider-container"><input type="range" id="bloomStrength" min="0" max="2" step=".05" value="1.2" oninput="updateParam('bloomStrength', this.value)"><span class="value-display" id="bloomStrength-value">1.2</span></div></div>
         <div class="control-group"><label>Core Light</label><div class="slider-container"><input type="range" id="coreIntensity" min=".3" max="2.5" step=".05" value="1.45" oninput="updateParam('coreIntensity', this.value)"><span class="value-display" id="coreIntensity-value">1.45</span></div></div>
       </div>
@@ -139,6 +140,7 @@
       thickness: 6,
       rotationSpeed: .065,
       tumbleSpeed: .75,
+      flashActivity: .09,
       bloomStrength: 1.2,
       coreIntensity: 1.45,
       colorPalette: ['#ff7138', '#b8a495', '#718fd1'],
@@ -172,28 +174,41 @@
       uniform float uTime;
       uniform float uRotationSpeed;
       uniform float uTumbleSpeed;
+      uniform float uFlashActivity;
       attribute vec3 aBasePosition;
-      attribute vec3 aScale;
-      attribute vec3 aAxis;
-      attribute float aSpin;
-      attribute float aPhase;
-      attribute float aEmission;
+      attribute float aSize;
+      attribute vec3 aAngularVelocity;
+      attribute vec3 aRotationPhase;
+      attribute vec3 aFlash;
       attribute vec3 aColor;
       varying vec3 vNormal;
       varying vec3 vWorldPosition;
       varying vec3 vColor;
-      varying float vEmission;
+      varying float vFlash;
 
-      vec3 rotateAxis(vec3 vector, vec3 axis, float angle) {
+      float hash11(float value) {
+        value = fract(value * .1031);
+        value *= value + 33.33;
+        value *= value + value;
+        return fract(value);
+      }
+
+      vec3 rotateX(vec3 vector, float angle) {
         float sine = sin(angle);
         float cosine = cos(angle);
-        return vector * cosine + cross(axis, vector) * sine + axis * dot(axis, vector) * (1.0 - cosine);
+        return vec3(vector.x, cosine * vector.y - sine * vector.z, sine * vector.y + cosine * vector.z);
       }
 
       vec3 rotateY(vec3 vector, float angle) {
         float sine = sin(angle);
         float cosine = cos(angle);
         return vec3(cosine * vector.x + sine * vector.z, vector.y, -sine * vector.x + cosine * vector.z);
+      }
+
+      vec3 rotateZ(vec3 vector, float angle) {
+        float sine = sin(angle);
+        float cosine = cos(angle);
+        return vec3(cosine * vector.x - sine * vector.y, sine * vector.x + cosine * vector.y, vector.z);
       }
 
       vec3 tiltDisk(vec3 vector) {
@@ -203,9 +218,9 @@
       }
 
       void main() {
-        float localAngle = aPhase + uTime * uTumbleSpeed * aSpin;
-        vec3 localPosition = rotateAxis(position * aScale, aAxis, localAngle);
-        vec3 localNormal = rotateAxis(normal, aAxis, localAngle);
+        vec3 localAngles = aRotationPhase + uTime * uTumbleSpeed * aAngularVelocity;
+        vec3 localPosition = rotateZ(rotateY(rotateX(position * aSize, localAngles.x), localAngles.y), localAngles.z);
+        vec3 localNormal = rotateZ(rotateY(rotateX(normal, localAngles.x), localAngles.y), localAngles.z);
         float galaxyAngle = uTime * uRotationSpeed;
         vec3 formedPosition = rotateY(aBasePosition + localPosition, galaxyAngle);
         vec3 formedNormal = rotateY(localNormal, galaxyAngle);
@@ -215,7 +230,12 @@
         vWorldPosition = worldPosition.xyz;
         vNormal = normalize(mat3(modelMatrix) * formedNormal);
         vColor = aColor;
-        vEmission = aEmission;
+        float flashClock = uTime * aFlash.y + aFlash.x * 29.17;
+        float flashCycle = floor(flashClock);
+        float flashPhase = fract(flashClock);
+        float flashEvent = step(1.0 - uFlashActivity, hash11(aFlash.x + flashCycle * 7.13));
+        float flashEnvelope = smoothstep(0.0, .08, flashPhase) * (1.0 - smoothstep(.18, .48, flashPhase));
+        vFlash = flashEvent * flashEnvelope * aFlash.z;
         gl_Position = projectionMatrix * viewMatrix * worldPosition;
       }
     `;
@@ -226,13 +246,14 @@
       varying vec3 vNormal;
       varying vec3 vWorldPosition;
       varying vec3 vColor;
-      varying float vEmission;
+      varying float vFlash;
 
       void main() {
         vec3 normal = normalize(vNormal);
         vec3 viewDirection = normalize(cameraPosition - vWorldPosition);
         vec3 coreDirection = normalize(-vWorldPosition + vec3(0.0, 2.0, 0.0));
         vec3 keyDirection = normalize(vec3(-.45, .8, .35));
+        vec3 halfDirection = normalize(keyDirection + viewDirection);
         float radius = length(vWorldPosition.xz);
         float coreLight = max(dot(normal, coreDirection), 0.0) * (uCoreIntensity / (1.0 + radius * .026));
         float keyLight = max(dot(normal, keyDirection), 0.0) * .78;
@@ -241,8 +262,10 @@
         vec3 color = vColor * (.16 + keyLight + coreLight);
         color += vec3(1.0, .22, .045) * coreGlow * uCoreIntensity * 1.15;
         color += mix(vColor, vec3(.65, .75, 1.0), .45) * rim * .22;
-        float brightFace = pow(max(dot(normal, viewDirection), 0.0), 2.0) * (.25 + keyLight);
-        color += mix(vColor, vec3(1.0, .72, .42), coreGlow) * vEmission * brightFace;
+        float specular = pow(max(dot(normal, halfDirection), 0.0), 34.0);
+        vec3 sparkColor = mix(vec3(.82, .9, 1.0), vec3(1.0, .58, .28), coreGlow);
+        color += sparkColor * specular * (.3 + coreGlow * .5);
+        color += sparkColor * vFlash * (.18 + specular * 3.8);
         float fog = smoothstep(58.0, 108.0, length(cameraPosition - vWorldPosition));
         color = mix(color, vec3(.012, .011, .014), fog * .78);
         gl_FragColor = vec4(color, 1.0);
@@ -294,11 +317,10 @@
       disposeSystem();
       const count = params.cubeCount;
       const basePositions = new Float32Array(count * 3);
-      const scales = new Float32Array(count * 3);
-      const axes = new Float32Array(count * 3);
-      const spins = new Float32Array(count);
-      const phases = new Float32Array(count);
-      const emissions = new Float32Array(count);
+      const sizes = new Float32Array(count);
+      const angularVelocities = new Float32Array(count * 3);
+      const rotationPhases = new Float32Array(count * 3);
+      const flashes = new Float32Array(count * 3);
       const colors = new Float32Array(count * 3);
       const coreColor = new THREE.Color(params.colorPalette[0]);
       const armColor = new THREE.Color(params.colorPalette[1]);
@@ -328,21 +350,16 @@
 
         const sizeBias = Math.pow(rng(), 3.15);
         const baseSize = .095 + sizeBias * (.7 + coreBulge * .2);
-        scales[cursor] = baseSize * (.55 + rng() * 1.4);
-        scales[cursor + 1] = baseSize * (.5 + rng() * 1.6);
-        scales[cursor + 2] = baseSize * (.55 + rng() * 1.4);
+        sizes[index] = baseSize * (.72 + rng() * .65);
 
-        let axisX = rng() * 2 - 1;
-        let axisY = rng() * 2 - 1;
-        let axisZ = rng() * 2 - 1;
-        const axisLength = Math.hypot(axisX, axisY, axisZ) || 1;
-        axes[cursor] = axisX / axisLength;
-        axes[cursor + 1] = axisY / axisLength;
-        axes[cursor + 2] = axisZ / axisLength;
-        spins[index] = .22 + rng() * 1.55;
-        phases[index] = rng() * Math.PI * 2;
-        const sparkChance = .07 + coreBulge * .16;
-        emissions[index] = rng() < sparkChance ? 1.2 + Math.pow(rng(), .45) * 4.8 : rng() * .08;
+        const speedClass = .18 + Math.pow(rng(), 1.45) * 1.8;
+        for (let axis = 0; axis < 3; axis++) {
+          angularVelocities[cursor + axis] = speedClass * (.24 + rng() * 1.05) * (rng() < .5 ? -1 : 1);
+          rotationPhases[cursor + axis] = rng() * Math.PI * 2;
+        }
+        flashes[cursor] = rng();
+        flashes[cursor + 1] = .35 + Math.pow(rng(), .7) * .72;
+        flashes[cursor + 2] = (1.4 + Math.pow(rng(), .5) * 4.5) * (.88 + coreBulge * .35);
 
         const coreMix = Math.pow(Math.max(0, 1 - radius / (params.radius * .62)), 2.1);
         mixedColor.copy(armColor).lerp(coreColor, coreMix);
@@ -358,11 +375,10 @@
       geometry.setAttribute('normal', box.getAttribute('normal').clone());
       geometry.setAttribute('uv', box.getAttribute('uv').clone());
       geometry.setAttribute('aBasePosition', new THREE.InstancedBufferAttribute(basePositions, 3));
-      geometry.setAttribute('aScale', new THREE.InstancedBufferAttribute(scales, 3));
-      geometry.setAttribute('aAxis', new THREE.InstancedBufferAttribute(axes, 3));
-      geometry.setAttribute('aSpin', new THREE.InstancedBufferAttribute(spins, 1));
-      geometry.setAttribute('aPhase', new THREE.InstancedBufferAttribute(phases, 1));
-      geometry.setAttribute('aEmission', new THREE.InstancedBufferAttribute(emissions, 1));
+      geometry.setAttribute('aSize', new THREE.InstancedBufferAttribute(sizes, 1));
+      geometry.setAttribute('aAngularVelocity', new THREE.InstancedBufferAttribute(angularVelocities, 3));
+      geometry.setAttribute('aRotationPhase', new THREE.InstancedBufferAttribute(rotationPhases, 3));
+      geometry.setAttribute('aFlash', new THREE.InstancedBufferAttribute(flashes, 3));
       geometry.setAttribute('aColor', new THREE.InstancedBufferAttribute(colors, 3));
       geometry.instanceCount = count;
       const material = new THREE.ShaderMaterial({
@@ -372,6 +388,7 @@
           uTime: { value: 0 },
           uRotationSpeed: { value: params.rotationSpeed },
           uTumbleSpeed: { value: params.tumbleSpeed },
+          uFlashActivity: { value: params.flashActivity },
           uCoreIntensity: { value: params.coreIntensity },
         },
       });
@@ -448,6 +465,7 @@
       document.getElementById(`${name}-value`).textContent = Number(value).toString();
       if (name === 'rotationSpeed' && cubeField) cubeField.material.uniforms.uRotationSpeed.value = params.rotationSpeed;
       else if (name === 'tumbleSpeed' && cubeField) cubeField.material.uniforms.uTumbleSpeed.value = params.tumbleSpeed;
+      else if (name === 'flashActivity' && cubeField) cubeField.material.uniforms.uFlashActivity.value = params.flashActivity;
       else if (name === 'bloomStrength' && bloomPass) bloomPass.strength = params.bloomStrength;
       else if (name === 'coreIntensity' && cubeField) cubeField.material.uniforms.uCoreIntensity.value = params.coreIntensity;
       else initializeSystem();
@@ -477,7 +495,7 @@
     };
     window.resetParameters = function () {
       params = { ...defaultParams, colorPalette: [...defaultParams.colorPalette] };
-      for (const name of ['cubeCount', 'armCount', 'radius', 'thickness', 'rotationSpeed', 'tumbleSpeed', 'bloomStrength', 'coreIntensity']) {
+      for (const name of ['cubeCount', 'armCount', 'radius', 'thickness', 'rotationSpeed', 'tumbleSpeed', 'flashActivity', 'bloomStrength', 'coreIntensity']) {
         document.getElementById(name).value = params[name];
         document.getElementById(`${name}-value`).textContent = params[name];
       }
@@ -492,7 +510,7 @@
     window.downloadPNG = function () {
       composer.render();
       const link = document.createElement('a');
-      link.download = `tidal-lattice-${params.seed}.png`;
+      link.download = `ember-lattice-${params.seed}.png`;
       link.href = renderer.domElement.toDataURL('image/png');
       link.click();
     };
