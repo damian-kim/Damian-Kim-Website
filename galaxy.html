@@ -95,9 +95,9 @@
         <div class="control-group"><label>Cube Count</label><div class="slider-container"><input type="range" id="cubeCount" min="800" max="10000" step="200" value="5200" oninput="updateParam('cubeCount', this.value)"><span class="value-display" id="cubeCount-value">5200</span></div></div>
         <div class="control-group"><label>Spiral Arms</label><div class="slider-container"><input type="range" id="armCount" min="2" max="8" step="1" value="5" oninput="updateParam('armCount', this.value)"><span class="value-display" id="armCount-value">5</span></div></div>
         <div class="control-group"><label>Disk Radius</label><div class="slider-container"><input type="range" id="radius" min="32" max="66" step="1" value="52" oninput="updateParam('radius', this.value)"><span class="value-display" id="radius-value">52</span></div></div>
-        <div class="control-group"><label>Volume Depth</label><div class="slider-container"><input type="range" id="thickness" min="4" max="24" step=".5" value="11" oninput="updateParam('thickness', this.value)"><span class="value-display" id="thickness-value">11</span></div></div>
-        <div class="control-group"><label>Galaxy Rotation</label><div class="slider-container"><input type="range" id="rotationSpeed" min="0" max=".2" step=".005" value=".065" oninput="updateParam('rotationSpeed', this.value)"><span class="value-display" id="rotationSpeed-value">0.065</span></div></div>
-        <div class="control-group"><label>Cube Tumble</label><div class="slider-container"><input type="range" id="tumbleSpeed" min="0" max="2" step=".05" value=".9" oninput="updateParam('tumbleSpeed', this.value)"><span class="value-display" id="tumbleSpeed-value">0.9</span></div></div>
+        <div class="control-group"><label>Volume Depth</label><div class="slider-container"><input type="range" id="thickness" min="3" max="18" step=".5" value="8" oninput="updateParam('thickness', this.value)"><span class="value-display" id="thickness-value">8</span></div></div>
+        <div class="control-group"><label>Galaxy Rotation</label><div class="slider-container"><input type="range" id="rotationSpeed" min="0" max=".12" step=".002" value=".026" oninput="updateParam('rotationSpeed', this.value)"><span class="value-display" id="rotationSpeed-value">0.026</span></div></div>
+        <div class="control-group"><label>Cube Tumble</label><div class="slider-container"><input type="range" id="tumbleSpeed" min="0" max="2" step=".05" value=".78" oninput="updateParam('tumbleSpeed', this.value)"><span class="value-display" id="tumbleSpeed-value">0.78</span></div></div>
         <div class="control-group"><label>Flash Activity</label><div class="slider-container"><input type="range" id="flashActivity" min="0" max=".3" step=".01" value=".11" oninput="updateParam('flashActivity', this.value)"><span class="value-display" id="flashActivity-value">0.11</span></div></div>
         <div class="control-group"><label>Bloom</label><div class="slider-container"><input type="range" id="bloomStrength" min="0" max="2" step=".05" value="1.2" oninput="updateParam('bloomStrength', this.value)"><span class="value-display" id="bloomStrength-value">1.2</span></div></div>
         <div class="control-group"><label>Core Light</label><div class="slider-container"><input type="range" id="coreIntensity" min=".3" max="2.5" step=".05" value="1.45" oninput="updateParam('coreIntensity', this.value)"><span class="value-display" id="coreIntensity-value">1.45</span></div></div>
@@ -105,9 +105,9 @@
 
       <div class="control-section">
         <h3>Colors</h3>
-        <div class="color-group"><label>Core Matter</label><div class="color-picker-container"><input type="color" id="color1" value="#9e6257" onchange="updateColor('color1', this.value)"><span class="color-value" id="color1-value">#9e6257</span></div></div>
-        <div class="color-group"><label>Dusty Arms</label><div class="color-picker-container"><input type="color" id="color2" value="#8a7a7d" onchange="updateColor('color2', this.value)"><span class="color-value" id="color2-value">#8a7a7d</span></div></div>
-        <div class="color-group"><label>Blue-Violet</label><div class="color-picker-container"><input type="color" id="color3" value="#5d6591" onchange="updateColor('color3', this.value)"><span class="color-value" id="color3-value">#5d6591</span></div></div>
+        <div class="color-group"><label>Core Matter</label><div class="color-picker-container"><input type="color" id="color1" value="#b66c58" onchange="updateColor('color1', this.value)"><span class="color-value" id="color1-value">#b66c58</span></div></div>
+        <div class="color-group"><label>Silver Dust</label><div class="color-picker-container"><input type="color" id="color2" value="#aaa19e" onchange="updateColor('color2', this.value)"><span class="color-value" id="color2-value">#aaa19e</span></div></div>
+        <div class="color-group"><label>Blue-Violet</label><div class="color-picker-container"><input type="color" id="color3" value="#6875ac" onchange="updateColor('color3', this.value)"><span class="color-value" id="color3-value">#6875ac</span></div></div>
       </div>
 
       <div class="control-section">
@@ -137,13 +137,13 @@
       cubeCount: 5200,
       armCount: 5,
       radius: 52,
-      thickness: 11,
-      rotationSpeed: .065,
-      tumbleSpeed: .9,
+      thickness: 8,
+      rotationSpeed: .026,
+      tumbleSpeed: .78,
       flashActivity: .11,
       bloomStrength: 1.2,
       coreIntensity: 1.45,
-      colorPalette: ['#9e6257', '#8a7a7d', '#5d6591'],
+      colorPalette: ['#b66c58', '#aaa19e', '#6875ac'],
     };
     const defaultParams = { ...params, colorPalette: [...params.colorPalette] };
 
@@ -215,8 +215,8 @@
       }
 
       vec3 tiltDisk(vec3 vector) {
-        float sine = .1564;
-        float cosine = .9877;
+        float sine = .4226;
+        float cosine = .9063;
         return vec3(vector.x, cosine * vector.y - sine * vector.z, sine * vector.y + cosine * vector.z);
       }
 
@@ -225,17 +225,17 @@
         vec3 localPosition = rotateZ(rotateY(rotateX(position * aSize, localAngles.x), localAngles.y), localAngles.z);
         vec3 localNormal = rotateZ(rotateY(rotateX(normal, localAngles.x), localAngles.y), localAngles.z);
         float radiusRatio = clamp(length(aBasePosition.xz) / uRadius, 0.0, 1.0);
-        float orbitalSpeed = mix(.62, 1.5, pow(radiusRatio, .72)) * aMotion.x;
+        float orbitalSpeed = mix(.78, 1.32, pow(radiusRatio, .72)) * aMotion.x;
         float galaxyAngle = uTime * uRotationSpeed * orbitalSpeed;
         float driftPhase = uTime * aMotion.z + aMotion.y;
-        float driftAmount = mix(.14, .82, radiusRatio);
+        float driftAmount = mix(.08, .46, radiusRatio);
         vec2 radialDirection = normalize(aBasePosition.xz + vec2(.001));
         vec2 tangentDirection = vec2(-radialDirection.y, radialDirection.x);
         vec3 animatedBase = aBasePosition;
         animatedBase.xz += radialDirection * sin(driftPhase * .73) * driftAmount;
         animatedBase.xz += tangentDirection * sin(driftPhase * 1.13 + aMotion.y) * driftAmount * .58;
-        animatedBase.y += sin(driftPhase) * (.18 + radiusRatio * .72);
-        animatedBase.y += cos(driftPhase * .61 + aMotion.x * 7.0) * .2;
+        animatedBase.y += sin(driftPhase) * (.1 + radiusRatio * .38);
+        animatedBase.y += cos(driftPhase * .61 + aMotion.x * 7.0) * .12;
         vec3 formedPosition = rotateY(animatedBase + localPosition, galaxyAngle);
         vec3 formedNormal = rotateY(localNormal, galaxyAngle);
         formedPosition = tiltDisk(formedPosition);
@@ -274,10 +274,10 @@
         float coreLight = max(dot(normal, coreDirection), 0.0) * (uCoreIntensity / (1.0 + radius * .026));
         float keyLight = max(dot(normal, keyDirection), 0.0) * .78;
         float rim = pow(1.0 - max(dot(normal, viewDirection), 0.0), 2.4);
-        float coreGlow = exp(-radius * .055);
-        vec3 color = vColor * (.23 + keyLight + coreLight);
-        vec3 warmBounce = mix(vColor, vec3(1.0, .43, .2), .22);
-        color += warmBounce * coreGlow * uCoreIntensity * .58;
+        float coreGlow = exp(-radius * .085);
+        vec3 color = vColor * (.27 + keyLight + coreLight);
+        vec3 warmBounce = mix(vColor, vec3(1.0, .46, .22), .3);
+        color += warmBounce * coreGlow * uCoreIntensity * .72;
         color += mix(vColor, vec3(.46, .48, .62), .45) * rim * .22;
         float specular = pow(max(dot(normal, halfDirection), 0.0), 34.0);
         vec3 sparkColor = mix(vec3(.92, .86, .82), vec3(1.0, .72, .53), coreGlow);
@@ -315,23 +315,23 @@
       }
 
       vec3 tiltDisk(vec3 vector) {
-        float sine = .1564;
-        float cosine = .9877;
+        float sine = .4226;
+        float cosine = .9063;
         return vec3(vector.x, cosine * vector.y - sine * vector.z, sine * vector.y + cosine * vector.z);
       }
 
       void main() {
         float radiusRatio = clamp(length(position.xz) / uRadius, 0.0, 1.0);
-        float orbitalSpeed = mix(.62, 1.5, pow(radiusRatio, .72)) * aMotion.x;
+        float orbitalSpeed = mix(.78, 1.32, pow(radiusRatio, .72)) * aMotion.x;
         float driftPhase = uTime * aMotion.z + aMotion.y;
-        float driftAmount = mix(.14, .82, radiusRatio);
+        float driftAmount = mix(.08, .46, radiusRatio);
         vec2 radialDirection = normalize(position.xz + vec2(.001));
         vec2 tangentDirection = vec2(-radialDirection.y, radialDirection.x);
         vec3 animatedPosition = position;
         animatedPosition.xz += radialDirection * sin(driftPhase * .73) * driftAmount;
         animatedPosition.xz += tangentDirection * sin(driftPhase * 1.13 + aMotion.y) * driftAmount * .58;
-        animatedPosition.y += sin(driftPhase) * (.18 + radiusRatio * .72);
-        animatedPosition.y += cos(driftPhase * .61 + aMotion.x * 7.0) * .2;
+        animatedPosition.y += sin(driftPhase) * (.1 + radiusRatio * .38);
+        animatedPosition.y += cos(driftPhase * .61 + aMotion.x * 7.0) * .12;
         vec3 formedPosition = tiltDisk(rotateY(animatedPosition, uTime * uRotationSpeed * orbitalSpeed));
         vec4 viewPosition = viewMatrix * modelMatrix * vec4(formedPosition, 1.0);
         gl_Position = projectionMatrix * viewPosition;
@@ -423,26 +423,28 @@
 
       for (let index = 0; index < count; index++) {
         const cursor = index * 3;
-        const corePopulation = rng() < .74;
+        const corePopulation = rng() < .58;
         const radius = corePopulation
-          ? Math.pow(rng(), 2.15) * params.radius * .64
-          : Math.pow(rng(), .78) * params.radius;
+          ? Math.pow(rng(), 2.55) * params.radius * .4
+          : Math.pow(rng(), .72) * params.radius;
         const arm = index % params.armCount;
         const armAngle = arm / params.armCount * Math.PI * 2;
-        const armWidth = .22 + radius * .009;
-        const spiralAngle = armAngle + radius * .19 + randomNormal() * armWidth;
-        const armInfluence = Math.min(1, radius / 14);
+        const strand = Math.floor(rng() * 3) - 1;
+        const strandOffset = strand * (.055 + radius * .0015);
+        const armWidth = .095 + radius * .0038;
+        const spiralAngle = armAngle + radius * .16 + strandOffset + randomNormal() * armWidth;
+        const armInfluence = Math.min(1, Math.max(0, (radius - 3) / 9));
         const angle = (rng() * Math.PI * 2) * (1 - armInfluence) + spiralAngle * armInfluence;
-        const radialScatter = randomNormal() * (.65 + radius * .026);
+        const radialScatter = randomNormal() * (.34 + radius * .012);
         const resolvedRadius = Math.max(.15, radius + radialScatter);
         const coreBulge = Math.exp(-radius * .09);
         const radiusRatio = Math.min(1, radius / params.radius);
-        const heightScale = params.thickness * (.34 + coreBulge * .66 + radiusRatio * .12);
-        const warp = Math.sin(angle * 2.0 + radius * .07) * (.5 + radius * .045);
+        const heightScale = params.thickness * (.25 + coreBulge * .75 + radiusRatio * .08);
+        const warp = Math.sin(angle * 2.0 + radius * .07) * (.28 + radius * .024);
         const verticalStrand = Math.sin(angle * 3.0 - radius * .11 + arm * .7)
           * params.thickness * (.08 + radiusRatio * .12);
-        const haloLift = rng() < .12
-          ? randomNormal() * params.thickness * (.4 + radiusRatio * .8)
+        const haloLift = rng() < .07
+          ? randomNormal() * params.thickness * (.3 + radiusRatio * .62)
           : 0;
         basePositions[cursor] = Math.cos(angle) * resolvedRadius;
         basePositions[cursor + 1] = randomNormal() * heightScale + warp + verticalStrand + haloLift;
@@ -455,7 +457,7 @@
           angularVelocities[cursor + axis] = speedClass * (.24 + rng() * 1.05) * (rng() < .5 ? -1 : 1);
           rotationPhases[cursor + axis] = rng() * Math.PI * 2;
         }
-        motions[cursor] = .72 + rng() * .56;
+        motions[cursor] = .9 + rng() * .2;
         motions[cursor + 1] = rng() * Math.PI * 2;
         motions[cursor + 2] = .12 + rng() * .2;
         flashes[cursor] = rng();
@@ -464,8 +466,8 @@
 
         const coreMix = Math.pow(Math.max(0, 1 - radius / (params.radius * .62)), 2.1);
         mixedColor.copy(armColor).lerp(coreColor, coreMix);
-        if (rng() < .18 + radiusRatio * .34) mixedColor.lerp(coldColor, .86);
-        mixedColor.multiplyScalar(.68 + rng() * .4);
+        if (rng() < .14 + radiusRatio * .28) mixedColor.lerp(coldColor, .84);
+        mixedColor.multiplyScalar(.72 + rng() * .42);
         mixedColor.toArray(colors, cursor);
       }
 
@@ -539,17 +541,17 @@
       canvas.height = 256;
       const context = canvas.getContext('2d');
       const gradient = context.createRadialGradient(128, 128, 0, 128, 128, 128);
-      gradient.addColorStop(0, 'rgba(255, 209, 159, .88)');
-      gradient.addColorStop(.09, 'rgba(255, 157, 105, .56)');
-      gradient.addColorStop(.38, 'rgba(110, 52, 43, .2)');
-      gradient.addColorStop(1, 'rgba(34, 12, 14, 0)');
+      gradient.addColorStop(0, 'rgba(255, 216, 165, .92)');
+      gradient.addColorStop(.055, 'rgba(255, 151, 96, .62)');
+      gradient.addColorStop(.24, 'rgba(126, 61, 48, .19)');
+      gradient.addColorStop(1, 'rgba(48, 20, 22, 0)');
       context.fillStyle = gradient;
       context.fillRect(0, 0, 256, 256);
       const texture = new THREE.CanvasTexture(canvas);
       texture.colorSpace = THREE.SRGBColorSpace;
-      const material = new THREE.SpriteMaterial({ map: texture, transparent: true, opacity: .52, blending: THREE.AdditiveBlending, depthWrite: false, depthTest: true });
+      const material = new THREE.SpriteMaterial({ map: texture, transparent: true, opacity: .58, blending: THREE.AdditiveBlending, depthWrite: false, depthTest: true });
       coreGlow = new THREE.Sprite(material);
-      coreGlow.scale.set(60, 60, 1);
+      coreGlow.scale.set(150, 150, 1);
       coreGlow.renderOrder = 1;
       scene.add(coreGlow);
     }
