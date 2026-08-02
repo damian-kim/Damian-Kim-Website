@@ -98,16 +98,16 @@
         <div class="control-group"><label>Disk Thickness</label><div class="slider-container"><input type="range" id="thickness" min="2" max="12" step=".5" value="6" oninput="updateParam('thickness', this.value)"><span class="value-display" id="thickness-value">6</span></div></div>
         <div class="control-group"><label>Galaxy Rotation</label><div class="slider-container"><input type="range" id="rotationSpeed" min="0" max=".2" step=".005" value=".065" oninput="updateParam('rotationSpeed', this.value)"><span class="value-display" id="rotationSpeed-value">0.065</span></div></div>
         <div class="control-group"><label>Cube Tumble</label><div class="slider-container"><input type="range" id="tumbleSpeed" min="0" max="2" step=".05" value=".75" oninput="updateParam('tumbleSpeed', this.value)"><span class="value-display" id="tumbleSpeed-value">0.75</span></div></div>
-        <div class="control-group"><label>Flash Activity</label><div class="slider-container"><input type="range" id="flashActivity" min="0" max=".3" step=".01" value=".16" oninput="updateParam('flashActivity', this.value)"><span class="value-display" id="flashActivity-value">0.16</span></div></div>
+        <div class="control-group"><label>Flash Activity</label><div class="slider-container"><input type="range" id="flashActivity" min="0" max=".3" step=".01" value=".11" oninput="updateParam('flashActivity', this.value)"><span class="value-display" id="flashActivity-value">0.11</span></div></div>
         <div class="control-group"><label>Bloom</label><div class="slider-container"><input type="range" id="bloomStrength" min="0" max="2" step=".05" value="1.2" oninput="updateParam('bloomStrength', this.value)"><span class="value-display" id="bloomStrength-value">1.2</span></div></div>
         <div class="control-group"><label>Core Light</label><div class="slider-container"><input type="range" id="coreIntensity" min=".3" max="2.5" step=".05" value="1.45" oninput="updateParam('coreIntensity', this.value)"><span class="value-display" id="coreIntensity-value">1.45</span></div></div>
       </div>
 
       <div class="control-section">
         <h3>Colors</h3>
-        <div class="color-group"><label>Core</label><div class="color-picker-container"><input type="color" id="color1" value="#ff7138" onchange="updateColor('color1', this.value)"><span class="color-value" id="color1-value">#ff7138</span></div></div>
-        <div class="color-group"><label>Outer Arms</label><div class="color-picker-container"><input type="color" id="color2" value="#b8a495" onchange="updateColor('color2', this.value)"><span class="color-value" id="color2-value">#b8a495</span></div></div>
-        <div class="color-group"><label>Cold Fragments</label><div class="color-picker-container"><input type="color" id="color3" value="#718fd1" onchange="updateColor('color3', this.value)"><span class="color-value" id="color3-value">#718fd1</span></div></div>
+        <div class="color-group"><label>Core</label><div class="color-picker-container"><input type="color" id="color1" value="#ff8a55" onchange="updateColor('color1', this.value)"><span class="color-value" id="color1-value">#ff8a55</span></div></div>
+        <div class="color-group"><label>Outer Arms</label><div class="color-picker-container"><input type="color" id="color2" value="#c9c1b9" onchange="updateColor('color2', this.value)"><span class="color-value" id="color2-value">#c9c1b9</span></div></div>
+        <div class="color-group"><label>Cold Fragments</label><div class="color-picker-container"><input type="color" id="color3" value="#68728f" onchange="updateColor('color3', this.value)"><span class="color-value" id="color3-value">#68728f</span></div></div>
       </div>
 
       <div class="control-section">
@@ -140,10 +140,10 @@
       thickness: 6,
       rotationSpeed: .065,
       tumbleSpeed: .75,
-      flashActivity: .16,
+      flashActivity: .11,
       bloomStrength: 1.2,
       coreIntensity: 1.45,
-      colorPalette: ['#ff7138', '#b8a495', '#718fd1'],
+      colorPalette: ['#ff8a55', '#c9c1b9', '#68728f'],
     };
     const defaultParams = { ...params, colorPalette: [...params.colorPalette] };
 
@@ -176,6 +176,7 @@
       uniform float uRotationSpeed;
       uniform float uTumbleSpeed;
       uniform float uFlashActivity;
+      uniform float uRadius;
       attribute vec3 aBasePosition;
       attribute float aSize;
       attribute vec3 aAngularVelocity;
@@ -222,7 +223,9 @@
         vec3 localAngles = aRotationPhase + uTime * uTumbleSpeed * aAngularVelocity;
         vec3 localPosition = rotateZ(rotateY(rotateX(position * aSize, localAngles.x), localAngles.y), localAngles.z);
         vec3 localNormal = rotateZ(rotateY(rotateX(normal, localAngles.x), localAngles.y), localAngles.z);
-        float galaxyAngle = uTime * uRotationSpeed;
+        float radiusRatio = clamp(length(aBasePosition.xz) / uRadius, 0.0, 1.0);
+        float orbitalSpeed = mix(.62, 1.5, pow(radiusRatio, .72));
+        float galaxyAngle = uTime * uRotationSpeed * orbitalSpeed;
         vec3 formedPosition = rotateY(aBasePosition + localPosition, galaxyAngle);
         vec3 formedNormal = rotateY(localNormal, galaxyAngle);
         formedPosition = tiltDisk(formedPosition);
@@ -234,8 +237,10 @@
         float flashClock = uTime * aFlash.y + aFlash.x * 29.17;
         float flashCycle = floor(flashClock);
         float flashPhase = fract(flashClock);
-        float flashEvent = step(1.0 - uFlashActivity, hash11(aFlash.x + flashCycle * 7.13));
-        float flashEnvelope = smoothstep(0.0, .08, flashPhase) * (1.0 - smoothstep(.18, .48, flashPhase));
+        float spatialActivity = mix(.3, 1.22, pow(radiusRatio, .68));
+        float localActivity = clamp(uFlashActivity * spatialActivity, 0.0, 1.0);
+        float flashEvent = step(1.0 - localActivity, hash11(aFlash.x + flashCycle * 7.13));
+        float flashEnvelope = smoothstep(0.0, .12, flashPhase) * (1.0 - smoothstep(.28, .72, flashPhase));
         vFlash = flashEvent * flashEnvelope * aFlash.z;
         gl_Position = projectionMatrix * viewMatrix * worldPosition;
       }
@@ -264,11 +269,11 @@
         color += vec3(1.0, .22, .045) * coreGlow * uCoreIntensity * 1.15;
         color += mix(vColor, vec3(.65, .75, 1.0), .45) * rim * .22;
         float specular = pow(max(dot(normal, halfDirection), 0.0), 34.0);
-        vec3 sparkColor = mix(vec3(.82, .9, 1.0), vec3(1.0, .58, .28), coreGlow);
+        vec3 sparkColor = mix(vec3(.86, .88, .96), vec3(1.0, .67, .43), coreGlow);
         color += sparkColor * specular * (.3 + coreGlow * .5);
         color += sparkColor * vFlash * (.18 + specular * 3.8);
         float fog = smoothstep(58.0, 108.0, length(cameraPosition - vWorldPosition));
-        color = mix(color, vec3(.012, .011, .014), fog * .78);
+        color = mix(color, vec3(.016, .01, .011), fog * .78);
         gl_FragColor = vec4(color, 1.0);
       }
     `;
@@ -277,6 +282,7 @@
       uniform float uTime;
       uniform float uRotationSpeed;
       uniform float uFlashActivity;
+      uniform float uRadius;
       uniform float uViewportHeight;
       uniform float uPixelRatio;
       attribute float aSize;
@@ -303,7 +309,9 @@
       }
 
       void main() {
-        vec3 formedPosition = tiltDisk(rotateY(position, uTime * uRotationSpeed));
+        float radiusRatio = clamp(length(position.xz) / uRadius, 0.0, 1.0);
+        float orbitalSpeed = mix(.62, 1.5, pow(radiusRatio, .72));
+        vec3 formedPosition = tiltDisk(rotateY(position, uTime * uRotationSpeed * orbitalSpeed));
         vec4 viewPosition = viewMatrix * modelMatrix * vec4(formedPosition, 1.0);
         gl_Position = projectionMatrix * viewPosition;
         float projectedSize = aSize * uViewportHeight * projectionMatrix[1][1] / (2.0 * max(-viewPosition.z, .001));
@@ -312,8 +320,10 @@
         float flashClock = uTime * aFlash.y + aFlash.x * 29.17;
         float flashCycle = floor(flashClock);
         float flashPhase = fract(flashClock);
-        float flashEvent = step(1.0 - uFlashActivity, hash11(aFlash.x + flashCycle * 7.13));
-        float flashEnvelope = smoothstep(0.0, .08, flashPhase) * (1.0 - smoothstep(.18, .48, flashPhase));
+        float spatialActivity = mix(.3, 1.22, pow(radiusRatio, .68));
+        float localActivity = clamp(uFlashActivity * spatialActivity, 0.0, 1.0);
+        float flashEvent = step(1.0 - localActivity, hash11(aFlash.x + flashCycle * 7.13));
+        float flashEnvelope = smoothstep(0.0, .12, flashPhase) * (1.0 - smoothstep(.28, .72, flashPhase));
         vFlash = flashEvent * flashEnvelope * aFlash.z;
       }
     `;
@@ -327,18 +337,18 @@
         float squareDistance = max(squarePosition.x, squarePosition.y);
         float softFill = 1.0 - smoothstep(.18, 1.0, squareDistance);
         float squareFrame = smoothstep(.28, .48, squareDistance) * (1.0 - smoothstep(.76, 1.0, squareDistance));
-        float strength = clamp(vFlash / 5.0, 0.0, 1.0);
-        float alpha = (softFill * .18 + squareFrame * .52) * strength;
+        float strength = clamp(vFlash / 4.8, 0.0, 1.0);
+        float alpha = (softFill * .035 + squareFrame * .12) * strength;
         if (alpha < .004) discard;
-        gl_FragColor = vec4(vec3(2.4, 2.28, 2.12), alpha);
+        gl_FragColor = vec4(vec3(1.55, 1.49, 1.4), alpha);
       }
     `;
 
     function init() {
       const container = document.getElementById('canvas-container');
       scene = new THREE.Scene();
-      scene.background = new THREE.Color(0x080709);
-      scene.fog = new THREE.FogExp2(0x080709, .008);
+      scene.background = new THREE.Color(0x0d0909);
+      scene.fog = new THREE.FogExp2(0x0d0909, .008);
       camera = new THREE.PerspectiveCamera(48, container.clientWidth / container.clientHeight, .1, 250);
       camera.position.set(0, 31, 78);
       camera.lookAt(0, 0, 0);
@@ -410,18 +420,17 @@
         basePositions[cursor + 1] = randomNormal() * heightScale + warp;
         basePositions[cursor + 2] = Math.sin(angle) * resolvedRadius;
 
-        sizes[index] = .23 + rng() * .11;
+        sizes[index] = .345 + rng() * .165;
 
         const radiusRatio = Math.min(1, radius / params.radius);
-        const radialSpeed = .58 + Math.pow(radiusRatio, .72) * .82;
-        const speedClass = (.18 + Math.pow(rng(), 1.45) * 1.45) * radialSpeed;
+        const speedClass = .18 + Math.pow(rng(), 1.45) * 1.45;
         for (let axis = 0; axis < 3; axis++) {
           angularVelocities[cursor + axis] = speedClass * (.24 + rng() * 1.05) * (rng() < .5 ? -1 : 1);
           rotationPhases[cursor + axis] = rng() * Math.PI * 2;
         }
         flashes[cursor] = rng();
-        flashes[cursor + 1] = .35 + Math.pow(rng(), .7) * .72;
-        flashes[cursor + 2] = (1.4 + Math.pow(rng(), .5) * 4.5) * (.88 + coreBulge * .35);
+        flashes[cursor + 1] = .24 + Math.pow(rng(), .7) * .24;
+        flashes[cursor + 2] = (1.2 + Math.pow(rng(), .5) * 3.5) * (.55 + radiusRatio * .65);
 
         const coreMix = Math.pow(Math.max(0, 1 - radius / (params.radius * .62)), 2.1);
         mixedColor.copy(armColor).lerp(coreColor, coreMix);
@@ -451,6 +460,7 @@
           uRotationSpeed: { value: params.rotationSpeed },
           uTumbleSpeed: { value: params.tumbleSpeed },
           uFlashActivity: { value: params.flashActivity },
+          uRadius: { value: params.radius },
           uCoreIntensity: { value: params.coreIntensity },
         },
       });
@@ -476,6 +486,7 @@
           uTime: { value: 0 },
           uRotationSpeed: { value: params.rotationSpeed },
           uFlashActivity: { value: params.flashActivity },
+          uRadius: { value: params.radius },
           uViewportHeight: { value: renderer.domElement.clientHeight * pixelRatio },
           uPixelRatio: { value: pixelRatio },
         },
@@ -497,7 +508,7 @@
       const context = canvas.getContext('2d');
       const gradient = context.createRadialGradient(128, 128, 0, 128, 128, 128);
       gradient.addColorStop(0, 'rgba(255, 206, 142, .9)');
-      gradient.addColorStop(.09, 'rgba(255, 117, 52, .6)');
+      gradient.addColorStop(.09, 'rgba(255, 139, 85, .58)');
       gradient.addColorStop(.38, 'rgba(155, 47, 22, .18)');
       gradient.addColorStop(1, 'rgba(40, 8, 4, 0)');
       context.fillStyle = gradient;
