@@ -95,7 +95,7 @@
         <div class="control-group"><label>Cube Count</label><div class="slider-container"><input type="range" id="cubeCount" min="800" max="10000" step="200" value="5200" oninput="updateParam('cubeCount', this.value)"><span class="value-display" id="cubeCount-value">5200</span></div></div>
         <div class="control-group"><label>Spiral Arms</label><div class="slider-container"><input type="range" id="armCount" min="2" max="8" step="1" value="5" oninput="updateParam('armCount', this.value)"><span class="value-display" id="armCount-value">5</span></div></div>
         <div class="control-group"><label>Disk Radius</label><div class="slider-container"><input type="range" id="radius" min="32" max="66" step="1" value="52" oninput="updateParam('radius', this.value)"><span class="value-display" id="radius-value">52</span></div></div>
-        <div class="control-group"><label>Disk Thickness</label><div class="slider-container"><input type="range" id="thickness" min="2" max="12" step=".5" value="6" oninput="updateParam('thickness', this.value)"><span class="value-display" id="thickness-value">6</span></div></div>
+        <div class="control-group"><label>Volume Depth</label><div class="slider-container"><input type="range" id="thickness" min="4" max="24" step=".5" value="11" oninput="updateParam('thickness', this.value)"><span class="value-display" id="thickness-value">11</span></div></div>
         <div class="control-group"><label>Galaxy Rotation</label><div class="slider-container"><input type="range" id="rotationSpeed" min="0" max=".2" step=".005" value=".065" oninput="updateParam('rotationSpeed', this.value)"><span class="value-display" id="rotationSpeed-value">0.065</span></div></div>
         <div class="control-group"><label>Cube Tumble</label><div class="slider-container"><input type="range" id="tumbleSpeed" min="0" max="2" step=".05" value=".75" oninput="updateParam('tumbleSpeed', this.value)"><span class="value-display" id="tumbleSpeed-value">0.75</span></div></div>
         <div class="control-group"><label>Flash Activity</label><div class="slider-container"><input type="range" id="flashActivity" min="0" max=".3" step=".01" value=".11" oninput="updateParam('flashActivity', this.value)"><span class="value-display" id="flashActivity-value">0.11</span></div></div>
@@ -105,9 +105,9 @@
 
       <div class="control-section">
         <h3>Colors</h3>
-        <div class="color-group"><label>Core</label><div class="color-picker-container"><input type="color" id="color1" value="#ff8a55" onchange="updateColor('color1', this.value)"><span class="color-value" id="color1-value">#ff8a55</span></div></div>
-        <div class="color-group"><label>Outer Arms</label><div class="color-picker-container"><input type="color" id="color2" value="#c9c1b9" onchange="updateColor('color2', this.value)"><span class="color-value" id="color2-value">#c9c1b9</span></div></div>
-        <div class="color-group"><label>Cold Fragments</label><div class="color-picker-container"><input type="color" id="color3" value="#68728f" onchange="updateColor('color3', this.value)"><span class="color-value" id="color3-value">#68728f</span></div></div>
+        <div class="color-group"><label>Core Matter</label><div class="color-picker-container"><input type="color" id="color1" value="#a96f61" onchange="updateColor('color1', this.value)"><span class="color-value" id="color1-value">#a96f61</span></div></div>
+        <div class="color-group"><label>Dusty Arms</label><div class="color-picker-container"><input type="color" id="color2" value="#8f827e" onchange="updateColor('color2', this.value)"><span class="color-value" id="color2-value">#8f827e</span></div></div>
+        <div class="color-group"><label>Blue-Violet</label><div class="color-picker-container"><input type="color" id="color3" value="#565d78" onchange="updateColor('color3', this.value)"><span class="color-value" id="color3-value">#565d78</span></div></div>
       </div>
 
       <div class="control-section">
@@ -137,13 +137,13 @@
       cubeCount: 5200,
       armCount: 5,
       radius: 52,
-      thickness: 6,
+      thickness: 11,
       rotationSpeed: .065,
       tumbleSpeed: .75,
       flashActivity: .11,
       bloomStrength: 1.2,
       coreIntensity: 1.45,
-      colorPalette: ['#ff8a55', '#c9c1b9', '#68728f'],
+      colorPalette: ['#a96f61', '#8f827e', '#565d78'],
     };
     const defaultParams = { ...params, colorPalette: [...params.colorPalette] };
 
@@ -214,8 +214,8 @@
       }
 
       vec3 tiltDisk(vec3 vector) {
-        float sine = -.2377;
-        float cosine = .9713;
+        float sine = .1564;
+        float cosine = .9877;
         return vec3(vector.x, cosine * vector.y - sine * vector.z, sine * vector.y + cosine * vector.z);
       }
 
@@ -266,14 +266,14 @@
         float rim = pow(1.0 - max(dot(normal, viewDirection), 0.0), 2.4);
         float coreGlow = exp(-radius * .055);
         vec3 color = vColor * (.16 + keyLight + coreLight);
-        color += vec3(1.0, .22, .045) * coreGlow * uCoreIntensity * 1.15;
-        color += mix(vColor, vec3(.65, .75, 1.0), .45) * rim * .22;
+        color += vec3(1.0, .44, .24) * coreGlow * uCoreIntensity * .92;
+        color += mix(vColor, vec3(.46, .48, .62), .45) * rim * .22;
         float specular = pow(max(dot(normal, halfDirection), 0.0), 34.0);
-        vec3 sparkColor = mix(vec3(.86, .88, .96), vec3(1.0, .67, .43), coreGlow);
+        vec3 sparkColor = mix(vec3(.92, .86, .82), vec3(1.0, .72, .53), coreGlow);
         color += sparkColor * specular * (.3 + coreGlow * .5);
         color += sparkColor * vFlash * (.18 + specular * 3.8);
         float fog = smoothstep(58.0, 108.0, length(cameraPosition - vWorldPosition));
-        color = mix(color, vec3(.016, .01, .011), fog * .78);
+        color = mix(color, vec3(.018, .011, .012), fog * .78);
         gl_FragColor = vec4(color, 1.0);
       }
     `;
@@ -303,8 +303,8 @@
       }
 
       vec3 tiltDisk(vec3 vector) {
-        float sine = -.2377;
-        float cosine = .9713;
+        float sine = .1564;
+        float cosine = .9877;
         return vec3(vector.x, cosine * vector.y - sine * vector.z, sine * vector.y + cosine * vector.z);
       }
 
@@ -347,17 +347,17 @@
     function init() {
       const container = document.getElementById('canvas-container');
       scene = new THREE.Scene();
-      scene.background = new THREE.Color(0x0d0909);
-      scene.fog = new THREE.FogExp2(0x0d0909, .008);
+      scene.background = new THREE.Color(0x0b0708);
+      scene.fog = new THREE.FogExp2(0x0b0708, .0085);
       camera = new THREE.PerspectiveCamera(48, container.clientWidth / container.clientHeight, .1, 250);
-      camera.position.set(0, 31, 78);
+      camera.position.set(0, 28, 82);
       camera.lookAt(0, 0, 0);
       renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true, powerPreference: 'high-performance' });
       renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
       renderer.setSize(container.clientWidth, container.clientHeight);
       renderer.outputColorSpace = THREE.SRGBColorSpace;
       renderer.toneMapping = THREE.ACESFilmicToneMapping;
-      renderer.toneMappingExposure = 1.2;
+      renderer.toneMappingExposure = 1.12;
       container.appendChild(renderer.domElement);
       composer = new EffectComposer(renderer);
       composer.addPass(new RenderPass(scene, camera));
@@ -414,15 +414,20 @@
         const radialScatter = randomNormal() * (.65 + radius * .026);
         const resolvedRadius = Math.max(.15, radius + radialScatter);
         const coreBulge = Math.exp(-radius * .09);
-        const heightScale = params.thickness * (.18 + coreBulge * .82);
-        const warp = Math.sin(angle * 2.0 + radius * .07) * radius * .018;
+        const radiusRatio = Math.min(1, radius / params.radius);
+        const heightScale = params.thickness * (.34 + coreBulge * .66 + radiusRatio * .12);
+        const warp = Math.sin(angle * 2.0 + radius * .07) * (.5 + radius * .045);
+        const verticalStrand = Math.sin(angle * 3.0 - radius * .11 + arm * .7)
+          * params.thickness * (.08 + radiusRatio * .12);
+        const haloLift = rng() < .12
+          ? randomNormal() * params.thickness * (.4 + radiusRatio * .8)
+          : 0;
         basePositions[cursor] = Math.cos(angle) * resolvedRadius;
-        basePositions[cursor + 1] = randomNormal() * heightScale + warp;
+        basePositions[cursor + 1] = randomNormal() * heightScale + warp + verticalStrand + haloLift;
         basePositions[cursor + 2] = Math.sin(angle) * resolvedRadius;
 
         sizes[index] = .345 + rng() * .165;
 
-        const radiusRatio = Math.min(1, radius / params.radius);
         const speedClass = .18 + Math.pow(rng(), 1.45) * 1.45;
         for (let axis = 0; axis < 3; axis++) {
           angularVelocities[cursor + axis] = speedClass * (.24 + rng() * 1.05) * (rng() < .5 ? -1 : 1);
@@ -435,7 +440,7 @@
         const coreMix = Math.pow(Math.max(0, 1 - radius / (params.radius * .62)), 2.1);
         mixedColor.copy(armColor).lerp(coreColor, coreMix);
         if (rng() < .085 + radius / params.radius * .1) mixedColor.lerp(coldColor, .72);
-        mixedColor.multiplyScalar(.72 + rng() * .5);
+        mixedColor.multiplyScalar(.62 + rng() * .42);
         mixedColor.toArray(colors, cursor);
       }
 
@@ -507,18 +512,18 @@
       canvas.height = 256;
       const context = canvas.getContext('2d');
       const gradient = context.createRadialGradient(128, 128, 0, 128, 128, 128);
-      gradient.addColorStop(0, 'rgba(255, 206, 142, .9)');
-      gradient.addColorStop(.09, 'rgba(255, 139, 85, .58)');
-      gradient.addColorStop(.38, 'rgba(155, 47, 22, .18)');
-      gradient.addColorStop(1, 'rgba(40, 8, 4, 0)');
+      gradient.addColorStop(0, 'rgba(255, 209, 159, .88)');
+      gradient.addColorStop(.09, 'rgba(255, 157, 105, .56)');
+      gradient.addColorStop(.38, 'rgba(110, 52, 43, .2)');
+      gradient.addColorStop(1, 'rgba(34, 12, 14, 0)');
       context.fillStyle = gradient;
       context.fillRect(0, 0, 256, 256);
       const texture = new THREE.CanvasTexture(canvas);
       texture.colorSpace = THREE.SRGBColorSpace;
-      const material = new THREE.SpriteMaterial({ map: texture, transparent: true, opacity: .58, blending: THREE.AdditiveBlending, depthWrite: false, depthTest: false });
+      const material = new THREE.SpriteMaterial({ map: texture, transparent: true, opacity: .52, blending: THREE.AdditiveBlending, depthWrite: false, depthTest: true });
       coreGlow = new THREE.Sprite(material);
-      coreGlow.scale.set(54, 54, 1);
-      coreGlow.renderOrder = 8;
+      coreGlow.scale.set(60, 60, 1);
+      coreGlow.renderOrder = 1;
       scene.add(coreGlow);
     }
 
@@ -535,7 +540,7 @@
       }
       const geometry = new THREE.BufferGeometry();
       geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-      const material = new THREE.PointsMaterial({ color: 0xb8bfd1, size: .18, transparent: true, opacity: .68, depthWrite: false, sizeAttenuation: true });
+      const material = new THREE.PointsMaterial({ color: 0xb8aaad, size: .15, transparent: true, opacity: .56, depthWrite: false, sizeAttenuation: true });
       starField = new THREE.Points(geometry, material);
       scene.add(starField);
     }
