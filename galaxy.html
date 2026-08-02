@@ -98,7 +98,7 @@
         <div class="control-group"><label>Disk Thickness</label><div class="slider-container"><input type="range" id="thickness" min="2" max="12" step=".5" value="6" oninput="updateParam('thickness', this.value)"><span class="value-display" id="thickness-value">6</span></div></div>
         <div class="control-group"><label>Galaxy Rotation</label><div class="slider-container"><input type="range" id="rotationSpeed" min="0" max=".2" step=".005" value=".065" oninput="updateParam('rotationSpeed', this.value)"><span class="value-display" id="rotationSpeed-value">0.065</span></div></div>
         <div class="control-group"><label>Cube Tumble</label><div class="slider-container"><input type="range" id="tumbleSpeed" min="0" max="2" step=".05" value=".75" oninput="updateParam('tumbleSpeed', this.value)"><span class="value-display" id="tumbleSpeed-value">0.75</span></div></div>
-        <div class="control-group"><label>Flash Activity</label><div class="slider-container"><input type="range" id="flashActivity" min="0" max=".3" step=".01" value=".09" oninput="updateParam('flashActivity', this.value)"><span class="value-display" id="flashActivity-value">0.09</span></div></div>
+        <div class="control-group"><label>Flash Activity</label><div class="slider-container"><input type="range" id="flashActivity" min="0" max=".3" step=".01" value=".16" oninput="updateParam('flashActivity', this.value)"><span class="value-display" id="flashActivity-value">0.16</span></div></div>
         <div class="control-group"><label>Bloom</label><div class="slider-container"><input type="range" id="bloomStrength" min="0" max="2" step=".05" value="1.2" oninput="updateParam('bloomStrength', this.value)"><span class="value-display" id="bloomStrength-value">1.2</span></div></div>
         <div class="control-group"><label>Core Light</label><div class="slider-container"><input type="range" id="coreIntensity" min=".3" max="2.5" step=".05" value="1.45" oninput="updateParam('coreIntensity', this.value)"><span class="value-display" id="coreIntensity-value">1.45</span></div></div>
       </div>
@@ -140,7 +140,7 @@
       thickness: 6,
       rotationSpeed: .065,
       tumbleSpeed: .75,
-      flashActivity: .09,
+      flashActivity: .16,
       bloomStrength: 1.2,
       coreIntensity: 1.45,
       colorPalette: ['#ff7138', '#b8a495', '#718fd1'],
@@ -166,6 +166,7 @@
     let composer;
     let bloomPass;
     let cubeField;
+    let flashField;
     let starField;
     let coreGlow;
     let reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -272,6 +273,67 @@
       }
     `;
 
+    const flashVertexShader = `
+      uniform float uTime;
+      uniform float uRotationSpeed;
+      uniform float uFlashActivity;
+      uniform float uViewportHeight;
+      uniform float uPixelRatio;
+      attribute float aSize;
+      attribute vec3 aFlash;
+      varying float vFlash;
+
+      float hash11(float value) {
+        value = fract(value * .1031);
+        value *= value + 33.33;
+        value *= value + value;
+        return fract(value);
+      }
+
+      vec3 rotateY(vec3 vector, float angle) {
+        float sine = sin(angle);
+        float cosine = cos(angle);
+        return vec3(cosine * vector.x + sine * vector.z, vector.y, -sine * vector.x + cosine * vector.z);
+      }
+
+      vec3 tiltDisk(vec3 vector) {
+        float sine = -.2377;
+        float cosine = .9713;
+        return vec3(vector.x, cosine * vector.y - sine * vector.z, sine * vector.y + cosine * vector.z);
+      }
+
+      void main() {
+        vec3 formedPosition = tiltDisk(rotateY(position, uTime * uRotationSpeed));
+        vec4 viewPosition = viewMatrix * modelMatrix * vec4(formedPosition, 1.0);
+        gl_Position = projectionMatrix * viewPosition;
+        float projectedSize = aSize * uViewportHeight * projectionMatrix[1][1] / (2.0 * max(-viewPosition.z, .001));
+        gl_PointSize = clamp(projectedSize * 3.4, 2.0 * uPixelRatio, 28.0 * uPixelRatio);
+
+        float flashClock = uTime * aFlash.y + aFlash.x * 29.17;
+        float flashCycle = floor(flashClock);
+        float flashPhase = fract(flashClock);
+        float flashEvent = step(1.0 - uFlashActivity, hash11(aFlash.x + flashCycle * 7.13));
+        float flashEnvelope = smoothstep(0.0, .08, flashPhase) * (1.0 - smoothstep(.18, .48, flashPhase));
+        vFlash = flashEvent * flashEnvelope * aFlash.z;
+      }
+    `;
+
+    const flashFragmentShader = `
+      precision highp float;
+      varying float vFlash;
+
+      void main() {
+        vec2 squarePosition = abs(gl_PointCoord - .5) * 2.0;
+        float squareDistance = max(squarePosition.x, squarePosition.y);
+        float softFill = 1.0 - smoothstep(.18, 1.0, squareDistance);
+        float squareFrame = smoothstep(.28, .48, squareDistance) * (1.0 - smoothstep(.76, 1.0, squareDistance));
+        float strength = clamp(vFlash / 5.0, 0.0, 1.0);
+        float alpha = (softFill * .18 + squareFrame * .52) * strength;
+        if (alpha < .004) discard;
+        gl_FragColor = vec4(vec3(2.4, 2.28, 2.12), alpha);
+      }
+    `;
+
     function init() {
       const container = document.getElementById('canvas-container');
       scene = new THREE.Scene();
@@ -329,10 +391,10 @@
 
       for (let index = 0; index < count; index++) {
         const cursor = index * 3;
-        const corePopulation = rng() < .58;
+        const corePopulation = rng() < .74;
         const radius = corePopulation
-          ? Math.pow(rng(), 1.62) * params.radius * .7
-          : Math.pow(rng(), .72) * params.radius;
+          ? Math.pow(rng(), 2.15) * params.radius * .64
+          : Math.pow(rng(), .78) * params.radius;
         const arm = index % params.armCount;
         const armAngle = arm / params.armCount * Math.PI * 2;
         const armWidth = .22 + radius * .009;
@@ -348,11 +410,11 @@
         basePositions[cursor + 1] = randomNormal() * heightScale + warp;
         basePositions[cursor + 2] = Math.sin(angle) * resolvedRadius;
 
-        const sizeBias = Math.pow(rng(), 3.15);
-        const baseSize = .095 + sizeBias * (.7 + coreBulge * .2);
-        sizes[index] = baseSize * (.72 + rng() * .65);
+        sizes[index] = .23 + rng() * .11;
 
-        const speedClass = .18 + Math.pow(rng(), 1.45) * 1.8;
+        const radiusRatio = Math.min(1, radius / params.radius);
+        const radialSpeed = .58 + Math.pow(radiusRatio, .72) * .82;
+        const speedClass = (.18 + Math.pow(rng(), 1.45) * 1.45) * radialSpeed;
         for (let axis = 0; axis < 3; axis++) {
           angularVelocities[cursor + axis] = speedClass * (.24 + rng() * 1.05) * (rng() < .5 ? -1 : 1);
           rotationPhases[cursor + axis] = rng() * Math.PI * 2;
@@ -396,8 +458,36 @@
       cubeField.frustumCulled = false;
       scene.add(cubeField);
       box.dispose();
+      createFlashField(basePositions, sizes, flashes);
       createStars();
       createCoreGlow();
+    }
+
+    function createFlashField(basePositions, sizes, flashes) {
+      const geometry = new THREE.BufferGeometry();
+      geometry.setAttribute('position', new THREE.BufferAttribute(basePositions, 3));
+      geometry.setAttribute('aSize', new THREE.BufferAttribute(sizes, 1));
+      geometry.setAttribute('aFlash', new THREE.BufferAttribute(flashes, 3));
+      const pixelRatio = renderer.getPixelRatio();
+      const material = new THREE.ShaderMaterial({
+        vertexShader: flashVertexShader,
+        fragmentShader: flashFragmentShader,
+        uniforms: {
+          uTime: { value: 0 },
+          uRotationSpeed: { value: params.rotationSpeed },
+          uFlashActivity: { value: params.flashActivity },
+          uViewportHeight: { value: renderer.domElement.clientHeight * pixelRatio },
+          uPixelRatio: { value: pixelRatio },
+        },
+        transparent: true,
+        depthTest: false,
+        depthWrite: false,
+        blending: THREE.AdditiveBlending,
+      });
+      flashField = new THREE.Points(geometry, material);
+      flashField.frustumCulled = false;
+      flashField.renderOrder = 7;
+      scene.add(flashField);
     }
 
     function createCoreGlow() {
@@ -422,7 +512,7 @@
     }
 
     function createStars() {
-      const count = 1300;
+      const count = 3200;
       const positions = new Float32Array(count * 3);
       for (let index = 0; index < count; index++) {
         const radius = 76 + rng() * 58;
@@ -442,13 +532,20 @@
     function animate() {
       requestAnimationFrame(animate);
       const delta = Math.min(clock.getDelta(), .05);
-      if (!document.hidden && cubeField && !reducedMotion) cubeField.material.uniforms.uTime.value += delta;
+      if (!document.hidden && cubeField && !reducedMotion) {
+        cubeField.material.uniforms.uTime.value += delta;
+        if (flashField) flashField.material.uniforms.uTime.value = cubeField.material.uniforms.uTime.value;
+        if (starField) {
+          starField.rotation.y -= delta * params.rotationSpeed * .72;
+          starField.rotation.x -= delta * params.rotationSpeed * .08;
+        }
+      }
       controls.update();
       composer.render();
     }
 
     function disposeSystem() {
-      for (const object of [cubeField, starField, coreGlow]) {
+      for (const object of [cubeField, flashField, starField, coreGlow]) {
         if (!object) continue;
         scene.remove(object);
         if (object.geometry) object.geometry.dispose();
@@ -456,6 +553,7 @@
         object.material.dispose();
       }
       cubeField = null;
+      flashField = null;
       starField = null;
       coreGlow = null;
     }
@@ -463,9 +561,15 @@
     window.updateParam = function (name, value) {
       params[name] = Number(value);
       document.getElementById(`${name}-value`).textContent = Number(value).toString();
-      if (name === 'rotationSpeed' && cubeField) cubeField.material.uniforms.uRotationSpeed.value = params.rotationSpeed;
+      if (name === 'rotationSpeed' && cubeField) {
+        cubeField.material.uniforms.uRotationSpeed.value = params.rotationSpeed;
+        if (flashField) flashField.material.uniforms.uRotationSpeed.value = params.rotationSpeed;
+      }
       else if (name === 'tumbleSpeed' && cubeField) cubeField.material.uniforms.uTumbleSpeed.value = params.tumbleSpeed;
-      else if (name === 'flashActivity' && cubeField) cubeField.material.uniforms.uFlashActivity.value = params.flashActivity;
+      else if (name === 'flashActivity' && cubeField) {
+        cubeField.material.uniforms.uFlashActivity.value = params.flashActivity;
+        if (flashField) flashField.material.uniforms.uFlashActivity.value = params.flashActivity;
+      }
       else if (name === 'bloomStrength' && bloomPass) bloomPass.strength = params.bloomStrength;
       else if (name === 'coreIntensity' && cubeField) cubeField.material.uniforms.uCoreIntensity.value = params.coreIntensity;
       else initializeSystem();
@@ -521,6 +625,11 @@
       camera.updateProjectionMatrix();
       renderer.setSize(container.clientWidth, container.clientHeight);
       composer.setSize(container.clientWidth, container.clientHeight);
+      if (flashField) {
+        const pixelRatio = renderer.getPixelRatio();
+        flashField.material.uniforms.uViewportHeight.value = container.clientHeight * pixelRatio;
+        flashField.material.uniforms.uPixelRatio.value = pixelRatio;
+      }
     });
 
     init();
