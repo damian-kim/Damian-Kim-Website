@@ -1,4 +1,4 @@
-import { useLayoutEffect, useMemo, useRef } from 'react';
+import { useEffect, useLayoutEffect, useMemo, useRef } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { Sparkles, Stars } from '@react-three/drei';
 import * as THREE from 'three';
@@ -20,11 +20,26 @@ function CubeGalaxy({ heroBackground = false }: { heroBackground?: boolean }) {
   const group = useRef<THREE.Group>(null);
   const mesh = useRef<THREE.InstancedMesh>(null);
   const material = useRef<THREE.MeshStandardMaterial>(null);
+  const heroPointer = useRef(new THREE.Vector2());
   const reducedMotion = useMemo(() => window.matchMedia('(prefers-reduced-motion: reduce)').matches, []);
   const viewportSize = useThree((state) => state.size);
+  const viewportAspect = viewportSize.width / viewportSize.height;
   const presentationScale = heroBackground
-    ? THREE.MathUtils.clamp((viewportSize.width / viewportSize.height) * 0.3, 0.34, 0.58)
+    ? THREE.MathUtils.clamp(viewportAspect * 0.3, 0.34, 0.58)
     : 1;
+  const heroOffsetX = heroBackground && viewportAspect > 1 ? 15 : 0;
+
+  useEffect(() => {
+    if (!heroBackground) return;
+    const updatePointer = (event: PointerEvent) => {
+      heroPointer.current.set(
+        (event.clientX / window.innerWidth) * 2 - 1,
+        -(event.clientY / window.innerHeight) * 2 + 1,
+      );
+    };
+    window.addEventListener('pointermove', updatePointer, { passive: true });
+    return () => window.removeEventListener('pointermove', updatePointer);
+  }, [heroBackground]);
 
   const field = useMemo(() => {
     const random = mulberry32(42817);
@@ -112,17 +127,24 @@ function CubeGalaxy({ heroBackground = false }: { heroBackground?: boolean }) {
 
   useFrame((state, delta) => {
     if (!group.current) return;
+    const pointer = heroBackground ? heroPointer.current : state.pointer;
     if (!reducedMotion) {
       group.current.rotation.y += delta * 0.037;
       const shader = material.current?.userData.shader;
       if (shader) shader.uniforms.uTime.value = state.clock.elapsedTime;
     }
-    group.current.rotation.x = THREE.MathUtils.lerp(group.current.rotation.x, -0.28 + state.pointer.y * 0.035, 0.025);
-    group.current.rotation.z = THREE.MathUtils.lerp(group.current.rotation.z, state.pointer.x * -0.028, 0.025);
+    const tiltStrength = heroBackground ? 0.115 : 0.035;
+    const rollStrength = heroBackground ? 0.09 : 0.028;
+    group.current.rotation.x = THREE.MathUtils.lerp(group.current.rotation.x, -0.28 + pointer.y * tiltStrength, 0.035);
+    group.current.rotation.z = THREE.MathUtils.lerp(group.current.rotation.z, pointer.x * -rollStrength, 0.035);
+    if (heroBackground) {
+      group.current.position.x = THREE.MathUtils.lerp(group.current.position.x, heroOffsetX + pointer.x * 2.4, 0.035);
+      group.current.position.y = THREE.MathUtils.lerp(group.current.position.y, -2 + pointer.y * 1.5, 0.035);
+    }
   });
 
   return (
-    <group ref={group} rotation={[-0.28, 0.28, 0.02]} scale={presentationScale}>
+    <group ref={group} rotation={[-0.28, 0.28, 0.02]} position={[heroOffsetX, heroBackground ? -2 : 0, 0]} scale={presentationScale}>
       <instancedMesh ref={mesh} args={[undefined, undefined, CUBE_COUNT]} frustumCulled={false}>
         <boxGeometry args={[1, 1, 1]} />
         <meshStandardMaterial ref={material} vertexColors roughness={0.34} metalness={0.33} emissive="#180804" emissiveIntensity={0.32} />

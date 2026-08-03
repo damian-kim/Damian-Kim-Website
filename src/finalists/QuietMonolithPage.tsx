@@ -32,6 +32,7 @@ export default function QuietMonolithPage() {
           <div className="monolith-cube-galaxy" aria-hidden="true">
             <GalaxyScene heroBackground />
           </div>
+          <div className="monolith-galaxy-hint" aria-hidden="true"><i />Move cursor to orbit</div>
           <div className="monolith-hero-minimal-copy">
             <h1 id="monolith-title">Damian Kim</h1>
             <p>I like solving hard problems.</p>
