@@ -1,5 +1,5 @@
 import { useLayoutEffect, useMemo, useRef } from 'react';
-import { Canvas, useFrame } from '@react-three/fiber';
+import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { Sparkles, Stars } from '@react-three/drei';
 import * as THREE from 'three';
 
@@ -16,11 +16,15 @@ function mulberry32(seed: number) {
   };
 }
 
-function CubeGalaxy() {
+function CubeGalaxy({ heroBackground = false }: { heroBackground?: boolean }) {
   const group = useRef<THREE.Group>(null);
   const mesh = useRef<THREE.InstancedMesh>(null);
   const material = useRef<THREE.MeshStandardMaterial>(null);
   const reducedMotion = useMemo(() => window.matchMedia('(prefers-reduced-motion: reduce)').matches, []);
+  const viewportSize = useThree((state) => state.size);
+  const presentationScale = heroBackground
+    ? THREE.MathUtils.clamp((viewportSize.width / viewportSize.height) * 0.3, 0.34, 0.58)
+    : 1;
 
   const field = useMemo(() => {
     const random = mulberry32(42817);
@@ -118,7 +122,7 @@ function CubeGalaxy() {
   });
 
   return (
-    <group ref={group} rotation={[-0.28, 0.28, 0.02]}>
+    <group ref={group} rotation={[-0.28, 0.28, 0.02]} scale={presentationScale}>
       <instancedMesh ref={mesh} args={[undefined, undefined, CUBE_COUNT]} frustumCulled={false}>
         <boxGeometry args={[1, 1, 1]} />
         <meshStandardMaterial ref={material} vertexColors roughness={0.34} metalness={0.33} emissive="#180804" emissiveIntensity={0.32} />
@@ -131,11 +135,11 @@ function CubeGalaxy() {
   );
 }
 
-export function GalaxyScene() {
+export function GalaxyScene({ heroBackground = false }: { heroBackground?: boolean }) {
   return (
     <Canvas
-      dpr={[1, 1.55]}
-      camera={{ position: [0, 23, 56], fov: 47, near: 0.1, far: 180 }}
+      dpr={heroBackground ? [1, 1.25] : [1, 1.55]}
+      camera={{ position: heroBackground ? [0, 18, 66] : [0, 23, 56], fov: 47, near: 0.1, far: 180 }}
       gl={{ antialias: true, powerPreference: 'high-performance', toneMapping: THREE.ACESFilmicToneMapping }}
       onCreated={({ camera, gl }) => {
         camera.lookAt(0, 0, 0);
@@ -147,7 +151,7 @@ export function GalaxyScene() {
       <fogExp2 attach="fog" args={['#090607', 0.012]} />
       <ambientLight intensity={0.15} color="#8b92a6" />
       <directionalLight position={[7, 18, 13]} intensity={1.5} color="#ffe4c6" />
-      <CubeGalaxy />
+      <CubeGalaxy heroBackground={heroBackground} />
       <Stars radius={90} depth={55} count={950} factor={1.5} saturation={0.2} fade speed={0.12} />
     </Canvas>
   );

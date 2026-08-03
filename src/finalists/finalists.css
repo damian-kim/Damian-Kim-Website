@@ -1163,9 +1163,9 @@
     background: var(--mono-black);
   }
   .monolith-hero.monolith-hero--minimal::before { display: none; }
-  .monolith-cube-galaxy { position: absolute; z-index: 0; inset: 0; overflow: hidden; pointer-events: none; background: #050405; }
+  .monolith-cube-galaxy { position: absolute; z-index: 0; inset: 0; width: 100%; height: 100%; overflow: hidden; contain: strict; pointer-events: none; background: #050405; }
   .monolith-cube-galaxy::after { content: ""; position: absolute; inset: 0; background: radial-gradient(circle at 50% 48%, rgba(5,5,5,.08) 0, rgba(5,5,5,.18) 36%, rgba(5,5,5,.62) 100%), linear-gradient(180deg, rgba(5,5,5,.25), transparent 24%, transparent 70%, rgba(5,5,5,.55)); pointer-events: none; }
-  .monolith-cube-galaxy > div, .monolith-cube-galaxy canvas { width: 100% !important; height: 100% !important; }
+  .monolith-cube-galaxy > div, .monolith-cube-galaxy canvas { position: absolute !important; inset: 0; width: 100% !important; height: 100% !important; max-width: none !important; max-height: none !important; }
   .monolith-gravity-mesh { position: absolute; z-index: 0; inset: 0; width: 100%; height: 100%; pointer-events: none; }
   .monolith-hero-minimal-copy { position: relative; z-index: 2; display: flex; flex-direction: column; align-items: center; text-align: center; }
   .monolith-hero-minimal-copy h1 { margin: 0; color: #f7f1e8; font-size: clamp(76px, 11vw, 176px); line-height: .82; letter-spacing: -.082em; font-weight: 520; text-shadow: 0 4px 34px rgba(0,0,0,.78); }
