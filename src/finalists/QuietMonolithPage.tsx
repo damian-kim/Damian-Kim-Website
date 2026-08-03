@@ -38,7 +38,7 @@ export default function QuietMonolithPage() {
             <p>I like solving hard problems.</p>
             <div className="monolith-hero-actions">
               <a href="#monolith-projects">Explore projects</a>
-              <a href="https://www.linkedin.com/in/damian-kim-56287a202" target="_blank" rel="noreferrer">LinkedIn</a>
+              <a href="/Damian-Kim-Resume.pdf" target="_blank" rel="noreferrer">Resume</a>
             </div>
           </div>
         </section>
