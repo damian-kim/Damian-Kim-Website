@@ -33,7 +33,7 @@ export default function QuietMonolithPage() {
             <GalaxyScene />
           </div>
           <div className="monolith-hero-minimal-copy">
-            <h1 id="monolith-title">Damian Kim</h1>
+            <h1 id="monolith-title"><span>Damian</span><span>Kim</span></h1>
             <div className="monolith-hero-actions">
               <a href="#monolith-projects">Explore projects</a>
               <a href="/Damian-Kim-Resume.pdf" target="_blank" rel="noreferrer">Resume</a>
