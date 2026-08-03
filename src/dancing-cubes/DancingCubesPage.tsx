@@ -131,7 +131,7 @@ function CubeGalaxy() {
   );
 }
 
-function GalaxyScene() {
+export function GalaxyScene() {
   return (
     <Canvas
       dpr={[1, 1.55]}

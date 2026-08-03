@@ -1,8 +1,8 @@
 import { experienceProof, supportingProjects } from './content';
 import { GolfieDemo } from './ProjectDemos';
 import { JunoSourceDemo, SateSourceDemo } from './RealProductDemos';
-import HeroGravityMesh from './HeroGravityMesh';
 import ContactSection from './ContactSection';
+import { GalaxyScene } from '../dancing-cubes/DancingCubesPage';
 
 function MonolithMark() {
   return <a className="monolith-mark" href="#monolith-top" aria-label="Damian Kim, back to top">DK<span>Damian Kim</span></a>;
@@ -29,7 +29,9 @@ export default function QuietMonolithPage() {
           className="monolith-hero monolith-hero--minimal"
           aria-labelledby="monolith-title"
         >
-          <HeroGravityMesh />
+          <div className="monolith-cube-galaxy" aria-hidden="true">
+            <GalaxyScene />
+          </div>
           <div className="monolith-hero-minimal-copy">
             <h1 id="monolith-title">Damian Kim</h1>
             <p>I like solving hard problems.</p>
