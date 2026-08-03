@@ -160,24 +160,6 @@ export function AnimatedBall({
 
   return (
     <group ref={ballRef}>
-      {emphasizeVisibility && (
-        <points frustumCulled={false} renderOrder={19}>
-          <bufferGeometry>
-            <bufferAttribute attach="attributes-position" args={[BALL_POINT, 3]} />
-          </bufferGeometry>
-          <pointsMaterial
-            color="#fff2b8"
-            size={24}
-            sizeAttenuation={false}
-            opacity={0.24}
-            transparent
-            depthTest={false}
-            depthWrite={false}
-            blending={THREE.AdditiveBlending}
-            toneMapped={false}
-          />
-        </points>
-      )}
       <points frustumCulled={false} renderOrder={20}>
         <bufferGeometry>
           <bufferAttribute attach="attributes-position" args={[BALL_POINT, 3]} />
