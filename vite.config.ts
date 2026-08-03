@@ -16,6 +16,7 @@ export default defineConfig({
         finalists: resolve(rootDir, 'finalists.html'),
         heroLab: resolve(rootDir, 'hero-lab.html'),
         galaxy: resolve(rootDir, 'galaxy.html'),
+        dancingCubes: resolve(rootDir, 'dancing-cubes/index.html'),
       },
     },
   },

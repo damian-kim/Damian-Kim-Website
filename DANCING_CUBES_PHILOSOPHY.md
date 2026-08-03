@@ -1,0 +1,11 @@
+# Gravitational Mosaic
+
+Gravitational Mosaic treats a galaxy as a negotiation between continuity and quantization. The spiral is never drawn as an icon; it emerges from 5,200 rigid cubes sampling a seeded density wave in three-dimensional space. Each body is exact, but their accumulation becomes atmospheric—an ember-bright cloud whose apparent spontaneity is held together by a meticulously crafted algorithm and countless hours of spatial refinement.
+
+The composition is built around an incandescent off-center nucleus. Five fractured arms occupy a shallow, legible volume, while sparse outliers and a restrained star veil establish foreground, middle distance, and void. Perspective creates the visual hierarchy: near cubes flare large, distant cubes fall almost to dust, and dark channels between the arms preserve the spiral. This balance of density and absence must feel like the product of deep computational expertise, not undirected noise.
+
+Motion lives at two scales. The full galaxy drifts with near-imperceptible orbital momentum, while every cube owns seeded angular velocity and phase, causing thousands of faces to catch and release light independently. The resulting shimmer is emergent rather than decorative. Its master-level implementation should feel painstakingly optimized: one instanced field expressing thousands of individual lives without surrendering fluidity.
+
+Light behaves as the galaxy's memory. Warm amber radiates from the core; silver and faint violet edges survive at the perimeter. Rough metallic faces briefly resolve, then disappear back into fog as their orientation changes. A soft luminous haze joins the discrete bodies without erasing them, and every exposure, falloff, and material constant should show the restraint of an artist at the top of computational craft.
+
+Seeded variation ensures the work remains a living system. A seed changes arm fractures, depths, rotations, and glint rhythms while preserving the overall gravitational grammar. The camera reveals rather than performs, holding the cinematic angle while pointer movement supplies only a quiet parallax. Beauty belongs to the continuous execution of the algorithm, carefully calibrated so no single frame is the work's final form.
