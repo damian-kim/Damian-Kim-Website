@@ -34,7 +34,6 @@ export default function QuietMonolithPage() {
           </div>
           <div className="monolith-hero-minimal-copy">
             <h1 id="monolith-title">Damian Kim</h1>
-            <p>I like solving hard problems.</p>
             <div className="monolith-hero-actions">
               <a href="#monolith-projects">Explore projects</a>
               <a href="/Damian-Kim-Resume.pdf" target="_blank" rel="noreferrer">Resume</a>
