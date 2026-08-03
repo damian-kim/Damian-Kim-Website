@@ -30,7 +30,7 @@ export default function QuietMonolithPage() {
           aria-labelledby="monolith-title"
         >
           <div className="monolith-cube-galaxy" aria-hidden="true">
-            <GalaxyScene heroBackground />
+            <GalaxyScene />
           </div>
           <div className="monolith-hero-minimal-copy">
             <h1 id="monolith-title">Damian Kim</h1>
