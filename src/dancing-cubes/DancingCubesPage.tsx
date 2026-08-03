@@ -31,6 +31,8 @@ function CubeGalaxy() {
     const phases = new Float32Array(CUBE_COUNT * 3);
     const spins = new Float32Array(CUBE_COUNT * 3);
     const color = new THREE.Color();
+    const coreColor = new THREE.Color('#ef4f2f');
+    const outerColor = new THREE.Color('#4269bd');
 
     for (let index = 0; index < CUBE_COUNT; index++) {
       const cursor = index * 3;
@@ -58,10 +60,10 @@ function CubeGalaxy() {
       spins[cursor + 1] = (random() - 0.5) * 0.7;
       spins[cursor + 2] = (random() - 0.5) * 0.7;
 
-      const choice = random();
-      if (core > 0.46 || choice > 0.82) color.setHSL(0.045 + random() * 0.035, 0.72, 0.42 + core * 0.3);
-      else if (choice < 0.15) color.setHSL(0.62 + random() * 0.045, 0.24, 0.42 + random() * 0.24);
-      else color.setHSL(0.085, 0.1, 0.4 + random() * 0.36);
+      const radialColorMix = Math.pow(Math.min(radius / 42, 1), 0.78);
+      color
+        .lerpColors(coreColor, outerColor, radialColorMix)
+        .offsetHSL((random() - 0.5) * 0.018, (random() - 0.5) * 0.08, (random() - 0.5) * 0.2 + core * 0.08);
       color.toArray(colors, cursor);
     }
     return { positions, rotations, scales, colors, phases, spins };
@@ -121,12 +123,12 @@ function CubeGalaxy() {
     <group ref={group} rotation={[-0.28, 0.28, 0.02]}>
       <instancedMesh ref={mesh} args={[undefined, undefined, CUBE_COUNT]} frustumCulled={false}>
         <boxGeometry args={[1, 1, 1]} />
-        <meshStandardMaterial ref={material} vertexColors roughness={0.34} metalness={0.33} emissive="#180804" emissiveIntensity={0.32} />
+        <meshStandardMaterial ref={material} vertexColors roughness={0.48} metalness={0.2} emissive="#121318" emissiveIntensity={0.48} />
       </instancedMesh>
-      <pointLight color="#ff7338" intensity={510} distance={39} decay={2} position={[0, 2.5, 0]} />
-      <pointLight color="#ffe0bd" intensity={190} distance={28} decay={2} position={[-5, 3, 5]} />
-      <pointLight color="#7786d7" intensity={95} distance={34} decay={2} position={[13, 5, -11]} />
-      <Sparkles count={170} scale={[25, 9, 25]} size={3.1} speed={0.22} color="#ff9a68" opacity={0.48} />
+      <pointLight color="#ff4f2f" intensity={470} distance={42} decay={2} position={[0, 2.5, 0]} />
+      <pointLight color="#ffb08b" intensity={210} distance={32} decay={2} position={[-7, 5, 9]} />
+      <pointLight color="#5f82e5" intensity={150} distance={38} decay={2} position={[16, 7, -12]} />
+      <Sparkles count={170} scale={[25, 9, 25]} size={3.1} speed={0.22} color="#ff7350" opacity={0.48} />
     </group>
   );
 }
@@ -145,8 +147,10 @@ export function GalaxyScene() {
     >
       <color attach="background" args={['#050405']} />
       <fogExp2 attach="fog" args={['#090607', 0.012]} />
-      <ambientLight intensity={0.15} color="#8b92a6" />
-      <directionalLight position={[7, 18, 13]} intensity={1.5} color="#ffe4c6" />
+      <ambientLight intensity={0.42} color="#8997bb" />
+      <hemisphereLight color="#7798ec" groundColor="#6e2118" intensity={0.95} />
+      <directionalLight position={[8, 20, 28]} intensity={2.1} color="#ffd3bd" />
+      <directionalLight position={[-22, 8, -12]} intensity={0.85} color="#6286e8" />
       <CubeGalaxy />
       <Stars radius={90} depth={55} count={950} factor={1.5} saturation={0.2} fade speed={0.12} />
     </Canvas>

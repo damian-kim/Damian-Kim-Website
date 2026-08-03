@@ -1167,7 +1167,7 @@
   .monolith-cube-galaxy::after { content: ""; position: absolute; inset: 0; background: radial-gradient(circle at 50% 48%, rgba(5,5,5,.05) 0, rgba(5,5,5,.14) 36%, rgba(5,5,5,.52) 100%), linear-gradient(180deg, rgba(5,5,5,.2), transparent 24%, transparent 70%, rgba(5,5,5,.48)); pointer-events: none; }
   .monolith-cube-galaxy > div, .monolith-cube-galaxy canvas { width: 100% !important; height: 100% !important; }
   .monolith-gravity-mesh { position: absolute; z-index: 0; inset: 0; width: 100%; height: 100%; pointer-events: none; }
-  .monolith-hero-minimal-copy { position: relative; z-index: 2; display: flex; flex-direction: column; align-items: center; text-align: center; }
+  .monolith-hero-minimal-copy { position: relative; z-index: 2; display: flex; flex-direction: column; align-items: center; text-align: center; opacity: .72; }
   .monolith-hero-minimal-copy h1 { margin: 0; color: #f7f1e8; font-size: clamp(76px, 11vw, 176px); line-height: .82; letter-spacing: -.082em; font-weight: 560; text-shadow: 0 2px 8px rgba(0,0,0,.95), 0 8px 40px rgba(0,0,0,.88); }
   .monolith-hero-minimal-copy p { margin: clamp(28px, 4vh, 44px) 0 0; color: #d1cbc1; font-size: clamp(17px, 1.5vw, 23px); line-height: 1.3; text-shadow: 0 2px 18px rgba(0,0,0,.88); }
   .monolith-hero-actions { display: flex; gap: 12px; margin-top: clamp(34px, 5vh, 56px); }
