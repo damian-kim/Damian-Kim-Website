@@ -13,9 +13,20 @@ interface ShotSimulatorViewProps {
   title?: string;
   subtitle?: string;
   sidebarControls?: ReactNode;
+  playbackRate?: number;
+  ballVisibilityScale?: number;
+  emphasizeBall?: boolean;
 }
 
-export function ShotSimulatorView({ payload, title, subtitle, sidebarControls }: ShotSimulatorViewProps) {
+export function ShotSimulatorView({
+  payload,
+  title,
+  subtitle,
+  sidebarControls,
+  playbackRate = 1,
+  ballVisibilityScale = 1,
+  emphasizeBall = false,
+}: ShotSimulatorViewProps) {
   const { metrics } = payload;
   const [showPrecursor, setShowPrecursor] = useState(false);
   const [videoError, setVideoError] = useState<string | null>(null);
@@ -106,6 +117,9 @@ export function ShotSimulatorView({ payload, title, subtitle, sidebarControls }:
           fitted={payload.fitted_points}
           playToken={playToken}
           onReplayClick={handleReplayClick}
+          playbackRate={playbackRate}
+          ballVisibilityScale={ballVisibilityScale}
+          emphasizeBall={emphasizeBall}
         />
       </div>
 

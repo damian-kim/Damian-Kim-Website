@@ -16,6 +16,9 @@ interface DrivingRangeSceneProps {
   fitted?: ScenePoint[];
   playToken?: number;
   onReplayClick?: () => void;
+  playbackRate?: number;
+  ballVisibilityScale?: number;
+  emphasizeBall?: boolean;
 }
 
 type LayerKey = "measured" | "fitted";
@@ -245,7 +248,10 @@ export function DrivingRangeScene({
   measured = [], 
   fitted = [], 
   playToken: externalPlayToken, 
-  onReplayClick 
+  onReplayClick,
+  playbackRate = 1,
+  ballVisibilityScale = 1,
+  emphasizeBall = false,
 }: DrivingRangeSceneProps) {
   const [visibleLayers, setVisibleLayers] = useState<Record<LayerKey, boolean>>({
     measured: true,
@@ -376,7 +382,14 @@ export function DrivingRangeScene({
             <TrajectoryHandoff point={scenePoints.measured[scenePoints.measured.length - 1]} />
           )}
           {simulated.length > 0 && (
-            <AnimatedBall points={scenePoints.simulated} playToken={playToken} chaseCamera={cameraMode === "chase"} />
+            <AnimatedBall
+              points={scenePoints.simulated}
+              playToken={playToken}
+              chaseCamera={cameraMode === "chase"}
+              playbackRate={playbackRate}
+              visibilityScale={ballVisibilityScale}
+              emphasizeVisibility={emphasizeBall}
+            />
           )}
           <FreeCameraControls
             enabled={cameraMode === "orbit"}

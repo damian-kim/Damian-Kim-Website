@@ -8,6 +8,9 @@ interface AnimatedBallProps {
   points: ScenePoint[];
   playToken: number;
   chaseCamera?: boolean;
+  playbackRate?: number;
+  visibilityScale?: number;
+  emphasizeVisibility?: boolean;
 }
 
 const MAX_LAUNCH_RPM = 3200;
@@ -17,11 +20,16 @@ const BALL_VERTEX_SHADER = `
   uniform float uViewportHeight;
   uniform float uPixelRatio;
   uniform float uWorldDiameter;
+  uniform float uVisibilityScale;
   void main() {
     vec4 viewPosition = modelViewMatrix * vec4(position, 1.0);
     gl_Position = projectionMatrix * viewPosition;
     float perspectiveSize = uWorldDiameter * uViewportHeight * projectionMatrix[1][1] / (2.0 * max(-viewPosition.z, 0.001));
-    gl_PointSize = clamp(perspectiveSize, 1.25 * uPixelRatio, 10.0 * uPixelRatio);
+    gl_PointSize = clamp(
+      perspectiveSize * uVisibilityScale,
+      1.25 * uPixelRatio * uVisibilityScale,
+      10.0 * uPixelRatio * uVisibilityScale
+    );
   }
 `;
 const BALL_FRAGMENT_SHADER = `
@@ -56,7 +64,14 @@ const BALL_FRAGMENT_SHADER = `
   }
 `;
 
-export function AnimatedBall({ points, playToken, chaseCamera = false }: AnimatedBallProps) {
+export function AnimatedBall({
+  points,
+  playToken,
+  chaseCamera = false,
+  playbackRate = 1,
+  visibilityScale = 1,
+  emphasizeVisibility = false,
+}: AnimatedBallProps) {
   const ballRef = useRef<THREE.Group>(null);
   const markerMaterialRef = useRef<THREE.ShaderMaterial>(null);
   const startTimeRef = useRef<number | null>(null);
@@ -93,8 +108,9 @@ export function AnimatedBall({ points, playToken, chaseCamera = false }: Animate
     lastChaseCameraRef.current = chaseCamera;
     const restPoint = points[points.length - 1];
     const elapsed = startTimeRef.current === null ? duration : state.clock.elapsedTime - startTimeRef.current;
-    const flightTime = THREE.MathUtils.clamp(elapsed, 0, duration);
-    const sample = startTimeRef.current === null || elapsed >= duration
+    const playbackElapsed = elapsed * playbackRate;
+    const flightTime = THREE.MathUtils.clamp(playbackElapsed, 0, duration);
+    const sample = startTimeRef.current === null || playbackElapsed >= duration
       ? restPoint
       : samplePointAtTime(points, firstPointTime + flightTime);
     if (!sample) return;
@@ -116,11 +132,11 @@ export function AnimatedBall({ points, playToken, chaseCamera = false }: Animate
       markerMaterialRef.current.uniforms.uViewportHeight.value = state.size.height * pixelRatio;
     }
 
-    if (markerMaterialRef.current && startTimeRef.current !== null && elapsed < duration) {
+    if (markerMaterialRef.current && startTimeRef.current !== null && playbackElapsed < duration) {
       const speedRatio = THREE.MathUtils.clamp(speed / initialSpeedRef.current, 0, 1);
       const rpm = MIN_FLIGHT_RPM + (MAX_LAUNCH_RPM - MIN_FLIGHT_RPM) * Math.pow(speedRatio, 0.78);
       const visibleRate = THREE.MathUtils.lerp(10, 28, Math.pow(speedRatio, 0.72)) * (rpm / MAX_LAUNCH_RPM);
-      visualSpinRef.current -= visibleRate * Math.min(delta, 0.04);
+      visualSpinRef.current -= visibleRate * Math.min(delta, 0.04) * playbackRate;
       markerMaterialRef.current.uniforms.uSpin.value = visualSpinRef.current;
     }
 
@@ -135,7 +151,7 @@ export function AnimatedBall({ points, playToken, chaseCamera = false }: Animate
       // Snap on activation/replay before the frame is painted. Subsequent frames
       // damp smoothly, eliminating the one-frame backward orbit-camera flash.
       if (chaseActivated) state.camera.position.copy(desired);
-      else if (elapsed < duration) state.camera.position.lerp(desired, 1 - Math.exp(-delta * 6.5));
+      else if (playbackElapsed < duration) state.camera.position.lerp(desired, 1 - Math.exp(-delta * 6.5));
       state.camera.up.set(0, 1, 0);
       state.camera.lookAt(ball);
       state.camera.updateMatrixWorld();
@@ -144,6 +160,24 @@ export function AnimatedBall({ points, playToken, chaseCamera = false }: Animate
 
   return (
     <group ref={ballRef}>
+      {emphasizeVisibility && (
+        <points frustumCulled={false} renderOrder={19}>
+          <bufferGeometry>
+            <bufferAttribute attach="attributes-position" args={[BALL_POINT, 3]} />
+          </bufferGeometry>
+          <pointsMaterial
+            color="#fff2b8"
+            size={24}
+            sizeAttenuation={false}
+            opacity={0.24}
+            transparent
+            depthTest={false}
+            depthWrite={false}
+            blending={THREE.AdditiveBlending}
+            toneMapped={false}
+          />
+        </points>
+      )}
       <points frustumCulled={false} renderOrder={20}>
         <bufferGeometry>
           <bufferAttribute attach="attributes-position" args={[BALL_POINT, 3]} />
@@ -158,9 +192,11 @@ export function AnimatedBall({ points, playToken, chaseCamera = false }: Animate
             // Slight readability allowance over the 42.67 mm physical diameter,
             // while retaining correct perspective falloff in a scaled portfolio demo.
             uWorldDiameter: { value: 0.09 },
+            uVisibilityScale: { value: visibilityScale },
             uSpin: { value: 0 },
           }}
           transparent
+          depthTest={!emphasizeVisibility}
           depthWrite={false}
           toneMapped={false}
         />
