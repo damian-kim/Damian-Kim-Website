@@ -1167,11 +1167,8 @@
   .monolith-cube-galaxy::after { content: ""; position: absolute; inset: 0; background: radial-gradient(circle at 50% 48%, rgba(5,5,5,.05) 0, rgba(5,5,5,.14) 36%, rgba(5,5,5,.52) 100%), linear-gradient(180deg, rgba(5,5,5,.2), transparent 24%, transparent 70%, rgba(5,5,5,.48)); pointer-events: none; }
   .monolith-cube-galaxy > div { width: 100% !important; height: 100% !important; transform: translateY(11%); }
   .monolith-cube-galaxy canvas { width: 100% !important; height: 100% !important; }
-  .monolith-star-strip { position: absolute; z-index: 1; top: 3%; left: 0; width: 100%; height: 45%; overflow: hidden; opacity: .82; pointer-events: none; mask-image: linear-gradient(to bottom, transparent 0, #000 14%, #000 82%, transparent 100%); }
-  .monolith-star-strip::before, .monolith-star-strip::after { content: ""; position: absolute; inset: 0 auto 0 0; width: 200%; background-repeat: repeat; will-change: transform; }
-  .monolith-star-strip::before { background-image: radial-gradient(circle, rgba(255,255,255,.95) 0 1px, transparent 1.35px), radial-gradient(circle, rgba(206,218,255,.85) 0 .8px, transparent 1.2px), radial-gradient(circle, rgba(255,222,204,.7) 0 .7px, transparent 1.1px); background-size: 83px 61px, 137px 97px, 211px 131px; background-position: 13px 9px, 57px 31px, 103px 73px; filter: drop-shadow(0 0 2px rgba(255,255,255,.42)); animation: monolith-stars-left 34s linear infinite; }
-  .monolith-star-strip::after { background-image: radial-gradient(circle, rgba(255,255,255,.76) 0 .65px, transparent 1px), radial-gradient(circle, rgba(157,184,255,.62) 0 .6px, transparent .95px); background-size: 109px 79px, 179px 113px; background-position: 29px 47px, 91px 17px; opacity: .62; animation: monolith-stars-left 52s linear infinite; }
-  @keyframes monolith-stars-left { to { transform: translate3d(-50%, 0, 0); } }
+  .monolith-star-strip { position: absolute; z-index: 1; top: 3%; left: 0; width: 100%; height: 45%; overflow: hidden; opacity: .74; pointer-events: none; mask-image: linear-gradient(to bottom, transparent 0, #000 14%, #000 82%, transparent 100%); }
+  .monolith-star-strip canvas { display: block; width: 100%; height: 100%; }
   .monolith-gravity-mesh { position: absolute; z-index: 0; inset: 0; width: 100%; height: 100%; pointer-events: none; }
   .monolith-hero-minimal-copy { position: absolute; z-index: 2; top: 25%; left: 24px; right: 24px; display: flex; flex-direction: column; align-items: center; text-align: center; opacity: .72; }
   .monolith-hero-minimal-copy h1 { margin: 0; display: flex; align-items: baseline; justify-content: center; gap: clamp(24px, 3vw, 48px); color: #f7f1e8; font-size: clamp(52px, 7vw, 108px); line-height: .86; letter-spacing: -.072em; font-weight: 560; text-shadow: 0 2px 8px rgba(0,0,0,.95), 0 8px 40px rgba(0,0,0,.88); }
@@ -1200,7 +1197,6 @@
 @media (prefers-reduced-motion: reduce) {
   .monolith-gravity-mesh { opacity: .78; }
   .monolith-cube-galaxy { opacity: .82; }
-  .monolith-star-strip::before, .monolith-star-strip::after { animation: none; }
 }
 
 @layer responsive {

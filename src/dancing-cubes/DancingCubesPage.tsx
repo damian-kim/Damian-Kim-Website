@@ -133,31 +133,7 @@ function CubeGalaxy() {
   );
 }
 
-function StarField({ driftLeft = false }: { driftLeft?: boolean }) {
-  const stars = useRef<THREE.Group>(null);
-  const reducedMotion = useMemo(() => window.matchMedia('(prefers-reduced-motion: reduce)').matches, []);
-
-  useFrame((_, delta) => {
-    if (!stars.current || !driftLeft || reducedMotion) return;
-    stars.current.rotation.y -= delta * 0.022;
-  });
-
-  return (
-    <group ref={stars}>
-      <Stars
-        radius={94}
-        depth={62}
-        count={driftLeft ? 1800 : 950}
-        factor={driftLeft ? 0.8 : 1.5}
-        saturation={driftLeft ? 0.08 : 0.2}
-        fade
-        speed={driftLeft ? 0.06 : 0.12}
-      />
-    </group>
-  );
-}
-
-export function GalaxyScene({ heroStars = false }: { heroStars?: boolean }) {
+export function GalaxyScene() {
   return (
     <Canvas
       dpr={[1, 1.55]}
@@ -176,7 +152,7 @@ export function GalaxyScene({ heroStars = false }: { heroStars?: boolean }) {
       <directionalLight position={[8, 20, 28]} intensity={2.1} color="#ffd3bd" />
       <directionalLight position={[-22, 8, -12]} intensity={0.85} color="#6286e8" />
       <CubeGalaxy />
-      <StarField driftLeft={heroStars} />
+      <Stars radius={90} depth={55} count={950} factor={1.5} saturation={0.2} fade speed={0.12} />
     </Canvas>
   );
 }

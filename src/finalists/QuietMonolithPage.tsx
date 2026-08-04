@@ -3,6 +3,7 @@ import { GolfieDemo } from './ProjectDemos';
 import { JunoSourceDemo, SateSourceDemo } from './RealProductDemos';
 import ContactSection from './ContactSection';
 import { GalaxyScene } from '../dancing-cubes/DancingCubesPage';
+import HeroStarStrip from './HeroStarStrip';
 
 function MonolithMark() {
   return <a className="monolith-mark" href="#monolith-top" aria-label="Damian Kim, back to top">DK<span>Damian Kim</span></a>;
@@ -30,9 +31,9 @@ export default function QuietMonolithPage() {
           aria-labelledby="monolith-title"
         >
           <div className="monolith-cube-galaxy" aria-hidden="true">
-            <GalaxyScene heroStars />
+            <GalaxyScene />
           </div>
-          <div className="monolith-star-strip" aria-hidden="true" />
+          <HeroStarStrip />
           <div className="monolith-hero-minimal-copy">
             <h1 id="monolith-title"><span>Damian</span><span>Kim</span></h1>
             <div className="monolith-hero-actions">
