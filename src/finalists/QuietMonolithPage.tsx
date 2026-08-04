@@ -32,6 +32,7 @@ export default function QuietMonolithPage() {
           <div className="monolith-cube-galaxy" aria-hidden="true">
             <GalaxyScene heroStars />
           </div>
+          <div className="monolith-star-strip" aria-hidden="true" />
           <div className="monolith-hero-minimal-copy">
             <h1 id="monolith-title"><span>Damian</span><span>Kim</span></h1>
             <div className="monolith-hero-actions">
