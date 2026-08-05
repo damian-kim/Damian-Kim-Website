@@ -60,7 +60,7 @@ export default function HeroStarStrip() {
           y: (0.04 + random() * 0.92) * height,
           radius: 0.2 + Math.pow(random(), 4.2) * 0.72,
           alpha: 0.18 + Math.pow(random(), 0.72) * 0.56,
-          speed: 0.35 + Math.pow(random(), 1.7) * 1.9,
+          speed: 5 + Math.pow(random(), 1.45) * 10,
           phase: random() * Math.PI * 2,
           twinkleRate: 0.12 + random() * 0.42,
           color,
